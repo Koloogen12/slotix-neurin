@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<style>.icard{background:rgba(255,255,255,.6);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.55);box-shadow:0 12px 34px rgba(20,40,70,.06);border-radius:20px;padding:24px;display:flex;flex-direction:column}</style>
+</helmet>
+<div style="padding:8px 12px 40px">
+  <h1 style="margin:0 0 6px;font:700 28px 'Golos Text';color:#1A1C1E;letter-spacing:-.01em">Интеграции</h1>
+  <p style="margin:0 0 26px;font:400 15px 'Golos Text';color:#8E97A4">Подключите сервисы видеосвязи, календарь и приём оплаты</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px">
+    <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
+    <div class="icard" style="{{ it.cardExtra }}">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px"><div style="width:46px;height:46px;border-radius:13px;background:{{ it.badgeBg }};display:flex;align-items:center;justify-content:center;color:{{ it.badgeColor }};font:800 17px 'Golos Text'">{{ it.glyph }}</div><div style="font:700 16px 'Golos Text';color:#1A1C1E">{{ it.name }}</div></div>
+      <div style="font:400 13.5px/1.5 'Golos Text';color:#8E97A4;margin-bottom:18px;flex:1">{{ it.desc }}</div>
+
+      <sc-if value="{{ it.isConnected }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:9px;padding-top:16px;border-top:1px solid rgba(20,30,45,.06)"><span style="display:flex;align-items:center;gap:7px;color:#2E8A73;font:600 13px 'Golos Text'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Подключено</span><span style="color:#8E97A4;font:400 12.5px 'Golos Text'">{{ it.account }}</span><span onClick="{{ it.disconnect }}" style="margin-left:auto;color:#8E97A4;cursor:pointer;font:500 12.5px 'Golos Text'">Отключить</span></div>
+      </sc-if>
+
+      <sc-if value="{{ it.isError }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:9px;padding-top:16px;border-top:1px solid rgba(20,30,45,.06)"><span style="display:flex;align-items:center;gap:7px;color:#D64545;font:600 13px 'Golos Text'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Ошибка подключения</span><button onClick="{{ it.connect }}" style="margin-left:auto;padding:8px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 13px 'Golos Text';cursor:pointer">Переподключить</button></div>
+      </sc-if>
+
+      <sc-if value="{{ it.isOff }}" hint-placeholder-val="{{ true }}">
+      <div style="padding-top:16px;border-top:1px solid rgba(20,30,45,.06)"><button onClick="{{ it.connect }}" style="width:100%;padding:11px;border:1px solid #D1D9E6;border-radius:11px;background:rgba(255,255,255,.6);color:#2F6FD0;font:600 14px 'Golos Text';cursor:pointer">Подключить</button></div>
+      </sc-if>
+    </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:11px;padding:14px 20px;border-radius:14px;background:#1A2733;color:#fff;box-shadow:0 16px 40px rgba(20,40,70,.3);font:600 14px 'Golos Text'"><span style="width:20px;height:20px;border-radius:50%;background:#3FCB6E;color:#fff;display:flex;align-items:center;justify-content:center;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:420}}">
+class Component extends DCLogic {
+  state = {
+    conn: { meet: 'on', zoom: 'off', telemost: 'off', yookassa: 'error' },
+    toast: null
+  };
+  toast(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  set(id, val, msg) { this.setState(s => ({ conn: { ...s.conn, [id]: val } })); if (msg) this.toast(msg); }
+  renderVals() {
+    const S = this.state;
+    const defs = [
+      { id: 'meet', name: 'Google Meet', glyph: 'M', badgeBg: '#EAF1FE', badgeColor: '#2F6FD0', desc: 'Ссылки на встречу создаются автоматически через ваш Google Calendar.', account: 'alexey@gmail.com' },
+      { id: 'zoom', name: 'Zoom', glyph: 'Z', badgeBg: '#E8F1FF', badgeColor: '#2D8CFF', desc: 'Создавайте Zoom-конференции для форматов с этой локацией.', account: 'alexey@gmail.com' },
+      { id: 'telemost', name: 'Яндекс Телемост', glyph: 'Я', badgeBg: '#FFEFEF', badgeColor: '#F04444', desc: 'Российский сервис видеовстреч без установки приложений.', account: 'alexey@yandex.ru' },
+      { id: 'yookassa', name: 'ЮKassa', glyph: 'Ю', badgeBg: '#EDE9FF', badgeColor: '#6A5AE0', desc: 'Приём оплаты за платные встречи напрямую на ваш счёт.', account: 'shop #480215' }
+    ];
+    const items = defs.map(d => {
+      const st = S.conn[d.id];
+      return {
+        ...d,
+        isConnected: st === 'on', isOff: st === 'off', isError: st === 'error',
+        cardExtra: st === 'error' ? 'border-color:rgba(242,106,106,.3)' : '',
+        connect: () => this.set(d.id, 'on', d.name + ' подключён'),
+        disconnect: () => this.set(d.id, 'off', d.name + ' отключён')
+      };
+    });
+    return { items, hasToast: !!S.toast, toast: S.toast };
+  }
+}
+</script>
+</body>
+</html>

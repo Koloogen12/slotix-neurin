@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:"Golos Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2F6FD0;text-decoration:none}
+.scene{min-height:100vh;background:#EAF2FB url(assets/aurora-bg.png) center/cover no-repeat fixed;display:flex;justify-content:center;align-items:flex-start;padding:80px 24px;box-sizing:border-box}
+.olbl{font:600 13px "Golos Text";color:#1A1C1E;margin-bottom:8px;display:block}
+.oinp{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #D1D9E6;background:rgba(255,255,255,.75);font:400 15px "Golos Text";color:#1A1C1E;outline:none}
+.oinp:focus{border-color:#5094F0;box-shadow:0 0 0 3px rgba(80,148,240,.15)}
+</style>
+</helmet>
+
+<div class="scene">
+  <div style="position:relative;width:600px;max-width:100%">
+<div style="position:relative">
+      <div style="display:flex;align-items:center;gap:11px;justify-content:center;margin-bottom:14px"><img src="assets/slotix-icon.png" alt="" style="width:34px;height:34px;border-radius:9px"><div style="font:700 20px 'Golos Text';color:#1A1C1E;letter-spacing:.02em">SLOTIX</div></div>
+      <h1 style="text-align:center;font:700 28px 'Golos Text';color:#1A1C1E;margin:0 0 6px">Добро пожаловать!</h1>
+      <p style="text-align:center;font:400 15px 'Golos Text';color:#8E97A4;margin:0 0 30px">Два шага — и вашу ссылку можно отправлять клиентам</p>
+
+      <!-- step 1 -->
+      <div style="background:rgba(255,255,255,.66);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);border:1px solid rgba(255,255,255,.6);box-shadow:0 14px 38px rgba(20,40,70,.08);border-radius:22px;padding:26px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:22px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:700 14px 'Golos Text';display:flex;align-items:center;justify-content:center">1</div>
+          <div style="font:700 16px 'Golos Text';color:#1A1C1E">Расскажите о себе и выберите адрес</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+          <div style="width:60px;height:60px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;overflow:hidden;flex:none;background:rgba(255,255,255,.85)"><image-slot id="onb-avatar" style="width:60px;height:60px" shape="circle" placeholder="Фото"></image-slot></div>
+          <div style="font:400 13px 'Golos Text';color:#8E97A4">Загрузите фото — так клиенты узнают, к кому идут на встречу</div>
+        </div>
+        <div style="display:grid;gap:16px">
+          <div><label class="olbl">Имя</label><input class="oinp" placeholder="Алексей Ковалёв"></div>
+          <div><label class="olbl">Короткое описание</label><input class="oinp" placeholder="Например: продуктовый эксперт"></div>
+          <div>
+            <label class="olbl">Адрес страницы</label>
+            <div style="display:flex;align-items:center;border:1px solid #D1D9E6;border-radius:12px;background:rgba(255,255,255,.75);overflow:hidden">
+              <span style="padding:12px 4px 12px 14px;font:400 15px 'Golos Text';color:#8E97A4">slotix.ru/</span>
+              <input value="{{ slug }}" onInput="{{ setSlug }}" style="flex:1;border:none;background:transparent;padding:12px 14px 12px 0;font:600 15px 'Golos Text';color:#1A1C1E;outline:none">
+            </div>
+            <div style="{{ slugMsgStyle }}">{{ slugMsg }}</div>
+          </div>
+          <div><label class="olbl">Часовой пояс</label><div class="oinp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">Москва (GMT+3)<span style="font:400 12px 'Golos Text';color:#8E97A4">Определили автоматически — проверьте</span></div></div>
+        </div>
+      </div>
+
+      <!-- step 2 -->
+      <div style="background:rgba(255,255,255,.66);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);border:1px solid rgba(255,255,255,.6);box-shadow:0 14px 38px rgba(20,40,70,.08);border-radius:22px;padding:26px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:18px">
+          <div style="{{ step2NumStyle }}"><sc-if value="{{ googleOn }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></sc-if><sc-if value="{{ googleOff }}" hint-placeholder-val="{{ true }}">2</sc-if></div>
+          <div style="font:700 16px 'Golos Text';color:#1A1C1E">Подключите аккаунт Google</div>
+        </div>
+        <sc-if value="{{ googleOff }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <p style="font:400 14px/1.5 'Golos Text';color:#8E97A4;margin:0 0 18px">Нужно для синхронизации календаря и создания ссылок Google Meet.</p>
+          <button onClick="{{ connectGoogle }}" style="display:flex;align-items:center;justify-content:center;gap:11px;width:100%;padding:13px;border:1px solid #D1D9E6;border-radius:12px;background:#fff;color:#1A1C1E;font:600 14px 'Golos Text';cursor:pointer">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"/><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1-3.6 1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1a11 11 0 0 0-9.7 6l3.7 2.8c.9-2.5 3.2-4.4 6-4.4z"/></svg>
+            Войти с помощью Google
+          </button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ googleOn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:rgba(63,162,148,.1);border:1px solid rgba(63,162,148,.22)">
+          <span style="color:#2E8A73"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <div style="font:600 14px 'Golos Text';color:#1A1C1E">Подключён — alexey@gmail.com</div>
+          <span onClick="{{ disconnectGoogle }}" style="margin-left:auto;font:500 13px 'Golos Text';color:#8E97A4;cursor:pointer">Отключить</span>
+        </div>
+        </sc-if>
+      </div>
+
+      <button style="{{ ctaStyle }}">Сохранить и продолжить</button>
+      <div style="text-align:center;margin-top:16px"><a href="#" style="font:500 14px 'Golos Text';color:#8E97A4">Настрою Google позже</a></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { slug: '', google: false };
+  renderVals() {
+    const taken = ['admin', 'alex', 'test', 'slotix'];
+    const s = this.state.slug.trim().toLowerCase();
+    let msg = '', color = '#8E97A4';
+    if (!s) { msg = 'Придумайте адрес — латиницей'; color = '#8E97A4'; }
+    else if (s.length < 3) { msg = 'Минимум 3 символа'; color = '#8E97A4'; }
+    else if (taken.includes(s)) { msg = '✗ Занят — попробуйте ' + s + '1 или ' + s + '.pro'; color = '#D64545'; }
+    else { msg = '✓ Адрес свободен'; color = '#2E8A73'; }
+    const ready = s.length >= 3 && !taken.includes(s);
+    return {
+      slug: this.state.slug,
+      slugMsg: msg,
+      slugMsgStyle: 'margin-top:8px;font:500 12.5px "Golos Text";color:' + color,
+      setSlug: (e) => this.setState({ slug: e.target.value.replace(/[^a-z0-9.-]/gi, '') }),
+      googleOn: this.state.google, googleOff: !this.state.google,
+      connectGoogle: () => this.setState({ google: true }),
+      disconnectGoogle: () => this.setState({ google: false }),
+      step2NumStyle: 'width:32px;height:32px;border-radius:50%;font:700 14px "Golos Text";display:flex;align-items:center;justify-content:center;flex:none;' + (this.state.google ? 'background:linear-gradient(135deg,#4FD6A0,#3FCB6E);color:#fff;' : 'background:rgba(80,148,240,.14);color:#2F6FD0;'),
+      ctaStyle: 'width:100%;padding:16px;border:none;border-radius:13px;font:600 15px "Golos Text";transition:all .2s;' + (ready
+        ? 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;cursor:pointer;box-shadow:0 10px 24px rgba(80,148,240,.35);'
+        : 'background:#DCE4EC;color:#A9B4BF;cursor:not-allowed;')
+    };
+  }
+}
+</script>
+</body>
+</html>

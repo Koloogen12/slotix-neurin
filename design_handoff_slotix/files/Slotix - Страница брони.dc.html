@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:"Golos Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#5094F0;text-decoration:none}a:hover{color:#3B7FD9}
+.scene{min-height:100vh;width:100%;background:#EAF2FB url(assets/aurora-bg.png) center/cover no-repeat fixed;display:flex;justify-content:center;align-items:flex-start;padding:96px 40px 80px;box-sizing:border-box}
+@media(max-width:900px){.scene{padding:64px 14px 48px}}
+.wk{font:400 12px "Golos Text",sans-serif;letter-spacing:.02em;color:#8E97A4;text-align:center;padding-bottom:10px}
+.pinp{width:100%;box-sizing:border-box;padding:13px 15px;border-radius:12px;border:1px solid #D1D9E6;background:rgba(255,255,255,.7);font:400 15px "Golos Text";color:#1A1C1E;outline:none}
+.pinp:focus{border-color:#5094F0;box-shadow:0 0 0 3px rgba(80,148,240,.15)}
+.plbl{font:600 13px "Golos Text";color:#1A1C1E;margin-bottom:8px;display:block}
+</style>
+</helmet>
+
+<div class="scene">
+
+  <!-- ===== DONE ===== -->
+  <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+  <div style="position:relative;width:{{ doneW }};max-width:100%">
+<div style="position:relative;background:rgba(255,255,255,.62);backdrop-filter:blur(32px) saturate(1.4);-webkit-backdrop-filter:blur(32px) saturate(1.4);border:1px solid rgba(255,255,255,.55);border-radius:28px;box-shadow:0 20px 50px rgba(20,40,70,.1);padding:40px;text-align:center">
+      <div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#4FD6A0,#3FCB6E);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;box-shadow:0 12px 28px rgba(63,203,110,.4)"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div style="font:700 26px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Вы записаны!</div>
+      <div style="font:400 15px 'Golos Text';color:#8E97A4;margin-bottom:28px">Подтверждение отправлено на почту</div>
+      <div style="text-align:left;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:18px;padding:22px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:18px"><div style="width:8px;height:8px;border-radius:50%;background:#5B7A9E"></div><div style="font:700 17px 'Golos Text';color:#1A1C1E">Консультация по продукту</div></div>
+        <div style="display:flex;flex-direction:column;gap:13px">
+          <div style="display:flex;gap:12px;font:500 14px 'Golos Text';color:#3E4347"><span style="color:#8E97A4;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Пятница, 17 июля 2026 · {{ selTime }} — {{ endTime }}</div>
+          <div style="display:flex;gap:12px;font:500 14px 'Golos Text';color:#3E4347"><span style="color:#8E97A4;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>45 минут · Москва (GMT+3)</div>
+          <div style="display:flex;gap:12px;font:500 14px 'Golos Text';color:#3E4347"><span style="color:#8E97A4;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg></span><a href="#">Ссылка на встречу</a></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:18px">
+        <button style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1px solid #D1D9E6;border-radius:12px;background:rgba(255,255,255,.7);color:#3E4347;font:600 14px 'Golos Text';cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>В Google Календарь</button>
+        <button style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1px solid #D1D9E6;border-radius:12px;background:rgba(255,255,255,.7);color:#3E4347;font:600 14px 'Golos Text';cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4M4 21h16"/></svg>Скачать .ics</button>
+      </div>
+      <div style="font:500 13.5px 'Golos Text';color:#8E97A4">Планы изменились? <a href="#">Перенести</a> · <a href="#" onClick="{{ restart }}">Отменить запись</a></div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== PICK / FORM ===== -->
+  <sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+  <div style="position:relative;width:{{ cardW }};max-width:100%">
+    <img src="assets/hero-glass.png" alt="" style="position:absolute;top:-168px;left:-10%;width:120%;pointer-events:none;-webkit-mask:radial-gradient(115% 132% at 50% 28%,#000 54%,transparent 100%);mask:radial-gradient(115% 132% at 50% 28%,#000 54%,transparent 100%)">
+
+    <div style="position:relative;display:flex;flex-direction:{{ dir }};background:rgba(255,255,255,.6);backdrop-filter:blur(32px) saturate(1.4);-webkit-backdrop-filter:blur(32px) saturate(1.4);border:1px solid rgba(255,255,255,.55);border-radius:32px;box-shadow:0 20px 50px rgba(20,40,70,.08),0 2px 6px rgba(20,40,70,.04);overflow:hidden">
+
+      <!-- LEFT: info (always) -->
+      <div style="{{ infoStyle }}">
+        <div style="margin-bottom:30px"><image-slot id="aurora-logo" style="width:118px;height:28px" shape="rounded" radius="6" fit="contain" placeholder="Логотип"></image-slot></div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:34px">
+          <div style="width:64px;height:64px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;overflow:hidden;flex:none;background:rgba(255,255,255,.85)"><image-slot id="aurora-avatar" style="width:64px;height:64px" shape="circle" placeholder="АК"></image-slot></div>
+          <div><div style="font:700 17px 'Golos Text';color:#1A1C1E;margin-bottom:3px">Алексей Ковалёв</div><div style="font:400 14px 'Golos Text';color:#8E97A4">Продуктовый эксперт</div></div>
+        </div>
+        <div style="font:700 26px/1.15 'Golos Text';color:#1A1C1E;letter-spacing:-.01em;margin-bottom:28px">Консультация<br>по продукту</div>
+        <div style="display:flex;flex-direction:column;gap:20px;margin-bottom:26px">
+          <div style="display:flex;align-items:center;gap:14px;color:#3E4347;font:500 15px 'Golos Text'"><span style="color:#8E97A4;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>45 минут</div>
+          <div style="display:flex;align-items:center;gap:14px;color:#3E4347;font:500 15px 'Golos Text'"><span style="color:#8E97A4;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg></span>Google Meet</div>
+          <div style="display:flex;align-items:center;gap:14px;color:#3E4347;font:500 15px 'Golos Text'"><span style="color:#8E97A4;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1-.6-1.5V4.8A1.8 1.8 0 0 1 4.8 3h6.9a2 2 0 0 1 1.4.6l7.5 7.5a1.9 1.9 0 0 1 0 2.3z"/><circle cx="7.8" cy="7.8" r="1.3" fill="currentColor" stroke="none"/></svg></span>3 000 ₽</div>
+        </div>
+        <div style="font:400 14px/1.5 'Golos Text';color:#8E97A4">Индивидуальная встреча, на которой мы разберём ваши задачи и подберём оптимальное решение для достижения ваших целей.</div>
+      </div>
+
+      <div style="{{ divStyle }}"></div>
+
+      <!-- PICK: calendar + times -->
+      <sc-if value="{{ isPick }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;{{ calPad }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:26px">
+          <button style="width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.85);box-shadow:0 2px 6px rgba(20,40,70,.06);color:#3E4347;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <div style="font:600 18px 'Golos Text';color:#1A1C1E">Июль 2026</div>
+          <button style="width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.85);box-shadow:0 2px 6px rgba(20,40,70,.06);color:#3E4347;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);justify-items:center;row-gap:8px">
+          <sc-for list="{{ days }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for>
+        </div>
+        <div style="margin-top:auto;padding-top:28px">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.6);box-shadow:0 2px 8px rgba(20,40,70,.05);cursor:pointer">
+            <span style="color:#8E97A4;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg></span>
+            <span style="font:500 15px 'Golos Text';color:#1A1C1E">Москва (GMT+3)</span>
+            <span style="margin-left:auto;color:#8E97A4;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          </div>
+        </div>
+      </div>
+      <div style="{{ divStyle }}"></div>
+      <div style="display:flex;flex-direction:column;{{ timesStyle }}">
+        <div style="font:600 16px 'Golos Text';color:#1A1C1E;margin-bottom:22px">Пятница, 17 июля</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ times }}" as="s" hint-placeholder-count="8"><div style="{{ s.style }}" onClick="{{ s.onClick }}">{{ s.t }}</div></sc-for>
+        </div>
+        <button onClick="{{ next }}" style="margin-top:24px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 15px 'Golos Text';cursor:pointer;box-shadow:0 8px 22px rgba(80,148,240,.35)">Далее<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+      </sc-if>
+
+      <!-- FORM -->
+      <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;{{ formPad }}">
+        <div onClick="{{ back }}" style="display:inline-flex;align-items:center;gap:7px;font:600 14px 'Golos Text';color:#2F6FD0;cursor:pointer;margin-bottom:18px;align-self:flex-start"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Изменить</div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:14px;background:rgba(80,148,240,.08);border:1px solid rgba(80,148,240,.2);margin-bottom:26px;max-width:520px">
+          <span style="color:#2F6FD0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>
+          <span style="font:600 15px 'Golos Text';color:#1A1C1E">Пятница, 17 июля · {{ selTime }}</span>
+        </div>
+        <div style="max-width:520px;display:flex;flex-direction:column;gap:18px">
+          <div><label class="plbl">Имя *</label><input class="pinp" placeholder="Как к вам обращаться"></div>
+          <div><label class="plbl">Email *</label><input class="pinp" placeholder="you@example.com"></div>
+          <div><label class="plbl">Комментарий</label><textarea class="pinp" style="min-height:88px;resize:vertical;line-height:1.5" placeholder="Расскажите, что хотите обсудить — необязательно"></textarea></div>
+          <button onClick="{{ book }}" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 15px 'Golos Text';cursor:pointer;box-shadow:0 8px 22px rgba(80,148,240,.35)">Перейти к оплате • 3 000 ₽</button>
+          <div style="text-align:center;font:400 13px 'Golos Text';color:#8E97A4">Подтверждение придёт на почту</div>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { step: 'pick', selTime: '14:00', vw: (typeof window !== 'undefined' ? window.innerWidth : 1200) };
+  componentDidMount() {
+    this._onResize = () => { if (this._raf) return; this._raf = requestAnimationFrame(() => { this._raf = null; if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); }); };
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+  day(state) {
+    const b = 'width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;font:500 15px "Golos Text",sans-serif;';
+    if (state === 'today') return b + 'box-shadow:inset 0 0 0 1.5px #5094F0;color:#1A1C1E;';
+    if (state === 'sel') return b + 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 8px 18px rgba(80,148,240,.35);';
+    return b + 'color:#1A1C1E;cursor:pointer;';
+  }
+  slot(sel) {
+    const b = 'padding:14px;border-radius:12px;text-align:center;font:600 15px "Golos Text",sans-serif;cursor:pointer;';
+    return sel
+      ? b + 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 6px 20px rgba(80,148,240,.35);'
+      : b + 'border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.5);color:#3E4347;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
+  }
+  endTime() {
+    const [h, m] = this.state.selTime.split(':').map(Number);
+    let tot = h * 60 + m + 45;
+    return String(Math.floor(tot / 60)).padStart(2, '0') + ':' + String(tot % 60).padStart(2, '0');
+  }
+  renderVals() {
+    const today = 15, sel = 17, days = [];
+    for (let i = 0; i < 2; i++) days.push({ n: '', style: 'width:40px;height:40px' });
+    for (let n = 1; n <= 31; n++) {
+      const st = n === today ? 'today' : n === sel ? 'sel' : 'plain';
+      days.push({ n: String(n), style: this.day(st) });
+    }
+    const times = ['10:00', '10:30', '11:00', '11:30', '13:00', '13:30', '14:00', '14:30'].map(t => ({
+      t, style: this.slot(t === this.state.selTime),
+      onClick: () => this.setState({ selTime: t })
+    }));
+    const mobile = this.state.vw < 1080;
+    const vdiv = 'width:1px;align-self:stretch;background:linear-gradient(180deg,transparent,rgba(20,30,45,.08) 16%,rgba(20,30,45,.08) 84%,transparent);flex:none';
+    const hdiv = 'height:1px;width:100%;background:rgba(20,30,45,.08);flex:none';
+    return {
+      mobile,
+      cardW: mobile ? '520px' : '1240px',
+      doneW: mobile ? '520px' : '560px',
+      dir: mobile ? 'column' : 'row',
+      infoStyle: mobile ? 'width:100%;flex:none;padding:30px 26px 24px' : 'width:372px;flex:none;padding:40px',
+      calPad: mobile ? 'padding:26px 22px' : 'padding:40px 44px',
+      timesStyle: mobile ? 'width:100%;flex:none;padding:26px 22px 30px' : 'width:326px;flex:none;padding:40px',
+      formPad: mobile ? 'padding:26px 22px 32px' : 'padding:36px 44px',
+      divStyle: mobile ? hdiv : vdiv,
+      days, times, selTime: this.state.selTime, endTime: this.endTime(),
+      isPick: this.state.step === 'pick',
+      isForm: this.state.step === 'form',
+      isDone: this.state.step === 'done',
+      notDone: this.state.step !== 'done',
+      next: () => this.setState({ step: 'form' }),
+      back: () => this.setState({ step: 'pick' }),
+      book: () => this.setState({ step: 'done' }),
+      restart: () => this.setState({ step: 'pick' })
+    };
+  }
+}
+</script>
+</body>
+</html>

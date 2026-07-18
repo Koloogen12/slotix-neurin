@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:"Golos Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2F6FD0;text-decoration:none}a:hover{color:#1F5FBF}
+html{scroll-behavior:smooth}
+input::placeholder,textarea::placeholder{color:#9AA4B0}
+@keyframes sx-blink{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
+@keyframes sx-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#EAF2FB url(assets/aurora-bg.png) center top/cover no-repeat fixed;overflow-x:hidden">
+
+  <!-- ===== NAV ===== -->
+  <div style="position:sticky;top:0;z-index:50;background:rgba(234,242,251,.55);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);border-bottom:1px solid rgba(255,255,255,.5)">
+    <div style="max-width:1200px;margin:0 auto;padding:16px clamp(20px,5vw,40px);display:flex;align-items:center;justify-content:space-between;gap:20px">
+      <a href="#top" style="display:flex;align-items:center"><img src="assets/slotix-logo.png" alt="Slotix" style="height:30px;width:auto;display:block"></a>
+      <div style="display:flex;align-items:center;gap:clamp(14px,2.4vw,34px)">
+        <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
+        <a href="#features" style="font:600 15px 'Golos Text';color:#3E4347">Возможности</a>
+        <a href="#integrations" style="font:600 15px 'Golos Text';color:#3E4347">Интеграции</a>
+        <a href="#pricing" style="font:600 15px 'Golos Text';color:#3E4347">Тарифы</a>
+        </sc-if>
+        <a href="Slotix - Кабинет.dc.html" style="font:600 15px 'Golos Text';color:#1A1C1E">Вход</a>
+        <a href="Slotix - Онбординг.dc.html" style="font:600 14px 'Golos Text';color:#fff;padding:10px 20px;border-radius:11px;background:linear-gradient(135deg,#66A6FF,#5094F0);box-shadow:0 8px 20px rgba(80,148,240,.32)" style-hover="box-shadow:0 10px 26px rgba(80,148,240,.45);color:#fff">Регистрация</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <div id="top" style="max-width:1200px;margin:0 auto;padding:clamp(48px,7vw,96px) clamp(20px,5vw,40px) clamp(40px,6vw,72px);display:flex;flex-wrap:wrap;align-items:center;gap:clamp(36px,5vw,64px)">
+    <div style="flex:1 1 420px;min-width:320px">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:100px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(20,40,70,.05);font:600 13px 'Golos Text';color:#2F6FD0;margin-bottom:26px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#3FCB6E;box-shadow:0 0 0 3px rgba(63,203,110,.2)"></span>Планирование встреч без переписок
+      </div>
+      <h1 style="font:800 clamp(34px,4.6vw,56px)/1.06 'Golos Text';letter-spacing:-.02em;color:#1A1C1E;margin:0 0 22px;text-wrap:balance">Slotix помогает<br>планировать встречи<br>без долгих переписок</h1>
+      <p style="font:400 clamp(16px,1.4vw,19px)/1.55 'Golos Text';color:#5C6672;margin:0 0 32px;max-width:480px">Клиент открывает вашу ссылку, сам выбирает свободный слот и бронирует встречу. Никаких «а когда тебе удобно?» в мессенджерах.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;max-width:520px">
+        <input placeholder="Введите ваш e-mail" style="flex:1 1 220px;min-width:0;box-sizing:border-box;padding:16px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:400 16px 'Golos Text';color:#1A1C1E;outline:none" style-focus="border-color:#5094F0;box-shadow:0 0 0 3px rgba(80,148,240,.15)">
+        <a href="Slotix - Онбординг.dc.html" style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:9px;padding:16px 26px;border-radius:14px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:700 16px 'Golos Text';box-shadow:0 12px 28px rgba(80,148,240,.38)" style-hover="box-shadow:0 14px 34px rgba(80,148,240,.5);color:#fff">Начать бесплатно<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:16px;font:500 14px 'Golos Text';color:#8E97A4">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3FCB6E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Бесплатно. Привязка карты не требуется.
+      </div>
+    </div>
+
+    <!-- hero visual -->
+    <div style="flex:1 1 400px;min-width:320px;display:flex;justify-content:center;position:relative">
+
+      <!-- CHAT -->
+      <sc-if value="{{ isChat }}" hint-placeholder-val="{{ true }}">
+      <div style="position:relative;width:100%;max-width:440px">
+        <div style="position:relative;background:rgba(255,255,255,.6);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border:1px solid rgba(255,255,255,.6);border-radius:28px;box-shadow:0 24px 60px rgba(20,40,70,.12);padding:26px 22px 30px">
+          <div style="display:flex;align-items:center;gap:11px;padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid rgba(20,30,45,.07)">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#CBD8EA,#9BB4D6);display:flex;align-items:center;justify-content:center;font:700 15px 'Golos Text';color:#fff;flex:none">М</div>
+            <div><div style="font:700 15px 'Golos Text';color:#1A1C1E">Марина</div><div style="font:400 12px 'Golos Text';color:#8E97A4">в сети</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="align-self:flex-start;max-width:82%;padding:11px 15px;border-radius:18px 18px 18px 5px;background:rgba(120,132,148,.14);color:#22262B;font:400 14.5px/1.35 'Golos Text'">Привет! Давай встретимся на этой неделе, ты когда свободен?</div>
+            <div style="align-self:flex-end;max-width:82%;padding:11px 15px;border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:400 14.5px/1.35 'Golos Text';box-shadow:0 6px 16px rgba(80,148,240,.28)">Привет! Есть время завтра :)</div>
+            <div style="align-self:flex-start;max-width:82%;padding:11px 15px;border-radius:18px 18px 18px 5px;background:rgba(120,132,148,.14);color:#22262B;font:400 14.5px/1.35 'Golos Text'">А в котором часу?</div>
+            <div style="align-self:flex-end;max-width:82%;padding:11px 15px;border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:400 14.5px/1.35 'Golos Text';box-shadow:0 6px 16px rgba(80,148,240,.28)">14:00 и 15:00, тебе когда удобно?</div>
+            <div style="align-self:flex-start;max-width:82%;padding:11px 15px;border-radius:18px 18px 18px 5px;background:rgba(120,132,148,.14);color:#22262B;font:400 14.5px/1.35 'Golos Text'">Не смогу, обедаю с коллегами(</div>
+            <div style="align-self:flex-end;max-width:82%;padding:11px 15px;border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:400 14.5px/1.35 'Golos Text';box-shadow:0 6px 16px rgba(80,148,240,.28)">Тогда среда с 17 до 20, подойдёт?</div>
+            <div style="align-self:flex-start;max-width:82%;padding:11px 15px;border-radius:18px 18px 18px 5px;background:rgba(120,132,148,.14);color:#22262B;font:400 14.5px/1.35 'Golos Text'">Нет… В среду работаю допоздна :(</div>
+            <div style="align-self:flex-start;display:flex;gap:5px;padding:14px 16px;border-radius:18px 18px 18px 5px;background:rgba(120,132,148,.14)">
+              <span style="width:7px;height:7px;border-radius:50%;background:#8E97A4;animation:sx-blink 1.2s infinite"></span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#8E97A4;animation:sx-blink 1.2s infinite .2s"></span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#8E97A4;animation:sx-blink 1.2s infinite .4s"></span>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ showFloat }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;left:-6%;bottom:-38px;width:88%;background:rgba(255,255,255,.82);backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px) saturate(1.5);border:1px solid rgba(255,255,255,.8);border-radius:20px;box-shadow:0 20px 46px rgba(20,40,70,.16);padding:16px 18px;display:flex;align-items:center;gap:14px;animation:sx-float 5s ease-in-out infinite">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 8px 18px rgba(80,148,240,.35)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4M9 14l2 2 4-4"/></svg></div>
+          <div style="flex:1"><div style="font:700 15px 'Golos Text';color:#1A1C1E">С Slotix — 1 клик</div><div style="font:400 13px 'Golos Text';color:#8E97A4">Клиент сам выбрал слот. Встреча в календаре.</div></div>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- BOOKING PREVIEW -->
+      <sc-if value="{{ isBooking }}" hint-placeholder-val="{{ false }}">
+      <div style="width:100%;max-width:420px;background:rgba(255,255,255,.62);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border:1px solid rgba(255,255,255,.6);border-radius:28px;box-shadow:0 24px 60px rgba(20,40,70,.12);padding:28px">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:22px">
+          <div style="width:52px;height:52px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;overflow:hidden;flex:none;background:rgba(255,255,255,.85)"><image-slot id="land-prev-avatar" style="width:52px;height:52px" shape="circle" placeholder="АК"></image-slot></div>
+          <div><div style="font:700 16px 'Golos Text';color:#1A1C1E">Консультация · 45 мин</div><div style="font:400 13px 'Golos Text';color:#8E97A4">Алексей Ковалёв</div></div>
+        </div>
+        <div style="font:600 15px 'Golos Text';color:#1A1C1E;margin-bottom:14px">Пятница, 17 июля</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:13px;border-radius:12px;text-align:center;font:600 15px 'Golos Text';border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.5);color:#3E4347">13:00</div>
+          <div style="padding:13px;border-radius:12px;text-align:center;font:600 15px 'Golos Text';background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 8px 20px rgba(80,148,240,.32)">14:00</div>
+          <div style="padding:13px;border-radius:12px;text-align:center;font:600 15px 'Golos Text';border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.5);color:#3E4347">15:30</div>
+        </div>
+        <div style="margin-top:18px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;text-align:center;font:700 15px 'Golos Text';box-shadow:0 10px 24px rgba(80,148,240,.35)">Забронировать</div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- ===== FEATURES ===== -->
+  <div id="features" style="max-width:1200px;margin:0 auto;padding:clamp(40px,6vw,80px) clamp(20px,5vw,40px)">
+    <div style="text-align:center;max-width:640px;margin:0 auto clamp(36px,4vw,52px)">
+      <div style="font:700 13px 'Golos Text';letter-spacing:.08em;text-transform:uppercase;color:#5094F0;margin-bottom:12px">Как это работает</div>
+      <h2 style="font:800 clamp(28px,3.4vw,40px)/1.12 'Golos Text';letter-spacing:-.015em;color:#1A1C1E;margin:0">Клиенту нужна только ссылка, чтобы записаться</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+      <div style="background:rgba(255,255,255,.55);backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);border:1px solid rgba(255,255,255,.6);border-radius:24px;box-shadow:0 14px 38px rgba(20,40,70,.07);padding:30px 28px">
+        <div style="width:52px;height:52px;border-radius:15px;background:rgba(80,148,240,.14);display:flex;align-items:center;justify-content:center;margin-bottom:22px;color:#3B7FD9"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg></div>
+        <div style="font:700 19px 'Golos Text';color:#1A1C1E;margin-bottom:10px">Одна ссылка вместо переписок</div>
+        <div style="font:400 15px/1.55 'Golos Text';color:#5C6672">Отправьте ссылку в мессенджер, соцсеть или подпись письма. Клиент видит только свободные слоты и бронирует сам.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.55);backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);border:1px solid rgba(255,255,255,.6);border-radius:24px;box-shadow:0 14px 38px rgba(20,40,70,.07);padding:30px 28px">
+        <div style="width:52px;height:52px;border-radius:15px;background:rgba(63,203,110,.15);display:flex;align-items:center;justify-content:center;margin-bottom:22px;color:#2FA85A"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/><path d="M8 14h3M8 17.5h6"/></svg></div>
+        <div style="font:700 19px 'Golos Text';color:#1A1C1E;margin-bottom:10px">Вы управляете расписанием</div>
+        <div style="font:400 15px/1.55 'Golos Text';color:#5C6672">Рабочие часы, перерывы между встречами и правила отмены — всё под вашим контролем.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.55);backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);border:1px solid rgba(255,255,255,.6);border-radius:24px;box-shadow:0 14px 38px rgba(20,40,70,.07);padding:30px 28px">
+        <div style="width:52px;height:52px;border-radius:15px;background:rgba(147,120,236,.15);display:flex;align-items:center;justify-content:center;margin-bottom:22px;color:#7B5CE0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div>
+        <div style="font:700 19px 'Golos Text';color:#1A1C1E;margin-bottom:10px">Без накладок в календаре</div>
+        <div style="font:400 15px/1.55 'Golos Text';color:#5C6672">Свободные слоты рассчитываются по вашему Google Календарю — двойных броней не будет.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PRODUCT PREVIEW ===== -->
+  <div style="max-width:1200px;margin:0 auto;padding:clamp(20px,3vw,40px) clamp(20px,5vw,40px) clamp(40px,6vw,80px);display:flex;flex-wrap:wrap;align-items:center;gap:clamp(36px,5vw,64px)">
+    <div style="flex:1 1 340px;min-width:300px">
+      <h2 style="font:800 clamp(26px,3vw,36px)/1.14 'Golos Text';letter-spacing:-.015em;color:#1A1C1E;margin:0 0 24px">Вы управляете расписанием — Slotix делает остальное</h2>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <sc-for list="{{ bullets }}" as="b" hint-placeholder-count="3">
+        <div style="display:flex;gap:14px">
+          <span style="width:26px;height:26px;border-radius:50%;background:rgba(63,203,110,.15);display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2FA85A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <div><div style="font:700 16px 'Golos Text';color:#1A1C1E;margin-bottom:4px">{{ b.title }}</div><div style="font:400 15px/1.5 'Golos Text';color:#5C6672">{{ b.text }}</div></div>
+        </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex:1 1 380px;min-width:300px;display:flex;justify-content:center">
+      <div style="width:100%;max-width:440px;background:rgba(255,255,255,.6);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border:1px solid rgba(255,255,255,.6);border-radius:28px;box-shadow:0 24px 60px rgba(20,40,70,.1);padding:28px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div style="font:700 17px 'Golos Text';color:#1A1C1E">Июль 2026</div>
+          <div style="display:flex;gap:8px"><span style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(20,40,70,.06);display:flex;align-items:center;justify-content:center;color:#3E4347"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span><span style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(20,40,70,.06);display:flex;align-items:center;justify-content:center;color:#3E4347"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+          <sc-for list="{{ calWk }}" as="w" hint-placeholder-count="7"><div style="text-align:center;font:400 11px 'Golos Text';color:#8E97A4;padding-bottom:4px">{{ w }}</div></sc-for>
+          <sc-for list="{{ calDays }}" as="d" hint-placeholder-count="35"><div style="{{ d.style }}">{{ d.n }}</div></sc-for>
+        </div>
+        <div style="margin-top:20px;display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:12px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.7);box-shadow:0 2px 8px rgba(20,40,70,.05)">
+          <span style="color:#8E97A4;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg></span>
+          <span style="font:500 14px 'Golos Text';color:#1A1C1E">Москва (GMT+3)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INTEGRATIONS ===== -->
+  <div id="integrations" style="max-width:1200px;margin:0 auto;padding:clamp(40px,6vw,80px) clamp(20px,5vw,40px)">
+    <h2 style="font:800 clamp(28px,3.4vw,42px)/1.1 'Golos Text';letter-spacing:-.02em;color:#1A1C1E;margin:0 0 clamp(32px,4vw,48px);max-width:640px">Работает с календарём, видеосвязью и другими сервисами</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(20px,3vw,40px)">
+      <sc-for list="{{ integ }}" as="g" hint-placeholder-count="3">
+      <div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+          <sc-for list="{{ g.tags }}" as="t" hint-placeholder-count="3"><span style="padding:8px 15px;border-radius:100px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.75);box-shadow:0 3px 10px rgba(20,40,70,.05);font:600 14px 'Golos Text';color:#3E4347">{{ t }}</span></sc-for>
+        </div>
+        <div style="font:700 19px 'Golos Text';color:#1A1C1E;margin-bottom:9px">{{ g.title }}</div>
+        <div style="font:400 15px/1.55 'Golos Text';color:#5C6672">{{ g.text }}</div>
+      </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ===== FINAL CTA ===== -->
+  <div id="pricing" style="max-width:1200px;margin:0 auto;padding:clamp(20px,3vw,40px) clamp(20px,5vw,40px) clamp(48px,7vw,96px)">
+    <div style="background:linear-gradient(135deg,rgba(223,242,233,.85),rgba(224,238,252,.85));backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border:1px solid rgba(255,255,255,.7);border-radius:32px;box-shadow:0 24px 60px rgba(20,40,70,.09);padding:clamp(40px,6vw,72px) clamp(28px,5vw,64px);text-align:center">
+      <h2 style="font:800 clamp(30px,3.8vw,46px)/1.1 'Golos Text';letter-spacing:-.02em;color:#1A1C1E;margin:0 0 14px;max-width:600px;margin-left:auto;margin-right:auto">Для регистрации нужен только email</h2>
+      <p style="font:400 clamp(15px,1.3vw,18px)/1.5 'Golos Text';color:#4A5560;margin:0 0 32px">7 дней тарифа Premium бесплатно. Дальше — выбираете подходящий тариф.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;max-width:520px;margin:0 auto 16px">
+        <input placeholder="Введите ваш e-mail" style="flex:1 1 220px;min-width:0;box-sizing:border-box;padding:16px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.85);background:rgba(255,255,255,.8);font:400 16px 'Golos Text';color:#1A1C1E;outline:none" style-focus="border-color:#5094F0;box-shadow:0 0 0 3px rgba(80,148,240,.15)">
+        <a href="Slotix - Онбординг.dc.html" style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:9px;padding:16px 26px;border-radius:14px;background:#1A1C1E;color:#fff;font:700 16px 'Golos Text';box-shadow:0 12px 28px rgba(20,30,45,.2)" style-hover="color:#fff;background:#000">Начать бесплатно</a>
+      </div>
+      <div style="font:500 14px 'Golos Text';color:#8E97A4">Без привязки карты · Отмена в любой момент</div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <div style="border-top:1px solid rgba(255,255,255,.5);background:rgba(234,242,251,.4)">
+    <div style="max-width:1200px;margin:0 auto;padding:clamp(40px,5vw,60px) clamp(20px,5vw,40px);display:flex;flex-wrap:wrap;gap:clamp(32px,5vw,64px)">
+      <div style="flex:1 1 260px;min-width:240px">
+        <img src="assets/slotix-logo.png" alt="Slotix" style="height:26px;width:auto;display:block;margin-bottom:16px">
+        <div style="font:400 14px/1.55 'Golos Text';color:#8E97A4;max-width:280px;margin-bottom:16px">Онлайн-сервис записи на встречи, консультации и занятия.</div>
+        <div style="font:400 13px 'Golos Text';color:#A9B4BF">© 2020–2026 Slotix</div>
+      </div>
+      <div style="flex:0 1 auto;min-width:150px">
+        <div style="font:700 14px 'Golos Text';color:#1A1C1E;margin-bottom:14px">Продукт</div>
+        <div style="display:flex;flex-direction:column;gap:11px;font:400 14px 'Golos Text'"><a href="#features">Возможности</a><a href="#integrations">Интеграции</a><a href="#pricing">Тарифы</a><a href="Slotix - Кабинет.dc.html">Войти</a></div>
+      </div>
+      <div style="flex:0 1 auto;min-width:150px">
+        <div style="font:700 14px 'Golos Text';color:#1A1C1E;margin-bottom:14px">Поддержка</div>
+        <div style="display:flex;flex-direction:column;gap:11px;font:400 14px 'Golos Text'"><a href="#">Справочный центр</a><a href="#">Сообщество</a><a href="#">Политика конфиденциальности</a><a href="#">Условия использования</a></div>
+      </div>
+      <div style="flex:0 1 auto;min-width:150px">
+        <div style="font:700 14px 'Golos Text';color:#1A1C1E;margin-bottom:14px">Язык</div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:11px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.75);font:500 14px 'Golos Text';color:#3E4347;cursor:pointer">Русский<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroVisual&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chat&quot;,&quot;booking&quot;],&quot;default&quot;:&quot;chat&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Экран-герой&quot;},&quot;showFloatingCard&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Экран-герой&quot;}}">
+class Component extends DCLogic {
+  state = { vw: (typeof window !== 'undefined' ? window.innerWidth : 1200) };
+  componentDidMount() {
+    this._onResize = () => { if (this._raf) return; this._raf = requestAnimationFrame(() => { this._raf = null; if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); }); };
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+  renderVals() {
+    const heroVisual = this.props.heroVisual ?? 'chat';
+    const showFloat = this.props.showFloatingCard ?? true;
+
+    const bullets = [
+      { title: 'Клиенту не нужна регистрация', text: 'Для записи достаточно указать email — никаких аккаунтов и паролей.' },
+      { title: 'Уведомления и напоминания', text: 'Вам и клиенту приходит подтверждение, а встреча сразу добавляется в календари.' },
+      { title: 'Оплата сразу при бронировании', text: 'Подключите приём платежей и получайте оплату онлайн в момент записи.' }
+    ];
+
+    const calWk = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+    const base = 'height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;font:500 14px "Golos Text",sans-serif;';
+    const avail = [10,11,17,18,22,23,24,29,30,31];
+    const calDays = [];
+    for (let i = 0; i < 2; i++) calDays.push({ n: '', style: 'height:38px' });
+    for (let n = 1; n <= 31; n++) {
+      let st;
+      if (n === 17) st = base + 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 6px 16px rgba(80,148,240,.35);';
+      else if (avail.includes(n)) st = base + 'background:rgba(80,148,240,.12);color:#2F6FD0;cursor:pointer;';
+      else st = base + 'color:#B5C0CC;';
+      calDays.push({ n: String(n), style: st });
+    }
+
+    const integ = [
+      { tags: ['Zoom','Google Meet','Телемост'], title: 'Встречи в Zoom, Meet и Телемост', text: 'После брони конференция создаётся автоматически, а клиент получает напоминание, где связаться с вами.' },
+      { tags: ['Google Календарь'], title: 'Подключите Google Календарь', text: 'Встречи автоматически появляются в вашем календаре и в календаре клиента.' },
+      { tags: ['ЮKassa','Stripe'], title: 'Принимайте оплату сразу', text: 'Подключите платёжный сервис и получайте оплату от клиентов онлайн при бронировании.' }
+    ];
+
+    return {
+      isWide: this.state.vw >= 720,
+      isChat: heroVisual !== 'booking',
+      isBooking: heroVisual === 'booking',
+      showFloat,
+      bullets, calWk, calDays, integ
+    };
+  }
+}
+</script>
+</body>
+</html>

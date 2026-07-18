@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E7EBED;font-family:Inter,system-ui,sans-serif}
+.dv-turn{padding:44px 48px 36px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#12313C;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 14px/1.2 Inter,sans-serif;color:#12313C}
+.dv-tsub{margin:0 0 26px;font:400 13px/1.5 Inter,sans-serif;color:#5C6E7D;max-width:640px}
+.dv-opts{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}
+.dv-olabel{display:flex;align-items:baseline;gap:9px;font:400 12px/1.35 Inter,sans-serif;color:#5C6E7D;max-width:820px}
+.dv-oid{font:600 11px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.07);color:#12313C;border-radius:5px;text-decoration:none;flex:none}
+.dv-oname{font-weight:600;color:#12313C}
+.dv-opt:target .dv-oid{background:#0E8C7F;color:#fff}
+.dv-env{display:flex;gap:22px;align-items:flex-start;padding:30px;border-radius:16px}
+.dv-next{margin:26px 0 0;font:12px/1.6 Inter,sans-serif;color:#5C6E7D}
+.mrow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.wk{text-align:center;font:600 11px Inter,sans-serif;color:#8A99A5;padding-bottom:9px}
+</style>
+<script src="./image-slot.js"></script>
+</helmet>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Замена акцента для «Тихого инструмента» <a class="dv-oid" href="#1a">1a</a> + загрузка логотипа и аватара</span></div>
+<p class="dv-tsub">Тот же строгий каркас, что и <a class="dv-oid" href="#1a">1a</a> — акцент используется сдержанно (выбранный день, активный слот, primary-кнопка, кольцо «сегодня»). Четыре спокойных «рабочих» акцента на замену тилу. В левой панели — слоты загрузки логотипа компании и аватара пользователя (перетащите или кликните). Выберите цвет.</p>
+<div class="dv-opts">
+
+<!-- 2a graphite -->
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a><span><span class="dv-oname">Графит.</span> Почти монохром — акцент #263340. Максимально нейтрально, цвет форматов будет солировать.</span></div>
+<div class="dv-env" style="background:#F6F8F9">
+  <div style="background:#fff;border:1px solid #E3E9ED;border-radius:14px;box-shadow:0 1px 2px rgba(16,40,60,.04),0 10px 30px rgba(16,40,60,.06);overflow:hidden;display:flex">
+    <div style="width:264px;padding:24px">
+      <div style="margin-bottom:20px"><image-slot id="logo2a" style="width:118px;height:30px" shape="rounded" radius="6" fit="contain" placeholder="Логотип"></image-slot></div>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px"><image-slot id="av2a" style="width:42px;height:42px" shape="circle" placeholder="Фото"></image-slot><div style="font:500 13px Inter;color:#5C6E7D">Анна Ковалёва</div></div>
+      <div style="font:600 20px/1.25 Inter;color:#1A2733;margin-bottom:18px">Консультация по продукту</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>45 минут</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg>Google Meet</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20V4h5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></svg>3 000 ₽</div>
+      <div style="margin-top:16px;font:400 13px/1.55 Inter;color:#5C6E7D">Разберём вашу задачу, приоритеты и следующие шаги.</div>
+    </div>
+    <div style="width:312px;padding:22px 24px;border-left:1px solid #EAEFF2">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font:600 16px Inter;color:#1A2733">Июль 2026</div><div style="display:flex;gap:6px"><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#B4C0C9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#5C6E7D"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"><sc-for list="{{ days2a }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for></div>
+    </div>
+    <div style="width:170px;padding:22px 18px;border-left:1px solid #EAEFF2">
+      <div style="font:600 13px Inter;color:#1A2733;margin-bottom:14px">Пятница, 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ times2a }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for></div>
+      <button style="margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:#263340;color:#fff;font:600 14px Inter;cursor:pointer">Далее</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 2b blue -->
+<div class="dv-opt" id="2b">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a><span><span class="dv-oname">Спокойный синий.</span> Акцент #2F62E6 — привычный «интерфейсный» цвет, доверие, чётко читается.</span></div>
+<div class="dv-env" style="background:#F6F8F9">
+  <div style="background:#fff;border:1px solid #E3E9ED;border-radius:14px;box-shadow:0 1px 2px rgba(16,40,60,.04),0 10px 30px rgba(16,40,60,.06);overflow:hidden;display:flex">
+    <div style="width:264px;padding:24px">
+      <div style="margin-bottom:20px"><image-slot id="logo2b" style="width:118px;height:30px" shape="rounded" radius="6" fit="contain" placeholder="Логотип"></image-slot></div>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px"><image-slot id="av2b" style="width:42px;height:42px" shape="circle" placeholder="Фото"></image-slot><div style="font:500 13px Inter;color:#5C6E7D">Анна Ковалёва</div></div>
+      <div style="font:600 20px/1.25 Inter;color:#1A2733;margin-bottom:18px">Консультация по продукту</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>45 минут</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg>Google Meet</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20V4h5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></svg>3 000 ₽</div>
+      <div style="margin-top:16px;font:400 13px/1.55 Inter;color:#5C6E7D">Разберём вашу задачу, приоритеты и следующие шаги.</div>
+    </div>
+    <div style="width:312px;padding:22px 24px;border-left:1px solid #EAEFF2">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font:600 16px Inter;color:#1A2733">Июль 2026</div><div style="display:flex;gap:6px"><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#B4C0C9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#5C6E7D"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"><sc-for list="{{ days2b }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for></div>
+    </div>
+    <div style="width:170px;padding:22px 18px;border-left:1px solid #EAEFF2">
+      <div style="font:600 13px Inter;color:#1A2733;margin-bottom:14px">Пятница, 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ times2b }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for></div>
+      <button style="margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:#2F62E6;color:#fff;font:600 14px Inter;cursor:pointer">Далее</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 2c steel -->
+<div class="dv-opt" id="2c">
+<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a><span><span class="dv-oname">Стальной синий.</span> Приглушённый #33526E — сдержанно, солидно, ближе по «температуре» к исходному тилу, но без бирюзы.</span></div>
+<div class="dv-env" style="background:#F6F8F9">
+  <div style="background:#fff;border:1px solid #E3E9ED;border-radius:14px;box-shadow:0 1px 2px rgba(16,40,60,.04),0 10px 30px rgba(16,40,60,.06);overflow:hidden;display:flex">
+    <div style="width:264px;padding:24px">
+      <div style="margin-bottom:20px"><image-slot id="logo2c" style="width:118px;height:30px" shape="rounded" radius="6" fit="contain" placeholder="Логотип"></image-slot></div>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px"><image-slot id="av2c" style="width:42px;height:42px" shape="circle" placeholder="Фото"></image-slot><div style="font:500 13px Inter;color:#5C6E7D">Анна Ковалёва</div></div>
+      <div style="font:600 20px/1.25 Inter;color:#1A2733;margin-bottom:18px">Консультация по продукту</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>45 минут</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg>Google Meet</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20V4h5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></svg>3 000 ₽</div>
+      <div style="margin-top:16px;font:400 13px/1.55 Inter;color:#5C6E7D">Разберём вашу задачу, приоритеты и следующие шаги.</div>
+    </div>
+    <div style="width:312px;padding:22px 24px;border-left:1px solid #EAEFF2">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font:600 16px Inter;color:#1A2733">Июль 2026</div><div style="display:flex;gap:6px"><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#B4C0C9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#5C6E7D"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"><sc-for list="{{ days2c }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for></div>
+    </div>
+    <div style="width:170px;padding:22px 18px;border-left:1px solid #EAEFF2">
+      <div style="font:600 13px Inter;color:#1A2733;margin-bottom:14px">Пятница, 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ times2c }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for></div>
+      <button style="margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:#33526E;color:#fff;font:600 14px Inter;cursor:pointer">Далее</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 2d terracotta -->
+<div class="dv-opt" id="2d">
+<div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a><span><span class="dv-oname">Терракота.</span> Тёплый приглушённый #A8503A — живее и человечнее, выделяется среди «синих» календарей-конкурентов.</span></div>
+<div class="dv-env" style="background:#F6F8F9">
+  <div style="background:#fff;border:1px solid #E3E9ED;border-radius:14px;box-shadow:0 1px 2px rgba(16,40,60,.04),0 10px 30px rgba(16,40,60,.06);overflow:hidden;display:flex">
+    <div style="width:264px;padding:24px">
+      <div style="margin-bottom:20px"><image-slot id="logo2d" style="width:118px;height:30px" shape="rounded" radius="6" fit="contain" placeholder="Логотип"></image-slot></div>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px"><image-slot id="av2d" style="width:42px;height:42px" shape="circle" placeholder="Фото"></image-slot><div style="font:500 13px Inter;color:#5C6E7D">Анна Ковалёва</div></div>
+      <div style="font:600 20px/1.25 Inter;color:#1A2733;margin-bottom:18px">Консультация по продукту</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>45 минут</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg>Google Meet</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20V4h5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></svg>3 000 ₽</div>
+      <div style="margin-top:16px;font:400 13px/1.55 Inter;color:#5C6E7D">Разберём вашу задачу, приоритеты и следующие шаги.</div>
+    </div>
+    <div style="width:312px;padding:22px 24px;border-left:1px solid #EAEFF2">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font:600 16px Inter;color:#1A2733">Июль 2026</div><div style="display:flex;gap:6px"><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#B4C0C9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#5C6E7D"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"><sc-for list="{{ days2d }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for></div>
+    </div>
+    <div style="width:170px;padding:22px 18px;border-left:1px solid #EAEFF2">
+      <div style="font:600 13px Inter;color:#1A2733;margin-bottom:14px">Пятница, 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ times2d }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for></div>
+      <button style="margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:#A8503A;color:#fff;font:600 14px Inter;cursor:pointer">Далее</button>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Дальше: «беру <a class="dv-oid" href="#2c">2c</a> — разверни весь флоу с этим акцентом» · «покажи <a class="dv-oid" href="#2b">2b</a> ещё темнее/светлее» · «хочу другой цвет — например, оливковый» · «ок по цвету, строй Все встречи + drawer»</p>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">4 визуальных направления · публичная страница бронирования</span></div>
+<p class="dv-tsub">Ключевой экран сервиса — трёхпанельный выбор слота (инфо · календарь · время) + мобильный шаг выбора времени. Одна палитра из спеки (тил #0E8C7F, спокойные нейтралы), но разный характер: типографика, плотность и роль акцентного тила. Выберите направление (или смешайте), дальше разверну в полный флоу.</p>
+<div class="dv-opts">
+
+<!-- ============ 1a ============ -->
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a><span><span class="dv-oname">Тихий инструмент.</span> Inter, компактно, сдержанный тил — цвет только на выбранном/активном. Тонкие линии, малые радиусы. Максимально «рабочий», близко к канону Calendly.</span></div>
+<div class="dv-env" style="background:#F6F8F9">
+  <!-- desktop -->
+  <div style="background:#fff;border:1px solid #E3E9ED;border-radius:14px;box-shadow:0 1px 2px rgba(16,40,60,.04),0 10px 30px rgba(16,40,60,.06);overflow:hidden;display:flex">
+    <div style="width:262px;padding:26px 24px;border-right:1px solid #EAEFF2">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px">
+        <div style="width:42px;height:42px;border-radius:50%;background:#E2F1EE;color:#0A6B61;display:flex;align-items:center;justify-content:center;font:700 15px Inter">АК</div>
+        <div style="font:500 13px Inter;color:#5C6E7D">Анна Ковалёва</div>
+      </div>
+      <div style="font:600 20px/1.25 Inter;color:#1A2733;margin-bottom:18px">Консультация по продукту</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><span style="color:#5C6E7D;display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>45 минут</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><span style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg></span>Google Meet</div>
+      <div class="mrow" style="color:#5C6E7D;font:500 14px Inter"><span style="display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20V4h5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></svg></span>3 000 ₽</div>
+      <div style="margin-top:16px;font:400 13px/1.55 Inter;color:#5C6E7D">Разберём вашу задачу, приоритеты и следующие шаги. Приходите с вопросами.</div>
+    </div>
+    <div style="width:318px;padding:22px 24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font:600 16px Inter;color:#1A2733">Июль 2026</div>
+        <div style="display:flex;gap:6px">
+          <span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#B4C0C9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+          <span style="width:30px;height:30px;border-radius:8px;border:1px solid #DAE2E8;display:flex;align-items:center;justify-content:center;color:#5C6E7D"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+        <sc-for list="{{ daysA }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for>
+      </div>
+      <div style="margin-top:18px;display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid #DAE2E8;border-radius:8px;color:#5C6E7D;font:500 13px Inter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+        Москва (GMT+3)
+        <span style="margin-left:auto;color:#B4C0C9"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+    </div>
+    <div style="width:172px;padding:22px 18px;border-left:1px solid #EAEFF2">
+      <div style="font:600 13px Inter;color:#1A2733;margin-bottom:14px">Пятница, 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ timesA }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for>
+      </div>
+      <button style="margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:#0E8C7F;color:#fff;font:600 14px Inter;cursor:pointer">Далее</button>
+    </div>
+  </div>
+  <!-- mobile -->
+  <div style="width:296px;background:#0D1116;border-radius:34px;padding:9px;box-shadow:0 20px 45px rgba(16,40,60,.22)">
+    <div style="background:#fff;border-radius:26px;overflow:hidden">
+      <div style="height:26px;background:#fff;display:flex;justify-content:center;align-items:flex-start;padding-top:8px"><div style="width:96px;height:6px;border-radius:4px;background:#E7EBED"></div></div>
+      <div style="padding:16px 18px 22px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="color:#5C6E7D"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+          <div><div style="font:600 15px Inter;color:#1A2733">Выберите время</div><div style="font:400 12px Inter;color:#5C6E7D">Пятница, 17 июля · GMT+3</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div style="padding:13px;border:1px solid #DAE2E8;border-radius:8px;text-align:center;font:600 15px Inter;color:#0A6B61">10:30</div>
+          <div style="padding:13px;border:1px solid #DAE2E8;border-radius:8px;text-align:center;font:600 15px Inter;color:#0A6B61">11:00</div>
+          <div style="padding:13px;border-radius:8px;text-align:center;font:600 15px Inter;background:#0E8C7F;color:#fff">14:00</div>
+          <div style="padding:13px;border:1px solid #DAE2E8;border-radius:8px;text-align:center;font:600 15px Inter;color:#0A6B61">14:30</div>
+          <div style="padding:13px;border:1px solid #DAE2E8;border-radius:8px;text-align:center;font:600 15px Inter;color:#0A6B61">15:00</div>
+        </div>
+        <button style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:10px;background:#0E8C7F;color:#fff;font:600 15px Inter">Далее</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ 1b ============ -->
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a><span><span class="dv-oname">Воздушный тил.</span> Manrope, много воздуха, тил во всю мощь — левая панель залита брендовым цветом. Крупные радиусы, мягкие тени, слоты-таблетки. Уверенно и дружелюбно.</span></div>
+<div class="dv-env" style="background:#EEF5F4">
+  <div style="background:#fff;border-radius:22px;box-shadow:0 2px 4px rgba(16,40,60,.05),0 18px 50px rgba(16,40,60,.12);overflow:hidden;display:flex">
+    <div style="width:280px;padding:34px 30px;background:#0E8C7F;color:#fff">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:26px">
+        <div style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font:700 16px Manrope">АК</div>
+        <div style="font:500 14px Manrope;color:rgba(255,255,255,.85)">Анна Ковалёва</div>
+      </div>
+      <div style="font:700 23px/1.25 Manrope;margin-bottom:24px">Консультация по продукту</div>
+      <div class="mrow" style="font:600 14.5px Manrope;color:rgba(255,255,255,.95)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>45 минут</div>
+      <div class="mrow" style="font:600 14.5px Manrope;color:rgba(255,255,255,.95)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg>Google Meet</div>
+      <div class="mrow" style="font:600 14.5px Manrope;color:rgba(255,255,255,.95)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20V4h5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></svg>3 000 ₽</div>
+      <div style="margin-top:20px;font:400 13.5px/1.6 Manrope;color:rgba(255,255,255,.8)">Разберём вашу задачу, приоритеты и следующие шаги. Приходите с вопросами.</div>
+    </div>
+    <div style="width:340px;padding:28px 30px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font:700 18px Manrope;color:#1A2733">Июль 2026</div>
+        <div style="display:flex;gap:8px">
+          <span style="width:34px;height:34px;border-radius:10px;background:#F1F6F5;display:flex;align-items:center;justify-content:center;color:#AEBBC4"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+          <span style="width:34px;height:34px;border-radius:10px;background:#E2F1EE;display:flex;align-items:center;justify-content:center;color:#0E8C7F"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+        <sc-for list="{{ daysB }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for>
+      </div>
+      <div style="margin-top:22px;display:flex;align-items:center;gap:10px;padding:13px 15px;background:#F1F6F5;border-radius:12px;color:#3C4E5B;font:600 13.5px Manrope">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+        Москва (GMT+3)<span style="margin-left:auto;color:#AEBBC4"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+    </div>
+    <div style="width:186px;padding:28px 20px;background:#FAFCFB">
+      <div style="font:700 14px Manrope;color:#1A2733;margin-bottom:16px">Пт, 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ timesB }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for>
+      </div>
+      <button style="margin-top:14px;width:100%;padding:13px;border:none;border-radius:12px;background:#0E8C7F;color:#fff;font:700 15px Manrope;cursor:pointer">Далее</button>
+    </div>
+  </div>
+  <div style="width:296px;background:#0D1116;border-radius:36px;padding:9px;box-shadow:0 20px 45px rgba(16,40,60,.22)">
+    <div style="background:#fff;border-radius:28px;overflow:hidden">
+      <div style="height:26px;display:flex;justify-content:center;align-items:flex-start;padding-top:8px"><div style="width:96px;height:6px;border-radius:4px;background:#E7EBED"></div></div>
+      <div style="background:#0E8C7F;color:#fff;padding:16px 20px 18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg><span style="font:600 14px Manrope;color:rgba(255,255,255,.85)">Назад</span></div>
+        <div style="font:700 19px Manrope">Выберите время</div>
+        <div style="font:500 13px Manrope;color:rgba(255,255,255,.8);margin-top:3px">Пятница, 17 июля · GMT+3</div>
+      </div>
+      <div style="padding:18px 20px 22px">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:14px;border:1.5px solid #CDE6E0;border-radius:12px;text-align:center;font:600 15px Manrope;color:#0A6B61">10:30</div>
+          <div style="padding:14px;border:1.5px solid #CDE6E0;border-radius:12px;text-align:center;font:600 15px Manrope;color:#0A6B61">11:00</div>
+          <div style="padding:14px;border-radius:12px;text-align:center;font:700 15px Manrope;background:#0E8C7F;color:#fff;box-shadow:0 6px 14px rgba(14,140,127,.32)">14:00</div>
+          <div style="padding:14px;border:1.5px solid #CDE6E0;border-radius:12px;text-align:center;font:600 15px Manrope;color:#0A6B61">14:30</div>
+        </div>
+        <button style="margin-top:16px;width:100%;padding:15px;border:none;border-radius:14px;background:#0E8C7F;color:#fff;font:700 15px Manrope">Далее</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ 1c ============ -->
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a><span><span class="dv-oname">Тёплый гротеск.</span> Кремовый фон, чуть глубже тил, крупнее шрифт и межстрочный — человечный, «не-корпоративный» тон. Мягкие тени, тёплые бордеры.</span></div>
+<div class="dv-env" style="background:#EDE4D6">
+  <div style="background:#FBF6EE;border:1px solid #E7DECF;border-radius:18px;box-shadow:0 2px 4px rgba(74,58,32,.05),0 18px 46px rgba(74,58,32,.1);overflow:hidden;display:flex">
+    <div style="width:270px;padding:32px 28px;border-right:1px solid #EDE3D3">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <div style="width:46px;height:46px;border-radius:50%;background:#0C7D71;color:#FBF6EE;display:flex;align-items:center;justify-content:center;font:700 16px Manrope">АК</div>
+        <div style="font:500 14px Manrope;color:#7A6E5A">Анна Ковалёва</div>
+      </div>
+      <div style="font:700 23px/1.3 Manrope;color:#2B2419;margin-bottom:22px">Консультация по продукту</div>
+      <div class="mrow" style="font:600 14.5px Manrope;color:#5A5140"><span style="color:#0C7D71;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>45 минут</div>
+      <div class="mrow" style="font:600 14.5px Manrope;color:#5A5140"><span style="color:#0C7D71;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg></span>Google Meet</div>
+      <div class="mrow" style="font:600 14.5px Manrope;color:#5A5140"><span style="color:#0C7D71;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20V4h5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></svg></span>3 000 ₽</div>
+      <div style="margin-top:18px;font:400 14px/1.65 Manrope;color:#7A6E5A">Разберём вашу задачу, приоритеты и следующие шаги. Приходите с вопросами — остальное на мне.</div>
+    </div>
+    <div style="width:334px;padding:30px 28px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font:700 19px Manrope;color:#2B2419">Июль 2026</div>
+        <div style="display:flex;gap:8px">
+          <span style="width:34px;height:34px;border-radius:10px;border:1px solid #E7DECF;display:flex;align-items:center;justify-content:center;color:#C7BCA9"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+          <span style="width:34px;height:34px;border-radius:10px;border:1px solid #E7DECF;display:flex;align-items:center;justify-content:center;color:#0C7D71"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk" style="color:#A99C84">Пн</div><div class="wk" style="color:#A99C84">Вт</div><div class="wk" style="color:#A99C84">Ср</div><div class="wk" style="color:#A99C84">Чт</div><div class="wk" style="color:#A99C84">Пт</div><div class="wk" style="color:#A99C84">Сб</div><div class="wk" style="color:#A99C84">Вс</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">
+        <sc-for list="{{ daysC }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for>
+      </div>
+      <div style="margin-top:22px;display:flex;align-items:center;gap:10px;padding:12px 15px;border:1px solid #E7DECF;border-radius:12px;color:#5A5140;font:600 13.5px Manrope">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+        Москва (GMT+3)<span style="margin-left:auto;color:#C7BCA9"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+    </div>
+    <div style="width:182px;padding:30px 20px;border-left:1px solid #EDE3D3">
+      <div style="font:700 14px Manrope;color:#2B2419;margin-bottom:16px">Пятница, 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ timesC }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for>
+      </div>
+      <button style="margin-top:14px;width:100%;padding:13px;border:none;border-radius:11px;background:#0C7D71;color:#FBF6EE;font:700 15px Manrope;cursor:pointer">Далее</button>
+    </div>
+  </div>
+  <div style="width:296px;background:#2B2419;border-radius:36px;padding:9px;box-shadow:0 20px 45px rgba(74,58,32,.24)">
+    <div style="background:#FBF6EE;border-radius:28px;overflow:hidden">
+      <div style="height:26px;display:flex;justify-content:center;align-items:flex-start;padding-top:8px"><div style="width:96px;height:6px;border-radius:4px;background:#E7DECF"></div></div>
+      <div style="padding:16px 20px 22px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="color:#7A6E5A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><div><div style="font:700 16px Manrope;color:#2B2419">Выберите время</div><div style="font:500 12.5px Manrope;color:#7A6E5A">Пятница, 17 июля · GMT+3</div></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:14px;border:1px solid #E7DECF;border-radius:10px;text-align:center;font:600 15px Manrope;color:#0C7D71;background:#fff">10:30</div>
+          <div style="padding:14px;border:1px solid #E7DECF;border-radius:10px;text-align:center;font:600 15px Manrope;color:#0C7D71;background:#fff">11:00</div>
+          <div style="padding:14px;border-radius:10px;text-align:center;font:700 15px Manrope;background:#0C7D71;color:#FBF6EE">14:00</div>
+          <div style="padding:14px;border:1px solid #E7DECF;border-radius:10px;text-align:center;font:600 15px Manrope;color:#0C7D71;background:#fff">14:30</div>
+        </div>
+        <button style="margin-top:16px;width:100%;padding:15px;border:none;border-radius:12px;background:#0C7D71;color:#FBF6EE;font:700 15px Manrope">Далее</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ 1d ============ -->
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a><span><span class="dv-oname">Смелая типографика.</span> Крупные display-заголовки, чернильный текст, тил как графический акцент (жирная линия, ценник, заливка выбора). Высокий контраст, чёткие углы, tabular-цифры. «Дизайнерский», но всё ещё инструмент.</span></div>
+<div class="dv-env" style="background:#EDF1F2">
+  <div style="background:#fff;border:1px solid #DCE3E7;border-radius:10px;box-shadow:0 1px 2px rgba(16,40,60,.05),0 14px 36px rgba(16,40,60,.08);overflow:hidden;display:flex">
+    <div style="width:284px;padding:30px 28px;border-right:1px solid #EAEFF2;position:relative">
+      <div style="width:40px;height:5px;background:#0E8C7F;border-radius:3px;margin-bottom:20px"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+        <div style="width:38px;height:38px;border-radius:9px;background:#0F1B24;color:#fff;display:flex;align-items:center;justify-content:center;font:800 14px Inter">АК</div>
+        <div style="font:600 13px Inter;color:#5C6E7D">Анна Ковалёва</div>
+      </div>
+      <div style="font:800 27px/1.15 Inter;color:#0F1B24;letter-spacing:-.02em;margin-bottom:22px">Консультация по&nbsp;продукту</div>
+      <div class="mrow" style="font:600 14px Inter;color:#1A2733"><span style="color:#0E8C7F;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>45 минут</div>
+      <div class="mrow" style="font:600 14px Inter;color:#1A2733"><span style="color:#0E8C7F;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg></span>Google Meet</div>
+      <div style="margin-top:18px;display:inline-flex;align-items:baseline;gap:6px;padding:7px 12px;background:#0F1B24;color:#fff;border-radius:6px"><span style="font:800 18px Inter;font-variant-numeric:tabular-nums">3 000</span><span style="font:600 13px Inter;color:#8FE3D8">₽</span></div>
+      <div style="margin-top:20px;font:400 13px/1.6 Inter;color:#5C6E7D">Разберём задачу, приоритеты и следующие шаги.</div>
+    </div>
+    <div style="width:330px;padding:28px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
+        <div><div style="font:800 22px Inter;color:#0F1B24;letter-spacing:-.01em">Июль</div><div style="font:600 13px Inter;color:#8A99A5">2026</div></div>
+        <div style="display:flex;gap:6px">
+          <span style="width:32px;height:32px;border-radius:6px;background:#F1F5F6;display:flex;align-items:center;justify-content:center;color:#BDC7CD"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+          <span style="width:32px;height:32px;border-radius:6px;background:#0F1B24;display:flex;align-items:center;justify-content:center;color:#fff"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">ПН</div><div class="wk">ВТ</div><div class="wk">СР</div><div class="wk">ЧТ</div><div class="wk">ПТ</div><div class="wk">СБ</div><div class="wk">ВС</div></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+        <sc-for list="{{ daysD }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for>
+      </div>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:10px;padding:11px 14px;background:#F1F5F6;border-radius:6px;color:#0F1B24;font:600 13px Inter">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+        Москва (GMT+3)<span style="margin-left:auto;color:#8A99A5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+    </div>
+    <div style="width:176px;padding:28px 18px;border-left:1px solid #EAEFF2">
+      <div style="font:800 13px Inter;color:#0F1B24;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px">Пт · 17 июля</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ timesD }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}">{{ s.t }}</div></sc-for>
+      </div>
+      <button style="margin-top:12px;width:100%;padding:12px;border:none;border-radius:6px;background:#0F1B24;color:#fff;font:700 14px Inter;cursor:pointer">Далее →</button>
+    </div>
+  </div>
+  <div style="width:296px;background:#0F1B24;border-radius:34px;padding:9px;box-shadow:0 20px 45px rgba(16,40,60,.24)">
+    <div style="background:#fff;border-radius:26px;overflow:hidden">
+      <div style="height:26px;display:flex;justify-content:center;align-items:flex-start;padding-top:8px"><div style="width:96px;height:6px;border-radius:4px;background:#E7EBED"></div></div>
+      <div style="padding:18px 20px 22px">
+        <div style="width:34px;height:5px;background:#0E8C7F;border-radius:3px;margin-bottom:14px"></div>
+        <div style="font:800 22px/1.1 Inter;color:#0F1B24;letter-spacing:-.01em;margin-bottom:4px">Выберите время</div>
+        <div style="font:600 12.5px Inter;color:#8A99A5;margin-bottom:16px">Пятница, 17 июля · GMT+3</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div style="padding:14px;border-radius:6px;text-align:center;font:700 15px Inter;background:#F1F5F6;color:#0F1B24;font-variant-numeric:tabular-nums">10:30</div>
+          <div style="padding:14px;border-radius:6px;text-align:center;font:700 15px Inter;background:#F1F5F6;color:#0F1B24;font-variant-numeric:tabular-nums">11:00</div>
+          <div style="padding:14px;border-radius:6px;text-align:center;font:800 15px Inter;background:#0E8C7F;color:#fff;font-variant-numeric:tabular-nums">14:00</div>
+          <div style="padding:14px;border-radius:6px;text-align:center;font:700 15px Inter;background:#F1F5F6;color:#0F1B24;font-variant-numeric:tabular-nums">14:30</div>
+        </div>
+        <button style="margin-top:16px;width:100%;padding:15px;border:none;border-radius:8px;background:#0F1B24;color:#fff;font:700 15px Inter">Далее →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Дальше можно: «беру <a class="dv-oid" href="#1b">1b</a>, разверни весь флоу» · «смешай воздух из <a class="dv-oid" href="#1b">1b</a> с типографикой <a class="dv-oid" href="#1d">1d</a>» · «покажи <a class="dv-oid" href="#1c">1c</a> на шаге 3 (форма) и экране Забронировано» · «хочу ещё направление»</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  cfgs() {
+    const base = (h, r, f) => `height:${h}px;display:flex;align-items:center;justify-content:center;border-radius:${r}px;font:${f}`;
+    return {
+      a: {
+        day: (s) => {
+          const b = base(36, 8, '600 13px Inter,sans-serif') + ';';
+          if (s === 'avail') return b + 'color:#0A6B61;cursor:pointer;';
+          if (s === 'today') return b + 'color:#1A2733;box-shadow:inset 0 0 0 1.5px #0E8C7F;';
+          if (s === 'sel') return b + 'background:#0E8C7F;color:#fff;';
+          if (s === 'off') return b + 'color:#B4C0C9;';
+          return 'height:36px;';
+        },
+        slot: (sel) => 'padding:10px 8px;border-radius:8px;text-align:center;font:600 13.5px Inter,sans-serif;cursor:pointer;' + (sel ? 'background:#0E8C7F;color:#fff;' : 'border:1px solid #DAE2E8;color:#0A6B61;')
+      },
+      b: {
+        day: (s) => {
+          const b = base(44, 12, '600 15px Manrope,sans-serif') + ';';
+          if (s === 'avail') return b + 'background:#E2F1EE;color:#0A6B61;cursor:pointer;';
+          if (s === 'today') return b + 'background:#fff;box-shadow:inset 0 0 0 2px #0E8C7F;color:#0E8C7F;';
+          if (s === 'sel') return b + 'background:#0E8C7F;color:#fff;font-weight:700;box-shadow:0 6px 14px rgba(14,140,127,.35);';
+          if (s === 'off') return b + 'color:#AEBBC4;';
+          return 'height:44px;';
+        },
+        slot: (sel) => 'padding:13px;border-radius:12px;text-align:center;font:600 15px Manrope,sans-serif;cursor:pointer;' + (sel ? 'background:#0E8C7F;color:#fff;font-weight:700;box-shadow:0 6px 14px rgba(14,140,127,.32);' : 'border:1.5px solid #CDE6E0;color:#0A6B61;')
+      },
+      c: {
+        day: (s) => {
+          const b = base(42, 12, '600 15px Manrope,sans-serif') + ';';
+          if (s === 'avail') return b + 'background:#fff;color:#0C7D71;box-shadow:inset 0 0 0 1px #EBE2D4;cursor:pointer;';
+          if (s === 'today') return b + 'box-shadow:inset 0 0 0 2px #0C7D71;color:#0C7D71;';
+          if (s === 'sel') return b + 'background:#0C7D71;color:#FBF6EE;font-weight:700;';
+          if (s === 'off') return b + 'color:#C7BCA9;';
+          return 'height:42px;';
+        },
+        slot: (sel) => 'padding:12px;border-radius:10px;text-align:center;font:600 15px Manrope,sans-serif;cursor:pointer;' + (sel ? 'background:#0C7D71;color:#FBF6EE;font-weight:700;' : 'border:1px solid #E7DECF;color:#0C7D71;background:#fff;')
+      },
+      d: {
+        day: (s) => {
+          const b = base(40, 6, '700 15px Inter,sans-serif') + ';font-variant-numeric:tabular-nums;';
+          if (s === 'avail') return b + 'background:#F1F5F6;color:#0F1B24;cursor:pointer;';
+          if (s === 'today') return b + 'box-shadow:inset 0 0 0 2px #0F1B24;color:#0F1B24;';
+          if (s === 'sel') return b + 'background:#0E8C7F;color:#fff;font-weight:800;';
+          if (s === 'off') return b + 'color:#BDC7CD;font-weight:600;';
+          return 'height:40px;';
+        },
+        slot: (sel) => 'padding:12px;border-radius:6px;text-align:center;font:700 15px Inter,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer;' + (sel ? 'background:#0E8C7F;color:#fff;font-weight:800;' : 'background:#F1F5F6;color:#0F1B24;')
+      }
+    };
+  }
+  buildDays(fn) {
+    const weekend = [4, 5, 11, 12, 18, 19, 25, 26], today = 15, sel = 17, arr = [];
+    for (let i = 0; i < 2; i++) arr.push({ n: '', style: 'height:1px' });
+    for (let n = 1; n <= 31; n++) {
+      let st = (weekend.includes(n) || n < today) ? 'off' : n === today ? 'today' : n === sel ? 'sel' : 'avail';
+      arr.push({ n: String(n), style: fn(st) });
+    }
+    return arr;
+  }
+  accent(main) {
+    return {
+      day: (s) => {
+        const b = 'height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;font:600 13px Inter,sans-serif;';
+        if (s === 'avail') return b + 'color:' + main + ';cursor:pointer;';
+        if (s === 'today') return b + 'box-shadow:inset 0 0 0 1.5px ' + main + ';color:#1A2733;';
+        if (s === 'sel') return b + 'background:' + main + ';color:#fff;';
+        if (s === 'off') return b + 'color:#B4C0C9;';
+        return 'height:36px;';
+      },
+      slot: (sel) => 'padding:10px 8px;border-radius:8px;text-align:center;font:600 13.5px Inter,sans-serif;cursor:pointer;' + (sel ? 'background:' + main + ';color:#fff;' : 'border:1px solid #DAE2E8;color:' + main + ';')
+    };
+  }
+  buildTimes(fn) {
+    return ['10:00', '10:30', '11:00', '11:30', '13:00', '13:30', '14:00', '14:30'].map(t => ({ t, style: fn(t === '14:00') }));
+  }
+  renderVals() {
+    const c = this.cfgs();
+    return {
+      daysA: this.buildDays(c.a.day), timesA: this.buildTimes(c.a.slot),
+      daysB: this.buildDays(c.b.day), timesB: this.buildTimes(c.b.slot),
+      daysC: this.buildDays(c.c.day), timesC: this.buildTimes(c.c.slot),
+      daysD: this.buildDays(c.d.day), timesD: this.buildTimes(c.d.slot),
+      ...(() => {
+        const g = this.accent('#263340'), bl = this.accent('#2F62E6'), st = this.accent('#33526E'), tc = this.accent('#A8503A');
+        return {
+          days2a: this.buildDays(g.day), times2a: this.buildTimes(g.slot),
+          days2b: this.buildDays(bl.day), times2b: this.buildTimes(bl.slot),
+          days2c: this.buildDays(st.day), times2c: this.buildTimes(st.slot),
+          days2d: this.buildDays(tc.day), times2d: this.buildTimes(tc.slot)
+        };
+      })()
+    };
+  }
+}
+</script>
+</body>
+</html>

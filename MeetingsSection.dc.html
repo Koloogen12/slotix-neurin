@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<style>
+.mtab{padding:9px 15px;border-radius:11px;font:600 14px "Golos Text";cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.mrow{display:flex;align-items:center;gap:14px;padding:15px 18px;border-radius:14px;cursor:pointer;transition:background .15s;position:relative}
+.mrow:hover{background:rgba(80,148,240,.06)}
+.dact{display:flex;align-items:center;justify-content:center;gap:9px;padding:12px;border-radius:12px;font:600 14px "Golos Text";cursor:pointer;width:100%;box-sizing:border-box}
+.menuitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;font:500 14px "Golos Text";color:#3E4347;cursor:pointer;white-space:nowrap}
+.menuitem:hover{background:rgba(80,148,240,.08)}
+.rwk{font:400 12px "Golos Text";color:#8E97A4;text-align:center;padding-bottom:6px}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:600px){.mrow{flex-wrap:wrap;row-gap:12px}.mpend{flex-basis:100%!important;order:9}.mpend button{flex:1}}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media(max-width:600px){.sheet-wrap{align-items:flex-end!important;padding:0!important}.sheet{width:100%!important;max-width:none!important;border-radius:22px 22px 0 0!important;animation:sheetUp .28s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}}
+</style>
+</helmet>
+
+<div style="padding:8px 12px 40px">
+
+  <h1 style="margin:0 0 20px;font:700 28px 'Golos Text';color:#1A1C1E;letter-spacing:-.01em">Все встречи</h1>
+
+  <div style="display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap">
+    <div class="mtab" style="{{ tabStyle.upcoming }}" onClick="{{ setTab.upcoming }}">Предстоящие</div>
+    <div class="mtab" style="{{ tabStyle.action }}" onClick="{{ setTab.action }}">Требуют действия<sc-if value="{{ hasAction }}" hint-placeholder-val="{{ true }}"><span style="{{ actionBadgeStyle }}">{{ actionCount }}</span></sc-if></div>
+    <div class="mtab" style="{{ tabStyle.past }}" onClick="{{ setTab.past }}">Прошедшие</div>
+    <div class="mtab" style="{{ tabStyle.cancelled }}" onClick="{{ setTab.cancelled }}">Отменённые</div>
+  </div>
+
+  <!-- toolbar -->
+  <div style="display:flex;gap:10px;margin-bottom:22px;position:relative">
+    <div style="position:relative;flex:1;max-width:340px">
+      <span style="position:absolute;left:14px;top:12px;color:#8E97A4"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></span>
+      <input value="{{ search }}" onInput="{{ setSearch }}" placeholder="Поиск по имени или почте" style="width:100%;box-sizing:border-box;padding:11px 14px 11px 42px;border-radius:12px;border:1px solid #D1D9E6;background:rgba(255,255,255,.6);font:400 14px 'Golos Text';color:#1A1C1E;outline:none">
+      <sc-if value="{{ hasSearch }}" hint-placeholder-val="{{ false }}"><span onClick="{{ clearSearch }}" style="position:absolute;right:12px;top:11px;color:#8E97A4;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></sc-if>
+    </div>
+    <div style="position:relative">
+      <div onClick="{{ toggleFilter }}" style="{{ filterBtnStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M6 12h12M10 19h4"/></svg>{{ filterLabel }}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div>
+      <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:calc(100% + 6px);left:0;min-width:220px;background:#fff;border:1px solid #E3E9EF;border-radius:14px;box-shadow:0 16px 40px rgba(20,40,70,.16);padding:6px;z-index:30">
+        <sc-for list="{{ filterOptions }}" as="f" hint-placeholder-count="4"><div class="menuitem" style="{{ f.style }}" onClick="{{ f.onClick }}"><span style="width:9px;height:9px;border-radius:50%;background:{{ f.color }};flex:none"></span>{{ f.name }}<sc-if value="{{ f.sel }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;color:#2F6FD0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></sc-if></div></sc-for>
+      </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ hasItems }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+    <div style="margin-bottom:22px">
+      <div style="font:600 13px 'Golos Text';color:#8E97A4;margin:0 0 8px 6px">{{ g.title }}</div>
+      <div style="background:rgba(255,255,255,.55);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.55);box-shadow:0 12px 34px rgba(20,40,70,.06);border-radius:18px;padding:6px">
+        <sc-for list="{{ g.items }}" as="m" hint-placeholder-count="3">
+        <div class="mrow" style="{{ m.rowStyle }}" onClick="{{ m.onClick }}">
+          <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ m.color }}"></div>
+          <div style="width:112px;flex:none;font:600 14px 'Golos Text';color:#1A1C1E;font-variant-numeric:tabular-nums">{{ m.time }}</div>
+          <div style="flex:1;min-width:0"><div style="font:600 14px 'Golos Text';color:#1A1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.format }}</div><div style="font:400 12.5px 'Golos Text';color:#8E97A4">{{ m.client }}</div></div>
+          <sc-if value="{{ m.pending }}" hint-placeholder-val="{{ false }}">
+          <div class="mpend" style="display:flex;gap:8px;flex:none" onClick="{{ m.stop }}">
+            <button onClick="{{ m.confirm }}" style="padding:8px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 13px 'Golos Text';cursor:pointer">Подтвердить</button>
+            <button onClick="{{ m.reject }}" style="padding:8px 14px;border:1px solid #D1D9E6;border-radius:10px;background:rgba(255,255,255,.6);color:#3E4347;font:600 13px 'Golos Text';cursor:pointer">Отклонить</button>
+          </div>
+          </sc-if>
+          <sc-if value="{{ m.showBadge }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ m.badgeStyle }}">{{ m.badge }}</div>
+          </sc-if>
+          <span style="color:#B5C0CC;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg></span>
+          <div style="position:relative;flex:none" onClick="{{ m.stop }}">
+            <span onClick="{{ m.toggleMenu }}" style="color:#B5C0CC;display:flex;cursor:pointer;padding:2px;border-radius:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+            <sc-if value="{{ m.menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:calc(100% + 4px);right:0;min-width:196px;background:#fff;border:1px solid #E3E9EF;border-radius:13px;box-shadow:0 16px 40px rgba(20,40,70,.18);padding:6px;z-index:25">
+              <div class="menuitem" onClick="{{ m.open }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Открыть детали</div>
+              <sc-if value="{{ m.pending }}" hint-placeholder-val="{{ false }}"><div class="menuitem" style="color:#2E8A73" onClick="{{ m.confirm }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Подтвердить</div></sc-if>
+              <div class="menuitem" onClick="{{ m.reschedule }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Перенести</div>
+              <div class="menuitem" onClick="{{ m.copy }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Скопировать ссылку</div>
+              <div style="height:1px;background:rgba(20,30,45,.07);margin:5px 8px"></div>
+              <div class="menuitem" style="color:#D64545" onClick="{{ m.cancel }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Отменить встречу</div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:70px 20px">
+    <div style="width:70px;height:70px;border-radius:20px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;color:#5094F0;margin-bottom:20px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div>
+    <div style="font:700 18px 'Golos Text';color:#1A1C1E;margin-bottom:6px">{{ emptyTitle }}</div>
+    <div style="font:400 14px 'Golos Text';color:#8E97A4;max-width:320px;margin-bottom:18px">{{ emptyText }}</div>
+    <sc-if value="{{ emptyReset }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resetFilters }}" style="padding:11px 18px;border:1px solid #D1D9E6;border-radius:12px;background:rgba(255,255,255,.7);color:#2F6FD0;font:600 14px 'Golos Text';cursor:pointer">Сбросить фильтры</button></sc-if>
+    <sc-if value="{{ emptyCTA }}" hint-placeholder-val="{{ false }}"><button onClick="{{ copyProfile }}" style="display:flex;align-items:center;gap:8px;padding:11px 18px;border:none;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(80,148,240,.3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Скопировать ссылку</button></sc-if>
+  </div>
+  </sc-if>
+
+  <!-- click-away for popovers -->
+  <sc-if value="{{ anyPopover }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closePopovers }}" style="position:fixed;inset:0;z-index:20"></div></sc-if>
+
+  <!-- DRAWER -->
+  <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(26,40,60,.28);backdrop-filter:blur(2px);z-index:40"></div>
+    <div style="position:fixed;top:0;right:0;height:100vh;width:428px;max-width:92vw;background:rgba(255,255,255,.82);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border-left:1px solid rgba(255,255,255,.6);box-shadow:-20px 0 50px rgba(20,40,70,.14);z-index:41;overflow-y:auto;box-sizing:border-box;padding:26px 28px">
+      <div style="display:flex;align-items:center;margin-bottom:22px">
+        <div style="{{ sel.badgeStyle }}">{{ sel.badge }}</div>
+        <span onClick="{{ closeDrawer }}" style="margin-left:auto;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;color:#5C6E7D;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><div style="width:10px;height:10px;border-radius:50%;background:{{ sel.color }}"></div><div style="font:700 20px 'Golos Text';color:#1A1C1E">{{ sel.format }}</div></div>
+      <div style="font:500 14px 'Golos Text';color:#8E97A4;margin-bottom:24px">{{ sel.dayLabel }} · {{ sel.time }}</div>
+
+      <div style="background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:16px;padding:18px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:16px"><div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#66A6FF,#5094F0);display:flex;align-items:center;justify-content:center;color:#fff;font:700 15px 'Golos Text'">{{ sel.initials }}</div><div><div style="font:600 15px 'Golos Text';color:#1A1C1E">{{ sel.client }}</div><div style="font:400 13px 'Golos Text';color:#8E97A4">{{ sel.email }}</div></div></div>
+        <div style="font:400 13.5px/1.5 'Golos Text';color:#3E4347;padding:12px 14px;background:rgba(255,255,255,.6);border-radius:11px">«{{ sel.comment }}»</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;padding:0 4px;margin-bottom:22px">
+        <div style="display:flex;gap:12px;font:400 14px 'Golos Text';color:#3E4347"><span style="color:#8E97A4;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div>{{ sel.time }} <span style="color:#8E97A4">· ваша зона (GMT+3)</span><br><span style="color:#8E97A4">{{ sel.timeClient }} · клиент (GMT+1)</span></div></div>
+        <div style="display:flex;gap:12px;font:400 14px 'Golos Text';color:#3E4347"><span style="color:#8E97A4;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg></span><div>Google Meet <span onClick="{{ copyLink }}" style="color:#2F6FD0;font-weight:600;cursor:pointer">· ссылка</span></div></div>
+        <div style="display:flex;gap:12px;font:400 14px 'Golos Text';color:#3E4347"><span style="color:#8E97A4;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1-.6-1.5V4.8A1.8 1.8 0 0 1 4.8 3h6.9a2 2 0 0 1 1.4.6l7.5 7.5a1.9 1.9 0 0 1 0 2.3z"/></svg></span>{{ sel.payLabel }}</div>
+      </div>
+
+      <sc-if value="{{ sel.pending }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <button onClick="{{ confirmSel }}" class="dact" style="background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 8px 20px rgba(80,148,240,.3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Подтвердить</button>
+        <button onClick="{{ rejectSel }}" class="dact" style="border:1px solid #D1D9E6;background:rgba(255,255,255,.6);color:#3E4347">Отклонить</button>
+      </div>
+      </sc-if>
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <button onClick="{{ rescheduleSel }}" class="dact" style="border:1px solid #D1D9E6;background:rgba(255,255,255,.6);color:#3E4347"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Перенести</button>
+        <button onClick="{{ writeSel }}" class="dact" style="border:1px solid #D1D9E6;background:rgba(255,255,255,.6);color:#3E4347"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 8h16M9 3v3M15 3v3"/></svg>Написать</button>
+      </div>
+      <button onClick="{{ openCancel }}" class="dact" style="border:1px solid rgba(242,106,106,.4);background:rgba(242,106,106,.06);color:#D64545"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Отменить встречу</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- CANCEL MODAL -->
+  <sc-if value="{{ cancelOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="sheet-wrap" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div onClick="{{ closeCancel }}" style="position:absolute;inset:0;background:rgba(26,40,60,.4);backdrop-filter:blur(3px)"></div>
+    <div class="sheet" style="position:relative;width:440px;max-width:100%;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(20,40,70,.28);padding:28px">
+      <div style="width:52px;height:52px;border-radius:15px;background:rgba(242,106,106,.12);display:flex;align-items:center;justify-content:center;color:#E15656;margin-bottom:18px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
+      <div style="font:700 20px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Отменить встречу?</div>
+      <div style="font:400 14px/1.5 'Golos Text';color:#5C6E7D;margin-bottom:18px">Клиент получит письмо об отмене. Это действие нельзя отменить.</div>
+      <div style="font:600 13px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Причина (увидит клиент)</div>
+      <textarea placeholder="Например: освободите слот, перенесём на следующей неделе" style="width:100%;box-sizing:border-box;min-height:80px;padding:12px 14px;border-radius:12px;border:1px solid #D1D9E6;font:400 14px 'Golos Text';color:#1A1C1E;outline:none;resize:vertical;margin-bottom:20px"></textarea>
+      <div style="display:flex;gap:10px">
+        <button onClick="{{ closeCancel }}" style="flex:1;padding:13px;border:1px solid #D1D9E6;border-radius:12px;background:#fff;color:#3E4347;font:600 14px 'Golos Text';cursor:pointer">Не отменять</button>
+        <button onClick="{{ doCancel }}" style="flex:1;padding:13px;border:none;border-radius:12px;background:#E15656;color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(225,86,86,.3)">Отменить встречу</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- RESCHEDULE MODAL -->
+  <sc-if value="{{ reschedOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="sheet-wrap" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div onClick="{{ closeResched }}" style="position:absolute;inset:0;background:rgba(26,40,60,.4);backdrop-filter:blur(3px)"></div>
+    <div class="sheet" style="position:relative;width:600px;max-width:100%;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(20,40,70,.28);padding:28px">
+      <div style="display:flex;align-items:center;margin-bottom:6px"><div style="font:700 20px 'Golos Text';color:#1A1C1E">Перенести встречу</div><span onClick="{{ closeResched }}" style="margin-left:auto;width:32px;height:32px;border-radius:9px;background:#F4F8FD;display:flex;align-items:center;justify-content:center;color:#5C6E7D;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div>
+      <div style="font:400 13.5px 'Golos Text';color:#8E97A4;margin-bottom:20px">{{ reschedName }} · сейчас {{ reschedCurrent }}</div>
+      <div style="display:flex;gap:26px;flex-wrap:wrap">
+        <div style="flex:1;min-width:250px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><button style="width:32px;height:32px;border-radius:50%;border:none;background:#F4F8FD;color:#3E4347;cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button><div style="font:600 16px 'Golos Text';color:#1A1C1E">Июль 2026</div><button style="width:32px;height:32px;border-radius:50%;border:none;background:#F4F8FD;color:#3E4347;cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button></div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="rwk">Пн</div><div class="rwk">Вт</div><div class="rwk">Ср</div><div class="rwk">Чт</div><div class="rwk">Пт</div><div class="rwk">Сб</div><div class="rwk">Вс</div></div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);justify-items:center;row-gap:5px"><sc-for list="{{ reschedDays }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}" onClick="{{ d.onClick }}">{{ d.n }}</div></sc-for></div>
+        </div>
+        <div style="width:168px;flex:none">
+          <div style="font:600 14px 'Golos Text';color:#1A1C1E;margin-bottom:12px">{{ reschedDayLabel }}</div>
+          <div style="display:flex;flex-direction:column;gap:8px;max-height:210px;overflow-y:auto"><sc-for list="{{ reschedTimes }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}" onClick="{{ s.onClick }}">{{ s.t }}</div></sc-for></div>
+        </div>
+      </div>
+      <button onClick="{{ doResched }}" style="margin-top:22px;width:100%;padding:15px;border:none;border-radius:13px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 15px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(80,148,240,.3)">Перенести на {{ reschedNewLabel }}</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- TOAST -->
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:11px;padding:14px 20px;border-radius:14px;background:#1A2733;color:#fff;box-shadow:0 16px 40px rgba(20,40,70,.3);font:600 14px 'Golos Text';animation:toastIn .25s ease">
+    <span style="{{ toastIconStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>{{ toast }}
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:800}}">
+class Component extends DCLogic {
+  state = {
+    tab: 'upcoming', sel: null, cancelOpen: false, search: '', formatFilter: 'all',
+    filterOpen: false, menuFor: null, toast: null, toastKind: 'ok',
+    reschedFor: null, reschedDay: 20, reschedTime: '14:00',
+    meetings: null
+  };
+  seed() {
+    return [
+      { id: 1, cat: 'upcoming', group: 'Сегодня', dayLabel: 'Сегодня, 17 июля', time: '14:00 — 14:45', timeClient: '12:00 — 12:45', format: 'Консультация по продукту', color: '#5B7A9E', client: 'Мария Соколова', initials: 'МС', email: 'maria@example.com', status: 'confirmed', comment: 'Хочу обсудить онбординг и метрики активации', payLabel: 'Оплачено · 3 000 ₽' },
+      { id: 2, cat: 'upcoming', group: 'Сегодня', dayLabel: 'Сегодня, 17 июля', time: '16:30 — 17:00', timeClient: '14:30 — 15:00', format: 'Быстрый созвон', color: '#5EA9E6', client: 'Иван Петров', initials: 'ИП', email: 'ivan.p@example.com', status: 'pending', comment: 'Пара вопросов по интеграции', payLabel: 'Бесплатно' },
+      { id: 3, cat: 'upcoming', group: 'Завтра', dayLabel: 'Завтра, 18 июля', time: '11:00 — 12:30', timeClient: '09:00 — 10:30', format: 'Стратегическая сессия', color: '#C79A2E', client: 'Ольга Кузнецова', initials: 'ОК', email: 'olga.k@example.com', status: 'pending', comment: 'Планирование roadmap на Q3', payLabel: 'Ждёт оплаты · 8 000 ₽' },
+      { id: 4, cat: 'upcoming', group: 'Пятница, 19 июля', dayLabel: 'Пятница, 19 июля', time: '13:00 — 13:30', timeClient: '11:00 — 11:30', format: 'Разбор портфолио', color: '#B5533A', client: 'Дмитрий Волков', initials: 'ДВ', email: 'dv@example.com', status: 'confirmed', comment: 'Разбор кейсов по продуктовому дизайну', payLabel: 'Оплачено · 2 500 ₽' },
+      { id: 5, cat: 'past', group: 'Вчера, 16 июля', dayLabel: 'Вчера, 16 июля', time: '10:00 — 10:45', timeClient: '08:00 — 08:45', format: 'Консультация по продукту', color: '#5B7A9E', client: 'Анна Лебедева', initials: 'АЛ', email: 'anna.l@example.com', status: 'confirmed', comment: 'Спасибо, было полезно!', payLabel: 'Оплачено · 3 000 ₽' },
+      { id: 6, cat: 'cancelled', group: 'Среда, 15 июля', dayLabel: 'Среда, 15 июля', time: '15:00 — 15:45', timeClient: '13:00 — 13:45', format: 'Менторская встреча', color: '#3FA294', client: 'Сергей Морозов', initials: 'СМ', email: 'sm@example.com', status: 'cancelled', comment: 'Не смогу, извините', payLabel: 'Возврат оформлен' }
+    ];
+  }
+  meetings() { return this.state.meetings || this.seed(); }
+  badge(status) {
+    const map = {
+      confirmed: ['Подтверждена', '#2E8A73', 'rgba(63,162,148,.14)'],
+      pending: ['Ждёт подтверждения', '#C77E1A', 'rgba(245,185,61,.16)'],
+      cancelled: ['Отменена', '#D64545', 'rgba(242,106,106,.1)'],
+      moved: ['Перенесена', '#2F6FD0', 'rgba(80,148,240,.12)']
+    };
+    const [label, color, bg] = map[status] || map.confirmed;
+    return { label, style: 'padding:5px 11px;border-radius:8px;font:600 12px "Golos Text";white-space:nowrap;color:' + color + ';background:' + bg + (status === 'cancelled' ? ';border:1px solid rgba(242,106,106,.35)' : '') };
+  }
+  toast(msg) {
+    this.setState({ toast: msg, menuFor: null });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+  update(id, patch) {
+    const list = this.meetings().map(m => m.id === id ? { ...m, ...patch } : m);
+    this.setState({ meetings: list, menuFor: null });
+  }
+  confirm(id) { this.update(id, { status: 'confirmed' }); this.toast('Встреча подтверждена — клиент уведомлён'); }
+  reject(id) { this.update(id, { status: 'cancelled', cat: 'cancelled' }); this.setState({ sel: null }); this.toast('Встреча отклонена'); }
+  dayStyle(state) {
+    const b = 'width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;font:500 14px "Golos Text";';
+    if (state === 'sel') return b + 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 6px 14px rgba(80,148,240,.35);';
+    if (state === 'off') return b + 'color:#C2CEDA;';
+    return b + 'color:#1A1C1E;cursor:pointer;';
+  }
+  slotStyle(sel) {
+    const b = 'padding:11px;border-radius:11px;text-align:center;font:600 14px "Golos Text";cursor:pointer;';
+    return sel ? b + 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 5px 14px rgba(80,148,240,.35);'
+      : b + 'border:1px solid #E3E9EF;background:#fff;color:#3E4347;';
+  }
+  renderVals() {
+    const S = this.state, all = this.meetings();
+    const uniqFormats = [...new Map(all.map(m => [m.format, m.color])).entries()];
+
+    let items;
+    if (S.tab === 'action') items = all.filter(m => m.cat === 'upcoming' && m.status === 'pending');
+    else items = all.filter(m => m.cat === S.tab);
+    if (S.formatFilter !== 'all') items = items.filter(m => m.format === S.formatFilter);
+    const q = S.search.trim().toLowerCase();
+    if (q) items = items.filter(m => (m.client + ' ' + m.email).toLowerCase().includes(q));
+
+    const groupTitles = [...new Set(items.map(m => m.group))];
+    const groups = groupTitles.map(t => ({
+      title: t,
+      items: items.filter(m => m.group === t).map(m => {
+        const b = this.badge(m.status), pending = m.status === 'pending';
+        return {
+          ...m, badge: b.label, badgeStyle: b.style, pending, showBadge: !pending,
+          rowStyle: pending ? 'box-shadow:inset 3px 0 0 #F5B93D' : '',
+          menuOpen: S.menuFor === m.id,
+          onClick: () => this.setState({ sel: m.id, menuFor: null }),
+          stop: (e) => { e.stopPropagation(); },
+          confirm: (e) => { e.stopPropagation(); this.confirm(m.id); },
+          reject: (e) => { e.stopPropagation(); this.reject(m.id); },
+          toggleMenu: (e) => { e.stopPropagation(); this.setState(st => ({ menuFor: st.menuFor === m.id ? null : m.id, filterOpen: false })); },
+          open: (e) => { e.stopPropagation(); this.setState({ sel: m.id, menuFor: null }); },
+          reschedule: (e) => { e.stopPropagation(); this.setState({ reschedFor: m.id, menuFor: null, reschedDay: 20, reschedTime: '14:00' }); },
+          copy: (e) => { e.stopPropagation(); this.toast('Ссылка на встречу скопирована'); },
+          cancel: (e) => { e.stopPropagation(); this.setState({ sel: m.id, menuFor: null, cancelOpen: true }); }
+        };
+      })
+    }));
+
+    const selObj = all.find(m => m.id === S.sel);
+    let sel = null;
+    if (selObj) { const b = this.badge(selObj.status); sel = { ...selObj, badge: b.label, badgeStyle: b.style, pending: selObj.status === 'pending' }; }
+
+    const filtering = S.formatFilter !== 'all' || !!q;
+    const empties = {
+      upcoming: ['Пока пусто', 'Поделитесь ссылкой — здесь появятся брони'],
+      action: ['Всё разобрано', 'Нет встреч, ожидающих вашего решения'],
+      past: ['Прошедших встреч нет', 'Здесь появятся завершённые встречи'],
+      cancelled: ['Отменённых нет', 'Здесь появятся отменённые встречи']
+    };
+    const tabStyleFor = (k) => S.tab === k
+      ? 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 6px 16px rgba(80,148,240,.3);'
+      : 'background:rgba(255,255,255,.55);color:#3E4347;border:1px solid rgba(255,255,255,.7);';
+
+    const filterOptions = [{ name: 'Все форматы', color: '#B5C0CC', val: 'all' }]
+      .concat(uniqFormats.map(([n, c]) => ({ name: n, color: c, val: n })))
+      .map(o => ({
+        name: o.name, color: o.color, sel: S.formatFilter === o.val,
+        style: S.formatFilter === o.val ? 'background:rgba(80,148,240,.08);color:#1A1C1E' : '',
+        onClick: () => this.setState({ formatFilter: o.val, filterOpen: false })
+      }));
+
+    const actionCount = all.filter(m => m.cat === 'upcoming' && m.status === 'pending').length;
+
+    // reschedule
+    const rObj = all.find(m => m.id === S.reschedFor);
+    const weekend = [4, 5, 11, 12, 18, 19, 25, 26];
+    const rDays = [];
+    for (let i = 0; i < 2; i++) rDays.push({ n: '', style: 'width:34px;height:34px' });
+    for (let n = 1; n <= 31; n++) {
+      let st = (weekend.includes(n) || n < 15) ? 'off' : (n === S.reschedDay ? 'sel' : 'plain');
+      rDays.push({ n: String(n), style: this.dayStyle(st), onClick: st === 'off' ? (() => {}) : (() => this.setState({ reschedDay: n })) });
+    }
+    const rTimes = ['10:00', '10:30', '11:00', '13:00', '14:00', '15:30', '16:00'].map(t => ({
+      t, style: this.slotStyle(t === S.reschedTime), onClick: () => this.setState({ reschedTime: t })
+    }));
+    const newLabel = S.reschedDay + ' июля, ' + S.reschedTime;
+
+    return {
+      hasItems: items.length > 0, isEmpty: items.length === 0,
+      emptyTitle: filtering ? 'Ничего не найдено' : empties[S.tab][0],
+      emptyText: filtering ? 'Попробуйте изменить поиск или фильтр' : empties[S.tab][1],
+      emptyReset: filtering, emptyCTA: !filtering && S.tab === 'upcoming' && all.filter(m => m.cat === 'upcoming').length === 0,
+      resetFilters: () => this.setState({ search: '', formatFilter: 'all' }),
+      copyProfile: () => this.toast('Ссылка на профиль скопирована'),
+      groups,
+      tabStyle: { upcoming: tabStyleFor('upcoming'), action: tabStyleFor('action'), past: tabStyleFor('past'), cancelled: tabStyleFor('cancelled') },
+      setTab: { upcoming: () => this.setState({ tab: 'upcoming', menuFor: null }), action: () => this.setState({ tab: 'action', menuFor: null }), past: () => this.setState({ tab: 'past', menuFor: null }), cancelled: () => this.setState({ tab: 'cancelled', menuFor: null }) },
+      hasAction: actionCount > 0, actionCount,
+      actionBadgeStyle: "font:600 11px 'Golos Text';color:#fff;background:" + (S.tab === 'action' ? 'rgba(255,255,255,.35)' : '#F26A6A') + ";min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px",
+      search: S.search, hasSearch: !!S.search,
+      setSearch: (e) => this.setState({ search: e.target.value }),
+      clearSearch: () => this.setState({ search: '' }),
+      filterOpen: S.filterOpen, filterOptions,
+      filterLabel: S.formatFilter === 'all' ? 'Все форматы' : S.formatFilter,
+      filterBtnStyle: 'display:flex;align-items:center;gap:8px;padding:11px 15px;border-radius:12px;border:1px solid ' + (S.formatFilter !== 'all' ? '#5094F0' : '#D1D9E6') + ';background:' + (S.formatFilter !== 'all' ? 'rgba(80,148,240,.08)' : 'rgba(255,255,255,.6)') + ';color:#3E4347;font:500 14px "Golos Text";cursor:pointer;white-space:nowrap',
+      toggleFilter: () => this.setState(st => ({ filterOpen: !st.filterOpen, menuFor: null })),
+      anyPopover: S.filterOpen || S.menuFor !== null,
+      closePopovers: () => this.setState({ filterOpen: false, menuFor: null }),
+      hasSel: !!sel, sel: sel || {},
+      closeDrawer: () => this.setState({ sel: null, cancelOpen: false }),
+      confirmSel: () => this.confirm(S.sel),
+      rejectSel: () => this.reject(S.sel),
+      rescheduleSel: () => this.setState({ reschedFor: S.sel, reschedDay: 20, reschedTime: '14:00' }),
+      writeSel: () => this.toast('Открываем почтовый клиент…'),
+      copyLink: () => this.toast('Ссылка на встречу скопирована'),
+      cancelOpen: S.cancelOpen,
+      openCancel: () => this.setState({ cancelOpen: true }),
+      closeCancel: () => this.setState({ cancelOpen: false }),
+      doCancel: () => { this.update(S.sel, { status: 'cancelled', cat: 'cancelled' }); this.setState({ cancelOpen: false, sel: null }); this.toast('Встреча отменена — клиент уведомлён'); },
+      reschedOpen: S.reschedFor !== null,
+      reschedName: rObj ? rObj.format : '', reschedCurrent: rObj ? (rObj.dayLabel + ', ' + rObj.time) : '',
+      closeResched: () => this.setState({ reschedFor: null }),
+      reschedDays: rDays, reschedTimes: rTimes,
+      reschedDayLabel: S.reschedDay + ' июля',
+      reschedNewLabel: newLabel,
+      doResched: () => { this.update(S.reschedFor, { status: 'moved', dayLabel: newLabel, time: S.reschedTime, group: S.reschedDay + ' июля' }); this.setState({ reschedFor: null, sel: null }); this.toast('Встреча перенесена на ' + newLabel); },
+      hasToast: !!S.toast, toast: S.toast,
+      toastIconStyle: 'width:20px;height:20px;border-radius:50%;background:#3FCB6E;color:#fff;display:flex;align-items:center;justify-content:center;flex:none'
+    };
+  }
+}
+</script>
+</body>
+</html>

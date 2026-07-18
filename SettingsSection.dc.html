@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<style>
+.scard{background:rgba(255,255,255,.6);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.55);box-shadow:0 12px 34px rgba(20,40,70,.06);border-radius:20px;padding:26px;margin-bottom:18px}
+.slbl{font:600 13px "Golos Text";color:#1A1C1E;margin-bottom:8px;display:block}
+.sinp{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #D1D9E6;background:rgba(255,255,255,.7);font:400 15px "Golos Text";color:#1A1C1E;outline:none}
+.sinp:focus{border-color:#5094F0;box-shadow:0 0 0 3px rgba(80,148,240,.15)}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media(max-width:600px){.sheet-wrap{align-items:flex-end!important;padding:0!important}.sheet{width:100%!important;max-width:none!important;border-radius:22px 22px 0 0!important;animation:sheetUp .28s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}}
+</style>
+</helmet>
+<div style="padding:8px 12px 40px;max-width:680px">
+  <h1 style="margin:0 0 6px;font:700 28px 'Golos Text';color:#1A1C1E;letter-spacing:-.01em">Настройки профиля</h1>
+  <p style="margin:0 0 26px;font:400 15px 'Golos Text';color:#8E97A4">Как вас видят клиенты на публичной странице</p>
+
+  <div class="scard">
+    <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px">
+      <div style="width:72px;height:72px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;overflow:hidden;flex:none;background:rgba(255,255,255,.85)"><image-slot id="set-avatar" style="width:72px;height:72px" shape="circle" placeholder="Фото"></image-slot></div>
+      <div><div style="font:600 15px 'Golos Text';color:#1A1C1E;margin-bottom:4px">Фото профиля</div><div style="font:400 13px 'Golos Text';color:#8E97A4">Перетащите изображение или кликните по кругу. PNG или JPG.</div></div>
+    </div>
+    <div style="display:grid;gap:18px">
+      <div><label class="slbl">Имя</label><input class="sinp" value="Алексей Ковалёв"></div>
+      <div><label class="slbl">Короткое описание</label><textarea class="sinp" style="min-height:72px;resize:vertical;line-height:1.5">Продуктовый эксперт. Помогаю командам находить фокус и растить метрики.</textarea></div>
+      <div>
+        <label class="slbl">Адрес страницы</label>
+        <div style="display:flex;align-items:center;border:1px solid #D1D9E6;border-radius:12px;background:rgba(255,255,255,.7);overflow:hidden">
+          <span style="padding:12px 4px 12px 14px;font:400 15px 'Golos Text';color:#8E97A4">slotix.ru/</span>
+          <input value="{{ slug }}" onInput="{{ setSlug }}" style="flex:1;border:none;background:transparent;padding:12px 14px 12px 0;font:600 15px 'Golos Text';color:#1A1C1E;outline:none">
+        </div>
+        <div style="{{ slugMsgStyle }}">{{ slugMsg }}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px">
+        <div><label class="slbl">Часовой пояс</label><div class="sinp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">Москва (GMT+3)<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        <div><label class="slbl">Язык писем</label><div class="sinp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">Русский<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:22px;font:500 13px 'Golos Text';color:#2E8A73"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Изменения сохраняются автоматически</div>
+  </div>
+
+  <div class="scard" style="border-color:rgba(242,106,106,.28)">
+    <div style="font:700 16px 'Golos Text';color:#D64545;margin-bottom:6px">Опасная зона</div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="font:400 13.5px/1.5 'Golos Text';color:#8E97A4;flex:1;min-width:200px">Удаление аккаунта необратимо. Все форматы, брони и настройки будут стёрты, будущие встречи — отменены.</div>
+      <button onClick="{{ openDelete }}" style="flex:none;padding:11px 18px;border:1px solid rgba(242,106,106,.4);border-radius:12px;background:rgba(242,106,106,.06);color:#D64545;font:600 14px 'Golos Text';cursor:pointer">Удалить аккаунт</button>
+    </div>
+  </div>
+
+  <sc-if value="{{ deleteOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="sheet-wrap" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div onClick="{{ closeDelete }}" style="position:absolute;inset:0;background:rgba(26,40,60,.4);backdrop-filter:blur(3px)"></div>
+    <div class="sheet" style="position:relative;width:440px;max-width:100%;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(20,40,70,.28);padding:28px">
+      <div style="width:52px;height:52px;border-radius:15px;background:rgba(242,106,106,.12);display:flex;align-items:center;justify-content:center;color:#E15656;margin-bottom:18px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div>
+      <div style="font:700 20px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Удалить аккаунт?</div>
+      <div style="font:400 14px/1.5 'Golos Text';color:#5C6E7D;margin-bottom:18px">Это действие нельзя отменить. Введите <b style="color:#1A1C1E">УДАЛИТЬ</b>, чтобы подтвердить.</div>
+      <input class="sinp" placeholder="УДАЛИТЬ" style="margin-bottom:20px">
+      <div style="display:flex;gap:10px">
+        <button onClick="{{ closeDelete }}" style="flex:1;padding:13px;border:1px solid #D1D9E6;border-radius:12px;background:#fff;color:#3E4347;font:600 14px 'Golos Text';cursor:pointer">Отмена</button>
+        <button style="flex:1;padding:13px;border:none;border-radius:12px;background:#E15656;color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(225,86,86,.3)">Удалить навсегда</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:700}}">
+class Component extends DCLogic {
+  state = { slug: 'alexey', deleteOpen: false };
+  renderVals() {
+    const taken = ['admin', 'alex', 'test', 'slotix'];
+    const s = this.state.slug.trim().toLowerCase();
+    const isTaken = taken.includes(s);
+    const free = s.length >= 3 && !isTaken;
+    let msg, color;
+    if (s.length < 3) { msg = 'Минимум 3 символа'; color = '#8E97A4'; }
+    else if (isTaken) { msg = '✗ Занят — попробуйте ' + s + '1 или ' + s + '.pro'; color = '#D64545'; }
+    else { msg = '✓ Адрес свободен'; color = '#2E8A73'; }
+    return {
+      slug: this.state.slug,
+      slugMsg: msg,
+      slugMsgStyle: 'margin-top:8px;font:500 12.5px "Golos Text";color:' + color,
+      setSlug: (e) => this.setState({ slug: e.target.value.replace(/[^a-z0-9.-]/gi, '') }),
+      deleteOpen: this.state.deleteOpen,
+      openDelete: () => this.setState({ deleteOpen: true }),
+      closeDelete: () => this.setState({ deleteOpen: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

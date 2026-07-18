@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:"Golos Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.scene{min-height:100vh;background:#EAF2FB url(assets/aurora-bg.png) center top/cover no-repeat fixed;padding:26px 24px 70px;box-sizing:border-box}
+.swi{padding:8px 14px;border-radius:10px;font:600 13px "Golos Text";cursor:pointer;white-space:nowrap}
+.mail{width:600px;max-width:100%;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(20,40,70,.14)}
+.mtop{height:4px;background:linear-gradient(90deg,#66A6FF,#5094F0)}
+.mhead{background:#fff;padding:22px 32px;border-bottom:1px solid #EEF2F6;display:flex;align-items:center}
+.mbody{padding:32px}
+.mdet{background:#F4F8FD;border:1px solid #E3ECF6;border-radius:14px;padding:20px;margin:20px 0}
+.mrow{display:flex;gap:11px;font:500 14px "Golos Text";color:#3E4347;padding:6px 0;align-items:center}
+.mrow span{color:#8E97A4;flex:none;display:flex}
+.mfoot{padding:20px 32px;border-top:1px solid #EEF2F6;font:400 12px "Golos Text";color:#A9B4BF;text-align:center}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:9px;font:600 13px "Golos Text";margin-bottom:16px}
+.btnp{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 14px "Golos Text";text-decoration:none;box-shadow:0 8px 20px rgba(80,148,240,.3)}
+.btns{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:12px;background:#F4F8FD;border:1px solid #E3ECF6;color:#3E4347;font:600 14px "Golos Text";text-decoration:none}
+</style>
+</helmet>
+
+<div class="scene">
+  <div style="display:flex;justify-content:center;margin-bottom:30px">
+    <div style="display:inline-flex;gap:4px;padding:5px;border-radius:14px;background:rgba(255,255,255,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 6px 18px rgba(20,40,70,.08);flex-wrap:wrap;justify-content:center;max-width:760px">
+      <div class="swi" style="{{ sw.booked }}" onClick="{{ go.booked }}">Вы записаны</div>
+      <div class="swi" style="{{ sw.magic }}" onClick="{{ go.magic }}">Вход по ссылке</div>
+      <div class="swi" style="{{ sw.pending }}" onClick="{{ go.pending }}">Запрос отправлен</div>
+      <div class="swi" style="{{ sw.owner }}" onClick="{{ go.owner }}">Владельцу: новая</div>
+      <div class="swi" style="{{ sw.payment }}" onClick="{{ go.payment }}">Оплата</div>
+      <div class="swi" style="{{ sw.reschedule }}" onClick="{{ go.reschedule }}">Перенос</div>
+      <div class="swi" style="{{ sw.canceled }}" onClick="{{ go.canceled }}">Отмена</div>
+      <div class="swi" style="{{ sw.remind }}" onClick="{{ go.remind }}">Напоминание</div>
+    </div>
+  </div>
+
+  <!-- ===== BOOKED ===== -->
+  <sc-if value="{{ isBooked }}" hint-placeholder-val="{{ true }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody">
+      <div class="chip" style="background:rgba(63,203,110,.15);color:#2FA85A"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Встреча подтверждена</div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Вы записаны, Мария!</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D">Встреча с Алексеем Ковалёвым подтверждена. Детали и ссылка — ниже.</div>
+      <div class="mdet">
+        <div style="font:700 16px 'Golos Text';color:#1A1C1E;margin-bottom:10px">Консультация по продукту</div>
+        <div class="mrow"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Пятница, 17 июля 2026 · 14:00 — 14:45</div>
+        <div class="mrow"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>45 минут · Ваш пояс (GMT+1)</div>
+        <div class="mrow"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg></span>Google Meet</div>
+      </div>
+      <a href="#" class="btnp" style="width:100%;box-sizing:border-box">Подключиться к встрече</a>
+      <div style="text-align:center;margin-top:18px;font:500 13px 'Golos Text';color:#8E97A4"><a href="#" style="color:#2F6FD0">В календарь</a> · <a href="#" style="color:#2F6FD0">Перенести</a> · <a href="#" style="color:#2F6FD0">Отменить</a></div>
+    </div>
+    <div class="mfoot">Вы получили это письмо, потому что записались через SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== MAGIC LINK ===== -->
+  <sc-if value="{{ isMagic }}" hint-placeholder-val="{{ false }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody" style="text-align:center">
+      <div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#66A6FF,#5094F0);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 10px 24px rgba(80,148,240,.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg></div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Ваша ссылка для входа</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D;max-width:400px;margin:0 auto 24px">Нажмите кнопку ниже, чтобы войти в Slotix. Пароль не нужен — вход по ссылке.</div>
+      <a href="Slotix - Кабинет.dc.html" class="btnp">Войти в Slotix</a>
+      <div style="margin:26px auto 12px;max-width:320px;display:flex;align-items:center;gap:12px;color:#C3CCD6;font:500 12px 'Golos Text'"><span style="flex:1;height:1px;background:#EEF2F6"></span>ИЛИ КОД ВРУЧНУЮ<span style="flex:1;height:1px;background:#EEF2F6"></span></div>
+      <div style="font:700 30px 'Golos Text';letter-spacing:.28em;color:#1A1C1E;padding-left:.28em">482913</div>
+      <div style="margin-top:22px;font:400 13px/1.5 'Golos Text';color:#A9B4BF;max-width:400px;margin-left:auto;margin-right:auto">Ссылка и код действуют 15 минут. Если вы не запрашивали вход, просто проигнорируйте это письмо.</div>
+    </div>
+    <div class="mfoot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== PENDING ===== -->
+  <sc-if value="{{ isPending }}" hint-placeholder-val="{{ false }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody">
+      <div class="chip" style="background:rgba(245,185,61,.16);color:#C77E1A"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Ждём подтверждения</div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Запрос отправлен</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D">Алексей подтвердит встречу — мы сразу напишем вам на почту. Обычно это занимает несколько часов.</div>
+      <div class="mdet">
+        <div style="font:700 16px 'Golos Text';color:#1A1C1E;margin-bottom:10px">Стратегическая сессия</div>
+        <div class="mrow"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Понедельник, 20 июля 2026 · 11:00 — 12:30</div>
+        <div class="mrow"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1-.6-1.5V4.8A1.8 1.8 0 0 1 4.8 3h6.9a2 2 0 0 1 1.4.6l7.5 7.5a1.9 1.9 0 0 1 0 2.3z"/></svg></span>Ждёт оплаты · 8 000 ₽</div>
+      </div>
+    </div>
+    <div class="mfoot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== OWNER ===== -->
+  <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ false }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody">
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Новая запись — нужно ваше решение</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D">Иван Петров записался на встречу, требующую подтверждения.</div>
+      <div class="mdet">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#66A6FF,#5094F0);display:flex;align-items:center;justify-content:center;color:#fff;font:700 14px 'Golos Text'">ИП</div><div><div style="font:600 15px 'Golos Text';color:#1A1C1E">Иван Петров</div><div style="font:400 13px 'Golos Text';color:#8E97A4">ivan.p@example.com</div></div></div>
+        <div class="mrow"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Быстрый созвон · Сегодня, 16:30 — 17:00</div>
+        <div style="font:400 13.5px/1.5 'Golos Text';color:#5C6E7D;padding:10px 0 0">«Пара вопросов по интеграции»</div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <a href="#" class="btnp" style="flex:1">Подтвердить</a>
+        <a href="#" class="btns" style="flex:1">Отклонить</a>
+      </div>
+    </div>
+    <div class="mfoot">Управляйте записями в кабинете SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== PAYMENT ===== -->
+  <sc-if value="{{ isPayment }}" hint-placeholder-val="{{ false }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody">
+      <div class="chip" style="background:rgba(63,203,110,.15);color:#2FA85A"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Оплачено</div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Оплата получена</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D">Спасибо! Оплата за встречу прошла успешно. Чек ниже.</div>
+      <div class="mdet">
+        <div class="mrow" style="justify-content:space-between"><span style="color:#8E97A4;font:400 14px 'Golos Text'">Услуга</span><span style="color:#1A1C1E;font:600 14px 'Golos Text'">Стратегическая сессия</span></div>
+        <div class="mrow" style="justify-content:space-between"><span style="color:#8E97A4;font:400 14px 'Golos Text'">Дата встречи</span><span style="color:#1A1C1E;font:600 14px 'Golos Text'">20 июля 2026, 11:00</span></div>
+        <div class="mrow" style="justify-content:space-between"><span style="color:#8E97A4;font:400 14px 'Golos Text'">Способ оплаты</span><span style="color:#1A1C1E;font:600 14px 'Golos Text'">Карта •• 4242</span></div>
+        <div style="height:1px;background:#E3ECF6;margin:12px 0"></div>
+        <div class="mrow" style="justify-content:space-between;padding:0"><span style="color:#1A1C1E;font:700 16px 'Golos Text'">Итого</span><span style="color:#1A1C1E;font:700 18px 'Golos Text'">8 000 ₽</span></div>
+      </div>
+      <a href="#" class="btns" style="width:100%;box-sizing:border-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4M4 21h16"/></svg>Скачать чек (PDF)</a>
+    </div>
+    <div class="mfoot">Платёж обработан безопасно · SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== RESCHEDULE ===== -->
+  <sc-if value="{{ isReschedule }}" hint-placeholder-val="{{ false }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody">
+      <div class="chip" style="background:rgba(80,148,240,.12);color:#2F6FD0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Новое время</div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Встреча перенесена</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D">Алексей предложил новое время для встречи «Консультация по продукту». Подтвердите, чтобы всё осталось в силе.</div>
+      <div class="mdet">
+        <div style="font:700 16px 'Golos Text';color:#1A1C1E;margin-bottom:12px">Консультация по продукту</div>
+        <div class="mrow" style="color:#A9B4BF"><span style="color:#C3CCD6"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span><s>Пятница, 17 июля · 14:00 — 14:45</s></div>
+        <div class="mrow" style="color:#1A1C1E;font-weight:700"><span style="color:#2F6FD0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>Вторник, 21 июля · 16:00 — 16:45</div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <a href="#" class="btnp" style="flex:1">Подтвердить время</a>
+        <a href="#" class="btns" style="flex:1">Выбрать другое</a>
+      </div>
+    </div>
+    <div class="mfoot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== CANCELED ===== -->
+  <sc-if value="{{ isCanceled }}" hint-placeholder-val="{{ false }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody">
+      <div class="chip" style="background:rgba(232,86,86,.13);color:#D14343"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Встреча отменена</div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Встреча отменена</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D">К сожалению, встреча «Консультация по продукту» отменена. Вы можете записаться на другое удобное время.</div>
+      <div class="mdet">
+        <div class="mrow" style="text-decoration:line-through;color:#A9B4BF"><span style="color:#C3CCD6"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Пятница, 17 июля 2026 · 14:00 — 14:45</div>
+        <div style="font:400 13.5px/1.5 'Golos Text';color:#5C6E7D;padding:8px 0 0">Причина: у организатора изменились планы</div>
+      </div>
+      <a href="Slotix - Страница брони.dc.html" class="btnp" style="width:100%;box-sizing:border-box">Записаться заново</a>
+    </div>
+    <div class="mfoot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== REMIND ===== -->
+  <sc-if value="{{ isRemind }}" hint-placeholder-val="{{ false }}">
+  <div class="mail">
+    <div class="mtop"></div>
+    <div class="mhead"><img src="assets/slotix-logo.png" alt="SLOTIX" style="height:24px;width:auto;display:block"></div>
+    <div class="mbody" style="text-align:center">
+      <div style="width:60px;height:60px;border-radius:50%;background:rgba(80,148,240,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#2F6FD0"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Встреча через 1 час</div>
+      <div style="font:400 15px/1.55 'Golos Text';color:#5C6E7D;margin-bottom:4px">Консультация по продукту с Алексеем Ковалёвым</div>
+      <div style="font:600 15px 'Golos Text';color:#1A1C1E;margin-bottom:22px">Сегодня, 14:00 — 14:45</div>
+      <a href="#" class="btnp">Подключиться к встрече</a>
+    </div>
+    <div class="mfoot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'booked' };
+  renderVals() {
+    const V = this.state.view;
+    const keys = ['booked','magic','pending','owner','payment','reschedule','canceled','remind'];
+    const swFor = (k) => V === k
+      ? 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 4px 12px rgba(80,148,240,.3);'
+      : 'color:#5C6E7D;';
+    const go = {}, sw = {};
+    keys.forEach(k => { go[k] = () => this.setState({ view: k }); sw[k] = swFor(k); });
+    return {
+      isBooked: V === 'booked', isMagic: V === 'magic', isPending: V === 'pending',
+      isOwner: V === 'owner', isPayment: V === 'payment', isReschedule: V === 'reschedule',
+      isCanceled: V === 'canceled', isRemind: V === 'remind',
+      sw, go
+    };
+  }
+}
+</script>
+</body>
+</html>

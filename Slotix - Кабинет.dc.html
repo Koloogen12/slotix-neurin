@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:"Golos Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2F6FD0;text-decoration:none}a:hover{color:#255FB8}
+.scene{min-height:100vh;background:#EAF2FB url(assets/aurora-bg.png) center/cover no-repeat fixed;display:flex;gap:16px;padding:16px;box-sizing:border-box}
+.tabbtn{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;padding:7px 2px 6px;font:600 10.5px "Golos Text";cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+.glass{background:rgba(255,255,255,.6);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.55);box-shadow:0 12px 34px rgba(20,40,70,.07)}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;font:600 12.5px "Golos Text";background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);color:#3E4347}
+.fmenu{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;font:500 14px "Golos Text";color:#3E4347;cursor:pointer;white-space:nowrap}
+.fmenu:hover{background:rgba(80,148,240,.08)}
+.sortitem{display:flex;align-items:center;padding:10px 12px;border-radius:9px;font:500 14px "Golos Text";color:#3E4347;cursor:pointer}
+.sortitem:hover{background:rgba(80,148,240,.08)}
+</style>
+</helmet>
+
+<div class="scene" style="{{ sceneStyle }}">
+
+  <!-- MOBILE TOP BAR -->
+  <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+  <header class="glass" style="position:sticky;top:0;z-index:35;display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:0 0 18px 18px">
+    <img src="assets/slotix-icon.png" alt="" style="width:28px;height:28px;border-radius:8px;flex:none"><div style="font:700 17px 'Golos Text';color:#1A1C1E;letter-spacing:.02em">SLOTIX</div>
+    <span style="font:600 11px 'Golos Text';color:#5A8BD4;background:rgba(80,148,240,.12);padding:3px 8px;border-radius:7px">Стандарт</span>
+    <div onClick="{{ handlers.settings }}" style="margin-left:auto;width:36px;height:36px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;overflow:hidden;flex:none;background:rgba(255,255,255,.85);cursor:pointer"><image-slot id="cab-avatar-m" style="width:36px;height:36px" shape="circle" placeholder="АК"></image-slot></div>
+  </header>
+  </sc-if>
+
+  <!-- SIDEBAR -->
+  <aside class="glass" style="width:236px;flex:none;border-radius:24px;padding:20px 16px;display:flex;flex-direction:column;position:sticky;top:16px;height:calc(100vh - 32px);box-sizing:border-box;{{ sidebarStyle }}">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 6px 20px">
+      <img src="assets/slotix-icon.png" alt="" style="width:30px;height:30px;border-radius:8px;flex:none"><div style="font:700 18px 'Golos Text';color:#1A1C1E;letter-spacing:.02em">SLOTIX</div>
+      <span style="margin-left:auto;font:600 11px 'Golos Text';color:#5A8BD4;background:rgba(80,148,240,.12);padding:3px 8px;border-radius:7px">Стандарт</span>
+    </div>
+
+    <nav style="display:flex;flex-direction:column;gap:4px">
+      <div style="{{ ns.formats }}" onClick="{{ handlers.formats }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ ni.formats }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Форматы встреч</div>
+      <div style="{{ ns.calendars }}" onClick="{{ handlers.calendars }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ ni.calendars }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>Календари</div>
+      <div style="{{ ns.integrations }}" onClick="{{ handlers.integrations }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ ni.integrations }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5M18 3v5"/><rect x="4" y="8" width="16" height="7" rx="2"/><path d="M12 15v4a3 3 0 0 0 3 3"/></svg>Интеграции</div>
+      <div style="{{ ns.meetings }}" onClick="{{ handlers.meetings }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ ni.meetings }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Все встречи<span style="margin-left:auto;font:600 11px 'Golos Text';color:#fff;background:#F26A6A;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px">2</span></div>
+      <div style="{{ ns.billing }}" onClick="{{ handlers.billing }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ ni.billing }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg>Оплата</div>
+    </nav>
+
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.7);border-radius:10px;padding:3px">
+        <div onClick="{{ setLangRu }}" style="{{ langRu }}">RU</div>
+        <div onClick="{{ setLangEn }}" style="{{ langEn }}">EN</div>
+      </div>
+      <div onClick="{{ handlers.settings }}" style="display:flex;align-items:center;gap:11px;padding:8px 6px;border-top:1px solid rgba(20,30,45,.07);padding-top:14px;cursor:pointer;border-radius:10px">
+        <div style="width:36px;height:36px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;overflow:hidden;flex:none;background:rgba(255,255,255,.85)"><image-slot id="cab-avatar" style="width:36px;height:36px" shape="circle" placeholder="АК"></image-slot></div>
+        <div style="min-width:0"><div style="font:600 13px 'Golos Text';color:#1A1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Алексей Ковалёв</div><div style="font:500 11px 'Golos Text';color:#8E97A4">Выйти</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main style="flex:1;min-width:0;padding:8px 12px 40px;{{ mainStyle }}">
+
+    <sc-if value="{{ isFormats }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+        <h1 style="margin:0;font:700 28px 'Golos Text';color:#1A1C1E;letter-spacing:-.01em">Форматы встреч</h1>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+          <div style="position:relative">
+            <div class="chip" style="cursor:pointer;color:#3E4347" onClick="{{ toggleSort }}">{{ sortLabel }}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+            <sc-if value="{{ sortOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:calc(100% + 6px);right:0;min-width:200px;background:#fff;border:1px solid #E3E9EF;border-radius:13px;box-shadow:0 16px 40px rgba(20,40,70,.18);padding:6px;z-index:30">
+              <sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="3"><div class="sortitem" style="{{ o.style }}" onClick="{{ o.onClick }}">{{ o.label }}<sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;color:#2F6FD0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></sc-if></div></sc-for>
+            </div>
+            </sc-if>
+          </div>
+          <div style="display:flex;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.7);border-radius:10px;padding:3px">
+            <div onClick="{{ setGrid }}" style="{{ gridBtnStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+            <div onClick="{{ setList }}" style="{{ listBtnStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></div>
+          </div>
+          <button style="display:flex;align-items:center;gap:8px;padding:11px 18px;border:none;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(80,148,240,.32)" onClick="{{ handlers.openNew }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Добавить формат</button>
+        </div>
+      </div>
+
+      <div class="glass" style="border-radius:20px;padding:18px 22px;display:flex;align-items:center;gap:16px;margin-bottom:26px;flex-wrap:wrap">
+        <div style="width:52px;height:52px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;overflow:hidden;flex:none;background:rgba(255,255,255,.85)"><image-slot id="cab-profile-avatar" style="width:52px;height:52px" shape="circle" placeholder="АК"></image-slot></div>
+        <div>
+          <div style="font:700 16px 'Golos Text';color:#1A1C1E">Алексей Ковалёв</div>
+          <div style="font:500 13px 'Golos Text';color:#8E97A4;margin-top:2px">slotix.ru/alexey</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:10px">
+          <button onClick="{{ copyProfile }}" style="display:flex;align-items:center;gap:8px;padding:10px 15px;border-radius:11px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.55);color:#2F6FD0;font:600 13px 'Golos Text';cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Скопировать ссылку</button>
+          <button onClick="{{ openPublic }}" style="display:flex;align-items:center;gap:8px;padding:10px 15px;border-radius:11px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.55);color:#3E4347;font:600 13px 'Golos Text';cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Открыть страницу</button>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(284px,1fr));gap:20px">
+        <sc-for list="{{ formats }}" as="f" hint-placeholder-count="6">
+        <div class="glass" style="border-radius:20px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;{{ f.dim }}" onClick="{{ f.open }}">
+          <div style="height:6px;background:{{ f.color }}"></div>
+          <div style="padding:20px;display:flex;flex-direction:column;flex:1">
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <div style="font:600 16px/1.3 'Golos Text';color:#1A1C1E">{{ f.name }}</div>
+              <div style="position:relative;flex:none" onClick="{{ f.stop }}">
+                <span onClick="{{ f.toggleMenu }}" style="color:#B5C0CC;display:flex;cursor:pointer;padding:2px;border-radius:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+                <sc-if value="{{ f.menuOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:calc(100% + 4px);right:0;min-width:196px;background:#fff;border:1px solid #E3E9EF;border-radius:13px;box-shadow:0 16px 40px rgba(20,40,70,.18);padding:6px;z-index:25">
+                  <div class="fmenu" onClick="{{ f.open }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Редактировать</div>
+                  <div class="fmenu" onClick="{{ f.copy }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>Скопировать ссылку</div>
+                  <div class="fmenu" onClick="{{ f.duplicate }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Дублировать</div>
+                  <sc-if value="{{ f.draft }}" hint-placeholder-val="{{ false }}"><div class="fmenu" style="color:#2E8A73" onClick="{{ f.publish }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Опубликовать</div></sc-if>
+                  <div style="height:1px;background:rgba(20,30,45,.07);margin:5px 8px"></div>
+                  <div class="fmenu" style="color:#D64545" onClick="{{ f.remove }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Удалить</div>
+                </div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="margin-top:6px;font:500 13px 'Golos Text';color:#8E97A4">{{ f.meta }}</div>
+            <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px"><span style="{{ f.priceStyle }}">{{ f.price }}</span><span class="chip" style="color:#8E97A4"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg>{{ f.provider }}</span></div>
+            <div style="margin-top:auto;padding-top:16px;border-top:1px solid rgba(20,30,45,.06);display:flex;align-items:center;gap:8px;{{ f.linkStyle }}" onClick="{{ f.copyRow }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>{{ f.linkText }}</div>
+          </div>
+        </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- LIST -->
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+      <div class="glass" style="border-radius:18px;padding:6px">
+        <sc-for list="{{ formats }}" as="f" hint-placeholder-count="6">
+        <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border-radius:13px;cursor:pointer;{{ f.dim }}" onClick="{{ f.open }}">
+          <div style="width:5px;height:34px;border-radius:3px;flex:none;background:{{ f.color }}"></div>
+          <div style="flex:1;min-width:0"><div style="font:600 15px 'Golos Text';color:#1A1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.name }}</div><div style="font:400 12.5px 'Golos Text';color:#8E97A4">{{ f.meta }}</div></div>
+          <span style="{{ f.priceStyle }}">{{ f.price }}</span>
+          <span class="chip" style="color:#8E97A4">{{ f.provider }}</span>
+          <div style="position:relative;flex:none" onClick="{{ f.stop }}">
+            <span onClick="{{ f.toggleMenu }}" style="color:#B5C0CC;display:flex;cursor:pointer;padding:2px"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+            <sc-if value="{{ f.menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:calc(100% + 4px);right:0;min-width:196px;background:#fff;border:1px solid #E3E9EF;border-radius:13px;box-shadow:0 16px 40px rgba(20,40,70,.18);padding:6px;z-index:25">
+              <div class="fmenu" onClick="{{ f.open }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Редактировать</div>
+              <div class="fmenu" onClick="{{ f.duplicate }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Дублировать</div>
+              <sc-if value="{{ f.draft }}" hint-placeholder-val="{{ false }}"><div class="fmenu" style="color:#2E8A73" onClick="{{ f.publish }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Опубликовать</div></sc-if>
+              <div style="height:1px;background:rgba(20,30,45,.07);margin:5px 8px"></div>
+              <div class="fmenu" style="color:#D64545" onClick="{{ f.remove }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Удалить</div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ anyFmtPopover }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closeFmtPopovers }}" style="position:fixed;inset:0;z-index:20"></div></sc-if>
+
+      <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:11px;padding:14px 20px;border-radius:14px;background:#1A2733;color:#fff;box-shadow:0 16px 40px rgba(20,40,70,.3);font:600 14px 'Golos Text'"><span style="width:20px;height:20px;border-radius:50%;background:#3FCB6E;color:#fff;display:flex;align-items:center;justify-content:center;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>{{ toast }}</div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isEditor }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="FormatEditor" on-back="{{ handlers.formats }}" draft="{{ editorDraft }}" hint-size="100%,900px"></dc-import>
+    </sc-if>
+
+    <sc-if value="{{ isMeetings }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="MeetingsSection" hint-size="100%,800px"></dc-import>
+    </sc-if>
+
+    <sc-if value="{{ isIntegrations }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="IntegrationsSection" hint-size="100%,420px"></dc-import>
+    </sc-if>
+
+    <sc-if value="{{ isCalendars }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="CalendarsSection" hint-size="100%,600px"></dc-import>
+    </sc-if>
+
+    <sc-if value="{{ isBilling }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="BillingSection" hint-size="100%,800px"></dc-import>
+    </sc-if>
+
+    <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="SettingsSection" hint-size="100%,700px"></dc-import>
+    </sc-if>
+
+  </main>
+
+  <!-- MOBILE TAB BAR -->
+  <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+  <nav class="glass" style="position:fixed;left:8px;right:8px;bottom:8px;z-index:40;display:flex;border-radius:20px;padding:4px 4px;box-shadow:0 -6px 24px rgba(20,40,70,.12)">
+    <div class="tabbtn" style="color:{{ ni.formats }}" onClick="{{ handlers.formats }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ ni.formats }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Форматы</div>
+    <div class="tabbtn" style="color:{{ ni.calendars }}" onClick="{{ handlers.calendars }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ ni.calendars }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>Календари</div>
+    <div class="tabbtn" style="color:{{ ni.integrations }}" onClick="{{ handlers.integrations }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ ni.integrations }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5M18 3v5"/><rect x="4" y="8" width="16" height="7" rx="2"/><path d="M12 15v4a3 3 0 0 0 3 3"/></svg>Интеграции</div>
+    <div class="tabbtn" style="color:{{ ni.meetings }}" onClick="{{ handlers.meetings }}"><span style="position:relative;display:flex"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ ni.meetings }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg><span style="position:absolute;top:-5px;right:-8px;font:600 10px 'Golos Text';color:#fff;background:#F26A6A;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px">2</span></span>Встречи</div>
+    <div class="tabbtn" style="color:{{ ni.billing }}" onClick="{{ handlers.billing }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ ni.billing }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg>Оплата</div>
+  </nav>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { active: 'formats', newFormat: false, view: 'grid', sort: 'new', sortOpen: false, menuFor: null, toast: null, formats: null, lang: 'ru', vw: (typeof window !== 'undefined' ? window.innerWidth : 1200) };
+  componentDidMount() {
+    this._onResize = () => { if (this._raf) return; this._raf = requestAnimationFrame(() => { this._raf = null; if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); }); };
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); clearTimeout(this._t); }
+  go(k) { return () => this.setState({ active: k, menuFor: null, sortOpen: false }); }
+  nstyle(k) {
+    const on = k === 'formats' ? (this.state.active === 'formats' || this.state.active === 'editor') : this.state.active === k;
+    return 'display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;font:' + (on ? '600' : '500') + ' 14px "Golos Text",sans-serif;cursor:pointer;' + (on ? 'background:rgba(80,148,240,.12);color:#2F6FD0;' : 'color:#3E4347;');
+  }
+  seed() {
+    return [
+      { id: 1, name: 'Консультация по продукту', dur: 45, price: 3000, provider: 'Meet', color: '#5B7A9E', status: 'live' },
+      { id: 2, name: 'Быстрый созвон', dur: 15, price: 0, provider: 'Meet', color: '#5EA9E6', status: 'live' },
+      { id: 3, name: 'Стратегическая сессия', dur: 90, price: 8000, provider: 'Zoom', color: '#C79A2E', status: 'live' },
+      { id: 4, name: 'Групповой вебинар', dur: 60, seats: 30, price: 0, provider: 'Телемост', color: '#8E86D6', status: 'draft' },
+      { id: 5, name: 'Разбор портфолио', dur: 30, price: 2500, provider: 'Meet', color: '#B5533A', status: 'live' },
+      { id: 6, name: 'Менторская встреча', dur: 60, price: 5000, provider: 'Meet', color: '#3FA294', status: 'live' }
+    ];
+  }
+  fmts() { return this.state.formats || this.seed(); }
+  toast(msg) { this.setState({ toast: msg, menuFor: null }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  setFmts(list) { this.setState({ formats: list, menuFor: null }); }
+  renderVals() {
+    const S = this.state;
+    const keys = ['formats', 'calendars', 'integrations', 'meetings', 'billing'];
+    const handlers = {}, ns = {}, ni = {};
+    keys.forEach(k => { handlers[k] = this.go(k); ns[k] = this.nstyle(k); ni[k] = this.nstyle(k).includes('#2F6FD0') ? '#2F6FD0' : '#8E97A4'; });
+    handlers.editor = () => this.setState({ active: 'editor', newFormat: false });
+    handlers.openNew = () => this.setState({ active: 'editor', newFormat: true });
+    handlers.settings = this.go('settings');
+
+    let list = this.fmts().slice();
+    if (S.sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+    else if (S.sort === 'price') list.sort((a, b) => b.price - a.price);
+    else if (S.sort === 'dur') list.sort((a, b) => a.dur - b.dur);
+
+    const formats = list.map(f => {
+      const draft = f.status === 'draft';
+      const durTxt = f.dur >= 60 ? (f.dur % 60 === 0 ? f.dur / 60 + ' ч' : Math.floor(f.dur / 60) + ' ч ' + f.dur % 60 + ' мин') : f.dur + ' минут';
+      const meta = durTxt + (f.seats ? ' · до ' + f.seats + ' мест' : '');
+      const priceLabel = draft ? 'Черновик' : (f.price === 0 ? 'Бесплатно' : f.price.toLocaleString('ru-RU') + ' ₽');
+      let priceStyle;
+      if (draft) priceStyle = "display:inline-flex;align-items:center;padding:6px 11px;border-radius:9px;font:600 12.5px 'Golos Text';color:#C77E1A;background:rgba(245,185,61,.16);border:1px solid rgba(245,185,61,.3)";
+      else if (f.price === 0) priceStyle = "display:inline-flex;align-items:center;padding:6px 11px;border-radius:9px;font:600 12.5px 'Golos Text';color:#3FA294;background:rgba(63,162,148,.1);border:1px solid rgba(63,162,148,.2)";
+      else priceStyle = "display:inline-flex;align-items:center;padding:6px 11px;border-radius:9px;font:600 12.5px 'Golos Text';background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);color:#3E4347";
+      return {
+        ...f, draft, meta, price: priceLabel, priceStyle,
+        dim: draft ? 'opacity:.96' : '',
+        menuOpen: S.menuFor === f.id,
+        linkStyle: draft ? 'color:#B5C0CC;font:600 13px "Golos Text"' : 'color:#2F6FD0;font:600 13px "Golos Text"',
+        linkText: draft ? 'Сначала опубликуйте' : 'Скопировать ссылку',
+        open: (e) => { e.stopPropagation(); this.setState({ active: 'editor', newFormat: false, menuFor: null }); },
+        stop: (e) => { e.stopPropagation(); },
+        toggleMenu: (e) => { e.stopPropagation(); this.setState(st => ({ menuFor: st.menuFor === f.id ? null : f.id, sortOpen: false })); },
+        copy: (e) => { e.stopPropagation(); this.toast('Ссылка на формат скопирована'); },
+        copyRow: (e) => { e.stopPropagation(); if (!draft) this.toast('Ссылка на формат скопирована'); },
+        duplicate: (e) => { e.stopPropagation(); const src = this.fmts().find(x => x.id === f.id); const copy = { ...src, id: Date.now(), name: src.name + ' (копия)', status: 'draft' }; this.setFmts([...this.fmts(), copy]); this.toast('Формат дублирован в черновик'); },
+        publish: (e) => { e.stopPropagation(); this.setFmts(this.fmts().map(x => x.id === f.id ? { ...x, status: 'live' } : x)); this.toast('Формат опубликован'); },
+        remove: (e) => { e.stopPropagation(); this.setFmts(this.fmts().filter(x => x.id !== f.id)); this.toast('Формат удалён'); }
+      };
+    });
+
+    const sortLabels = { new: 'Сначала новые', name: 'По названию', price: 'По цене', dur: 'По длительности' };
+    const sortOptions = ['new', 'name', 'price', 'dur'].map(k => ({
+      label: sortLabels[k], sel: S.sort === k,
+      style: S.sort === k ? 'background:rgba(80,148,240,.08);color:#1A1C1E' : '',
+      onClick: () => this.setState({ sort: k, sortOpen: false })
+    }));
+    const viewBtn = (on) => 'width:32px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;' + (on ? 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;' : 'color:#8E97A4;');
+    const langBtn = (on) => 'flex:1;text-align:center;padding:6px;border-radius:8px;font:600 12px "Golos Text";cursor:pointer;' + (on ? 'color:#fff;background:linear-gradient(135deg,#66A6FF,#5094F0);' : 'color:#8E97A4;');
+
+    const mobile = S.vw < 860;
+    return {
+      mobile,
+      sceneStyle: mobile ? 'flex-direction:column;gap:0;padding:0' : '',
+      sidebarStyle: mobile ? 'display:none' : '',
+      mainStyle: mobile ? 'padding:14px 14px 96px' : '',
+      isFormats: S.active === 'formats', isEditor: S.active === 'editor', isMeetings: S.active === 'meetings',
+      isIntegrations: S.active === 'integrations', isCalendars: S.active === 'calendars', isBilling: S.active === 'billing', isSettings: S.active === 'settings',
+      handlers, ns, ni, editorDraft: S.newFormat,
+      formats, isGrid: S.view === 'grid', isList: S.view === 'list',
+      setGrid: () => this.setState({ view: 'grid' }), setList: () => this.setState({ view: 'list' }),
+      gridBtnStyle: viewBtn(S.view === 'grid'), listBtnStyle: viewBtn(S.view === 'list'),
+      sortLabel: sortLabels[S.sort], sortOpen: S.sortOpen, sortOptions,
+      toggleSort: () => this.setState(st => ({ sortOpen: !st.sortOpen, menuFor: null })),
+      anyFmtPopover: S.sortOpen || S.menuFor !== null,
+      closeFmtPopovers: () => this.setState({ sortOpen: false, menuFor: null }),
+      copyProfile: () => this.toast('Ссылка на профиль скопирована'),
+      openPublic: () => this.toast('Публичная страница открыта в новой вкладке'),
+      langRu: langBtn(S.lang === 'ru'), langEn: langBtn(S.lang === 'en'),
+      setLangRu: () => this.setState({ lang: 'ru' }), setLangEn: () => this.setState({ lang: 'en' }),
+      hasToast: !!S.toast, toast: S.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

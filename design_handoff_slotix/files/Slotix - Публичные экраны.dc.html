@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:"Golos Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2F6FD0;text-decoration:none}
+.scene{min-height:100vh;background:#EAF2FB url(assets/aurora-bg.png) center/cover no-repeat fixed;padding:26px 24px 70px;box-sizing:border-box}
+.card{background:rgba(255,255,255,.66);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);border:1px solid rgba(255,255,255,.6);box-shadow:0 16px 40px rgba(20,40,70,.09);border-radius:26px}
+.swi{padding:8px 14px;border-radius:10px;font:600 13px "Golos Text";cursor:pointer}
+.foot{text-align:center;margin-top:22px;font:400 12px "Golos Text";color:#A9B4BF}
+.wk{font:400 12px "Golos Text";color:#8E97A4;text-align:center;padding-bottom:8px}
+</style>
+</helmet>
+
+<div class="scene">
+
+  <!-- switcher -->
+  <div style="display:flex;justify-content:center;margin-bottom:34px">
+    <div style="display:inline-flex;gap:4px;padding:5px;border-radius:14px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);box-shadow:0 6px 18px rgba(20,40,70,.06);flex-wrap:wrap;justify-content:center">
+      <div class="swi" style="{{ sw.profile }}" onClick="{{ go.profile }}">Профиль</div>
+      <div class="swi" style="{{ sw.cancel }}" onClick="{{ go.cancel }}">Отмена</div>
+      <div class="swi" style="{{ sw.reschedule }}" onClick="{{ go.reschedule }}">Перенос</div>
+      <div class="swi" style="{{ sw.closed }}" onClick="{{ go.closed }}">Закрыто</div>
+      <div class="swi" style="{{ sw.e404 }}" onClick="{{ go.e404 }}">404</div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:540px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:30px">
+      <div style="width:88px;height:88px;border-radius:50%;box-shadow:0 0 0 2px #5094F0;overflow:hidden;margin:0 auto 16px;background:rgba(255,255,255,.85)"><image-slot id="pub-avatar" style="width:88px;height:88px" shape="circle" placeholder="АК"></image-slot></div>
+      <div style="font:700 24px 'Golos Text';color:#1A1C1E;margin-bottom:6px">Алексей Ковалёв</div>
+      <div style="font:400 15px/1.5 'Golos Text';color:#8E97A4;max-width:420px;margin:0 auto">Продуктовый эксперт. Помогаю командам находить фокус и растить метрики.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ formats }}" as="f" hint-placeholder-count="3">
+      <div class="card" style="border-radius:18px;padding:0;overflow:hidden;display:flex;align-items:stretch;cursor:pointer">
+        <div style="width:6px;background:{{ f.color }}"></div>
+        <div style="flex:1;padding:18px 20px;display:flex;align-items:center;gap:14px">
+          <div style="flex:1"><div style="font:600 16px 'Golos Text';color:#1A1C1E">{{ f.name }}</div><div style="font:400 13px 'Golos Text';color:#8E97A4;margin-top:3px">{{ f.meta }}</div></div>
+          <span style="color:#B5C0CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        </div>
+      </div>
+      </sc-for>
+    </div>
+    <div class="foot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- CANCEL -->
+  <sc-if value="{{ isCancel }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:480px;margin:0 auto">
+    <sc-if value="{{ cancelDone }}" hint-placeholder-val="{{ false }}">
+    <div class="card" style="padding:36px;text-align:center">
+      <div style="width:66px;height:66px;border-radius:50%;background:rgba(92,110,125,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:#5C6E7D"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></div>
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Встреча отменена</div>
+      <div style="font:400 14px 'Golos Text';color:#8E97A4;margin-bottom:24px">Мы сообщили Алексею. Хотите записаться на другое время?</div>
+      <button onClick="{{ resetCancel }}" style="padding:13px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(80,148,240,.3)">Записаться заново</button>
+    </div>
+    </sc-if>
+    <sc-if value="{{ cancelPre }}" hint-placeholder-val="{{ true }}">
+    <div class="card" style="padding:32px">
+      <div style="font:700 22px 'Golos Text';color:#1A1C1E;margin-bottom:20px">Отменить встречу?</div>
+      <div style="background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:16px;padding:18px;margin-bottom:22px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:8px;height:8px;border-radius:50%;background:#5B7A9E"></div><div style="font:700 16px 'Golos Text';color:#1A1C1E">Консультация по продукту</div></div>
+        <div style="font:500 14px 'Golos Text';color:#3E4347">Пятница, 17 июля 2026 · 14:00 — 14:45</div>
+        <div style="font:400 13px 'Golos Text';color:#8E97A4;margin-top:4px">с Алексеем Ковалёвым · Google Meet</div>
+      </div>
+      <label style="font:600 13px 'Golos Text';color:#1A1C1E;display:block;margin-bottom:8px">Причина (необязательно)</label>
+      <textarea placeholder="Например: изменились планы" style="width:100%;box-sizing:border-box;min-height:76px;padding:12px 14px;border-radius:12px;border:1px solid #D1D9E6;background:rgba(255,255,255,.75);font:400 14px 'Golos Text';color:#1A1C1E;outline:none;resize:vertical;margin-bottom:20px"></textarea>
+      <button onClick="{{ doCancel }}" style="width:100%;padding:14px;border:none;border-radius:12px;background:#E15656;color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(225,86,86,.3)">Отменить встречу</button>
+    </div>
+    </sc-if>
+    <div class="foot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- RESCHEDULE -->
+  <sc-if value="{{ isReschedule }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:640px;margin:0 auto">
+    <div style="display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:11px;background:rgba(245,185,61,.16);border:1px solid rgba(245,185,61,.3);color:#C77E1A;font:600 13px 'Golos Text';margin-bottom:18px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Перенос встречи с 18 июля, 14:00
+    </div>
+    <div class="card" style="padding:32px;display:flex;gap:30px;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><button style="width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.85);color:#3E4347;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button><div style="font:600 17px 'Golos Text';color:#1A1C1E">Июль 2026</div><button style="width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.85);color:#3E4347;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button></div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr)"><div class="wk">Пн</div><div class="wk">Вт</div><div class="wk">Ср</div><div class="wk">Чт</div><div class="wk">Пт</div><div class="wk">Сб</div><div class="wk">Вс</div></div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);justify-items:center;row-gap:6px"><sc-for list="{{ days }}" as="d" hint-placeholder-count="33"><div style="{{ d.style }}">{{ d.n }}</div></sc-for></div>
+      </div>
+      <div style="width:180px;flex:none">
+        <div style="font:600 14px 'Golos Text';color:#1A1C1E;margin-bottom:14px">Понедельник, 20 июля</div>
+        <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ times }}" as="s" hint-placeholder-count="6"><div style="{{ s.style }}" onClick="{{ s.onClick }}">{{ s.t }}</div></sc-for></div>
+        <button style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(80,148,240,.3)">Перенести на {{ selTime }}</button>
+      </div>
+    </div>
+    <div class="foot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- CLOSED -->
+  <sc-if value="{{ isClosed }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:440px;margin:60px auto 0">
+    <div class="card" style="padding:40px;text-align:center">
+      <div style="width:80px;height:80px;border-radius:50%;box-shadow:0 0 0 2px #C9D4DE;overflow:hidden;margin:0 auto 18px;background:rgba(255,255,255,.85)"><image-slot id="closed-avatar" style="width:80px;height:80px" shape="circle" placeholder="АК"></image-slot></div>
+      <div style="font:700 21px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Запись закрыта</div>
+      <div style="font:400 14px/1.5 'Golos Text';color:#8E97A4;margin-bottom:24px">Алексей сейчас не принимает записи по этой ссылке. Загляните на страницу — возможно, есть другие форматы.</div>
+      <button onClick="{{ go.profile }}" style="padding:13px 22px;border:1px solid #D1D9E6;border-radius:12px;background:rgba(255,255,255,.7);color:#2F6FD0;font:600 14px 'Golos Text';cursor:pointer">На страницу Алексея</button>
+    </div>
+    <div class="foot">Работает на SLOTIX</div>
+  </div>
+  </sc-if>
+
+  <!-- 404 -->
+  <sc-if value="{{ isE404 }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:440px;margin:60px auto 0">
+    <div class="card" style="padding:44px 40px;text-align:center">
+      <div style="font:800 64px 'Golos Text';background:linear-gradient(135deg,#66A6FF,#5094F0);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px">404</div>
+      <div style="font:700 20px 'Golos Text';color:#1A1C1E;margin-bottom:8px">Страница не найдена</div>
+      <div style="font:400 14px/1.5 'Golos Text';color:#8E97A4;margin-bottom:24px">Возможно, ссылка устарела или её ввели с ошибкой.</div>
+      <button style="padding:13px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(80,148,240,.3)">На главную Slotix</button>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'profile', cancelled: false, selTime: '14:00' };
+  day(state) {
+    const b = 'width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;font:500 14px "Golos Text";';
+    if (state === 'today') return b + 'box-shadow:inset 0 0 0 1.5px #5094F0;color:#1A1C1E;';
+    if (state === 'sel') return b + 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 6px 14px rgba(80,148,240,.35);';
+    if (state === 'off') return b + 'color:#C2CEDA;';
+    return b + 'color:#1A1C1E;cursor:pointer;';
+  }
+  slot(sel) {
+    const b = 'padding:12px;border-radius:11px;text-align:center;font:600 14px "Golos Text";cursor:pointer;';
+    return sel ? b + 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 6px 16px rgba(80,148,240,.35);'
+      : b + 'border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.5);color:#3E4347;';
+  }
+  renderVals() {
+    const V = this.state.view;
+    const swFor = (k) => this.state.view === k
+      ? 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 4px 12px rgba(80,148,240,.3);'
+      : 'color:#5C6E7D;';
+    const go = {}; ['profile', 'cancel', 'reschedule', 'closed', 'e404'].forEach(k => go[k] = () => this.setState({ view: k }));
+    const today = 15, sel = 20, weekend = [4, 5, 11, 12, 18, 19, 25, 26], days = [];
+    for (let i = 0; i < 2; i++) days.push({ n: '', style: 'width:36px;height:36px' });
+    for (let n = 1; n <= 31; n++) {
+      let st = (weekend.includes(n) || n < today) ? 'off' : n === sel ? 'sel' : n === today ? 'today' : 'plain';
+      days.push({ n: String(n), style: this.day(st) });
+    }
+    const times = ['10:00', '10:30', '11:00', '13:00', '14:00', '15:30'].map(t => ({ t, style: this.slot(t === this.state.selTime), onClick: () => this.setState({ selTime: t }) }));
+    return {
+      isProfile: V === 'profile', isCancel: V === 'cancel', isReschedule: V === 'reschedule', isClosed: V === 'closed', isE404: V === 'e404',
+      sw: { profile: swFor('profile'), cancel: swFor('cancel'), reschedule: swFor('reschedule'), closed: swFor('closed'), e404: swFor('e404') },
+      go,
+      formats: [
+        { name: 'Консультация по продукту', meta: '45 минут · 3 000 ₽', color: '#5B7A9E' },
+        { name: 'Быстрый созвон', meta: '15 минут · бесплатно', color: '#5EA9E6' },
+        { name: 'Стратегическая сессия', meta: '90 минут · 8 000 ₽', color: '#C79A2E' }
+      ],
+      cancelDone: this.state.cancelled, cancelPre: !this.state.cancelled,
+      doCancel: () => this.setState({ cancelled: true }),
+      resetCancel: () => this.setState({ cancelled: false, view: 'profile' }),
+      days, times, selTime: this.state.selTime
+    };
+  }
+}
+</script>
+</body>
+</html>

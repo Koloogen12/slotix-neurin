@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<style>
+.fe-sec{background:rgba(255,255,255,.6);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.55);box-shadow:0 12px 34px rgba(20,40,70,.06);border-radius:20px;margin-bottom:16px;overflow:hidden}
+.fe-hd{display:flex;align-items:center;gap:12px;padding:20px 24px;cursor:pointer;user-select:none}
+.fe-lbl{font:600 13px "Golos Text";color:#1A1C1E;margin-bottom:9px}
+.fe-inp{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #D1D9E6;background:rgba(255,255,255,.7);font:400 15px "Golos Text";color:#1A1C1E;outline:none}
+.fe-inp:focus{border-color:#5094F0;box-shadow:0 0 0 3px rgba(80,148,240,.15)}
+.fe-hint{font:400 12.5px "Golos Text";color:#8E97A4;margin-top:7px}
+</style>
+</helmet>
+
+<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;padding:8px 12px 40px">
+
+  <!-- editor column -->
+  <div style="flex:1 1 440px;min-width:0;max-width:720px">
+
+    <!-- header -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+      <div style="display:flex;align-items:center;gap:8px;font:500 14px 'Golos Text';color:#8E97A4">
+        <span onClick="{{ onBack }}" style="cursor:pointer;color:#2F6FD0">Форматы встреч</span>
+        <span>/</span>
+        <span style="color:#1A1C1E;font-weight:600">{{ breadcrumbName }}</span>
+      </div>
+      <sc-if value="{{ isDraft }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ onBack }}" style="margin-left:auto;display:flex;align-items:center;gap:8px;padding:11px 20px;border:none;border-radius:11px;background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;font:600 14px 'Golos Text';cursor:pointer;box-shadow:0 8px 20px rgba(80,148,240,.3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Опубликовать</button>
+      </sc-if>
+      <sc-if value="{{ notDraft }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;padding:7px 13px;border-radius:10px;background:rgba(63,162,148,.12);color:#2E8A73;font:600 13px 'Golos Text'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Сохранено
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- SECTION: basic -->
+    <div class="fe-sec">
+      <div class="fe-hd" onClick="{{ toggle.basic }}">
+        <span style="font:600 16px 'Golos Text';color:#1A1C1E">Основная информация</span>
+        <span style="margin-left:auto;color:#8E97A4;transition:transform .2s;transform:{{ rot.basic }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+      <sc-if value="{{ open.basic }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:0 24px 26px">
+        <div class="fe-lbl">Тип встречи</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin-bottom:24px">
+          <div onClick="{{ setType.one }}" style="{{ typeStyle.one }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><div style="font:600 13px 'Golos Text';margin-top:10px">Один на один</div><div style="font:400 11.5px 'Golos Text';color:#8E97A4;margin-top:3px">Консультация 1:1</div></div>
+          <div onClick="{{ setType.group }}" style="{{ typeStyle.group }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M15.5 5.3a3.2 3.2 0 0 1 0 5.4"/><path d="M3 21c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M17 16.2c2.3.4 4 1.9 4 4.8"/></svg><div style="font:600 13px 'Golos Text';margin-top:10px">Групповая</div><div style="font:400 11.5px 'Golos Text';color:#8E97A4;margin-top:3px">Лимит мест</div></div>
+          <div onClick="{{ setType.many }}" style="{{ typeStyle.many }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-2a4 4 0 0 0-3-3.9M9 20v-2a4 4 0 0 1 3-3.9M7 9a2.5 2.5 0 1 1 0-.1M17 9a2.5 2.5 0 1 0 0-.1M12 7a2.5 2.5 0 1 1 0-.1"/></svg><div style="font:600 13px 'Golos Text';margin-top:10px">Без лимита</div><div style="font:400 11.5px 'Golos Text';color:#8E97A4;margin-top:3px">Сколько угодно</div></div>
+        </div>
+
+        <sc-if value="{{ isGroup }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:24px">
+          <div class="fe-lbl">Количество мест</div>
+          <div style="display:inline-flex;align-items:center;gap:2px;border:1px solid #D1D9E6;border-radius:12px;background:rgba(255,255,255,.7);padding:4px">
+            <button onClick="{{ seatsDown }}" style="width:34px;height:34px;border:none;background:transparent;border-radius:9px;color:#3E4347;font-size:20px;cursor:pointer">−</button>
+            <div style="width:44px;text-align:center;font:600 15px 'Golos Text';color:#1A1C1E">{{ seats }}</div>
+            <button onClick="{{ seatsUp }}" style="width:34px;height:34px;border:none;background:transparent;border-radius:9px;color:#3E4347;font-size:20px;cursor:pointer">+</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <div class="fe-lbl">Цвет формата</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px">
+          <sc-for list="{{ colorList }}" as="c" hint-placeholder-count="10"><div onClick="{{ c.onClick }}" style="{{ c.style }}"><sc-if value="{{ c.sel }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></sc-if></div></sc-for>
+        </div>
+
+        <div class="fe-lbl">Название</div>
+        <input class="fe-inp" value="{{ name }}" onInput="{{ setName }}" placeholder="Например: Консультация 30 минут">
+        <div class="fe-hint">Так событие будет отображаться у клиента · {{ nameLeft }} символов осталось</div>
+
+        <div class="fe-lbl" style="margin-top:22px">Локация</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:11px;background:rgba(80,148,240,.1);border:1px solid rgba(80,148,240,.25);color:#2F6FD0;font:600 13px 'Golos Text'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg>Google Meet<span style="cursor:pointer;color:#8FB4E8">✕</span></div>
+          <div onClick="{{ toggleLoc }}" style="display:flex;align-items:center;gap:6px;padding:9px 13px;border-radius:11px;border:1px dashed #C2CEDA;color:#5C6E7D;font:500 13px 'Golos Text';cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Добавить локацию</div>
+        </div>
+        <sc-if value="{{ locOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:10px;width:280px;background:#fff;border:1px solid #E3E9EF;border-radius:14px;box-shadow:0 16px 40px rgba(20,40,70,.14);padding:6px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;font:500 14px 'Golos Text';color:#3E4347;cursor:pointer"><span style="color:#8E97A4">🎥</span>Zoom<span style="margin-left:auto;width:7px;height:7px;border-radius:50%;background:#F5B93D" title="Подключите Zoom в Интеграциях"></span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;font:500 14px 'Golos Text';color:#3E4347;cursor:pointer"><span style="color:#8E97A4">🎬</span>Яндекс Телемост</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;font:500 14px 'Golos Text';color:#3E4347;cursor:pointer"><span style="color:#8E97A4">🔗</span>Своя ссылка</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;font:500 14px 'Golos Text';color:#3E4347;cursor:pointer"><span style="color:#8E97A4">📞</span>Телефонный звонок</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;font:500 14px 'Golos Text';color:#3E4347;cursor:pointer"><span style="color:#8E97A4">📍</span>Адрес офлайн</div>
+        </div>
+        </sc-if>
+
+        <div class="fe-lbl" style="margin-top:22px">Описание или инструкции</div>
+        <textarea class="fe-inp" style="min-height:96px;resize:vertical;line-height:1.5">Индивидуальная встреча, на которой мы разберём ваши задачи и подберём оптимальное решение для достижения ваших целей.</textarea>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- SECTION: timing -->
+    <div class="fe-sec">
+      <div class="fe-hd" onClick="{{ toggle.timing }}">
+        <span style="font:600 16px 'Golos Text';color:#1A1C1E">Сколько длится и когда доступно</span>
+        <span style="margin-left:auto;color:#8E97A4;transition:transform .2s;transform:{{ rot.timing }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+      <sc-if value="{{ open.timing }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:0 24px 26px">
+        <div class="fe-lbl">Длительность</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+          <sc-for list="{{ durList }}" as="d" hint-placeholder-count="8"><div onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</div></sc-for>
+          <div style="padding:9px 14px;border-radius:10px;border:1px dashed #C2CEDA;color:#5C6E7D;font:500 14px 'Golos Text';cursor:pointer">Своя…</div>
+        </div>
+
+        <div class="fe-lbl">Открытые дни</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;font:400 14px 'Golos Text';color:#3E4347">Для записи открыты следующие <b style="color:#1A1C1E">60 дней</b><span style="color:#2F6FD0;font-weight:600;cursor:pointer;margin-left:2px">Изменить</span></div>
+
+        <div class="fe-lbl">Расписание</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <button style="width:32px;height:32px;border-radius:9px;border:1px solid #D1D9E6;background:rgba(255,255,255,.7);color:#3E4347;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <div style="font:600 14px 'Golos Text';color:#1A1C1E">13 — 19 июля 2026</div>
+          <button style="width:32px;height:32px;border-radius:9px;border:1px solid #D1D9E6;background:rgba(255,255,255,.7);color:#3E4347;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+        <div style="overflow-x:auto;margin:0 -4px;padding:0 4px 4px"><div style="display:grid;grid-template-columns:repeat(7,minmax(84px,1fr));gap:8px;min-width:620px">
+          <sc-for list="{{ week }}" as="w" hint-placeholder-count="7"><div style="{{ w.cardStyle }}"><div style="font:600 12px 'Golos Text';color:#1A1C1E">{{ w.wd }}</div><div style="font:400 11px 'Golos Text';color:#8E97A4;margin-bottom:8px">{{ w.date }}</div><div style="{{ w.slotStyle }}">{{ w.slot }}</div></div></sc-for>
+        </div></div>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- SECTION: advanced -->
+    <div class="fe-sec">
+      <div class="fe-hd" onClick="{{ toggle.advanced }}">
+        <span style="font:600 16px 'Golos Text';color:#1A1C1E">Продвинутые настройки расписания</span>
+        <span style="font:400 13px 'Golos Text';color:#8E97A4">шаг слота {{ step }} минут</span>
+        <span style="margin-left:auto;color:#8E97A4;transition:transform .2s;transform:{{ rot.advanced }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+      <sc-if value="{{ open.advanced }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:0 24px 26px;display:flex;flex-direction:column;gap:20px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+          <div><div class="fe-lbl">Шаг слота</div><div class="fe-inp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">30 минут<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+          <div><div class="fe-lbl">Мин. время до брони</div><div class="fe-inp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">за 2 часа<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+          <div><div class="fe-lbl">Буфер до встречи</div><div class="fe-inp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">0 минут<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+          <div><div class="fe-lbl">Буфер после встречи</div><div class="fe-inp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">10 минут<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding-top:4px">
+          <div onClick="{{ toggleManual }}" style="{{ manualTrack }}"><div style="{{ manualKnob }}"></div></div>
+          <div><div style="font:600 14px 'Golos Text';color:#1A1C1E">Подтверждать записи вручную</div><div style="font:400 12.5px 'Golos Text';color:#8E97A4;margin-top:2px">Клиент получит подтверждение только после вашего одобрения</div></div>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- SECTION: price -->
+    <div class="fe-sec">
+      <div class="fe-hd" onClick="{{ toggle.price }}">
+        <span style="font:600 16px 'Golos Text';color:#1A1C1E">Стоимость и способ оплаты</span>
+        <span style="font:400 13px 'Golos Text';color:#8E97A4">{{ priceSummary }}</span>
+        <span style="margin-left:auto;color:#8E97A4;transition:transform .2s;transform:{{ rot.price }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+      <sc-if value="{{ open.price }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:0 24px 26px">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <div onClick="{{ togglePaid }}" style="{{ paidTrack }}"><div style="{{ paidKnob }}"></div></div>
+          <div style="font:600 14px 'Golos Text';color:#1A1C1E">Платная встреча</div>
+        </div>
+        <sc-if value="{{ paid }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:16px">
+          <div><div class="fe-lbl">Сумма</div><div style="position:relative"><input class="fe-inp" value="{{ price }}" onInput="{{ setPrice }}" style="padding-right:34px"><span style="position:absolute;right:14px;top:12px;color:#8E97A4;font:500 15px 'Golos Text'">₽</span></div></div>
+          <div><div class="fe-lbl">Приём оплаты</div><div class="fe-inp" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">ЮKassa<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E97A4" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;background:rgba(245,185,61,.12);border:1px solid rgba(245,185,61,.28)">
+          <span style="color:#C77E1A;flex:none;margin-top:1px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+          <div style="font:400 13px/1.45 'Golos Text';color:#8A6410">ЮKassa не подключена — оплату принять не получится. <span style="color:#2F6FD0;font-weight:600;cursor:pointer">Подключить в Интеграциях</span></div>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+    </div>
+
+  </div>
+
+  <!-- sticky live preview -->
+  <div style="flex:1 1 280px;min-width:280px;max-width:320px;position:sticky;top:16px">
+    <div style="font:600 12px 'Golos Text';color:#8E97A4;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px">Как увидит клиент</div>
+    <div style="background:rgba(255,255,255,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.6);border-radius:22px;box-shadow:0 16px 40px rgba(20,40,70,.1);overflow:hidden">
+      <div style="height:6px;background:{{ color }}"></div>
+      <div style="padding:22px">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:18px"><div style="width:40px;height:40px;border-radius:50%;box-shadow:0 0 0 1.5px #5094F0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font:700 13px 'Golos Text';color:#2F6FD0">АК</div><div style="font:500 13px 'Golos Text';color:#8E97A4">Алексей Ковалёв</div></div>
+        <div style="font:700 19px/1.25 'Golos Text';color:#1A1C1E;margin-bottom:16px">{{ name }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:11px;color:#3E4347;font:500 14px 'Golos Text'"><span style="color:#8E97A4"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>{{ durLabel }}</div>
+          <div style="display:flex;align-items:center;gap:11px;color:#3E4347;font:500 14px 'Golos Text'"><span style="color:#8E97A4"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="13" height="12" rx="2.5"/><path d="M15 10l6-3.5v11L15 14"/></svg></span>Google Meet</div>
+          <sc-if value="{{ paid }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:11px;color:#3E4347;font:500 14px 'Golos Text'"><span style="color:#8E97A4"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1-.6-1.5V4.8A1.8 1.8 0 0 1 4.8 3h6.9a2 2 0 0 1 1.4.6l7.5 7.5a1.9 1.9 0 0 1 0 2.3z"/></svg></span>{{ price }} ₽</div></sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900},&quot;onBack&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = {
+    open: { basic: true, timing: true, advanced: false, price: false },
+    type: 'one', seats: 20, color: '#5B7A9E',
+    name: 'Консультация по продукту', duration: 45,
+    locOpen: false, paid: true, price: '3 000', manual: false, step: 30
+  };
+  componentDidMount() {
+    if (this.props.draft) this.setState({ name: '', paid: false, price: '', color: '#8E86D6' });
+  }
+  tog(k) { return () => this.setState(s => ({ open: { ...s.open, [k]: !s.open[k] } })); }
+  durLabel(v) { return v === 120 ? '2 ч' : v === 180 ? '3 ч' : v + ' мин'; }
+  renderVals() {
+    const S = this.state;
+    const colors = ['#8E86D6', '#5B7A9E', '#C79A2E', '#B5533A', '#4E79A7', '#5EA9E6', '#3FA294', '#D9B382', '#2F4B7C', '#7B5EA7'];
+    const colorList = colors.map(c => ({
+      c, sel: c === S.color,
+      onClick: () => this.setState({ color: c }),
+      style: 'width:32px;height:32px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:' + c + (c === S.color ? ';box-shadow:0 0 0 2px #fff,0 0 0 4px ' + c : '')
+    }));
+    const durs = [15, 30, 45, 60, 90, 120, 150, 180];
+    const durList = durs.map(v => ({
+      val: v, label: this.durLabel(v),
+      onClick: () => this.setState({ duration: v }),
+      style: 'padding:9px 14px;border-radius:10px;font:600 14px "Golos Text";cursor:pointer;' + (v === S.duration ? 'background:linear-gradient(135deg,#66A6FF,#5094F0);color:#fff;box-shadow:0 4px 12px rgba(80,148,240,.3);' : 'border:1px solid #D1D9E6;background:rgba(255,255,255,.6);color:#3E4347;')
+    }));
+    const typeStyleFor = (k) => {
+      const on = S.type === k;
+      return 'padding:16px 12px;border-radius:14px;text-align:center;cursor:pointer;color:' + (on ? '#2F6FD0' : '#8E97A4') + ';background:' + (on ? 'rgba(80,148,240,.08)' : 'rgba(255,255,255,.5)') + ';border:1.5px solid ' + (on ? '#5094F0' : '#E3E9EF') + ';box-shadow:' + (on ? '0 6px 16px rgba(80,148,240,.14)' : 'none') + ';display:flex;flex-direction:column;align-items:center';
+    };
+    const days = [['Пн', '13'], ['Вт', '14'], ['Ср', '15'], ['Чт', '16'], ['Пт', '17'], ['Сб', '18'], ['Вс', '19']];
+    const week = days.map((d, i) => {
+      const avail = i < 5;
+      return {
+        wd: d[0], date: d[1] + ' июля',
+        slot: avail ? '10:00–17:00' : 'Недоступно',
+        cardStyle: 'padding:12px 8px;border-radius:12px;text-align:center;border:1px solid ' + (avail ? 'rgba(80,148,240,.2)' : '#E3E9EF') + ';background:' + (avail ? 'rgba(80,148,240,.05)' : 'rgba(255,255,255,.4)'),
+        slotStyle: avail ? 'font:600 11px "Golos Text";color:#2F6FD0;padding:5px 4px;border-radius:7px;background:rgba(80,148,240,.1)' : 'font:500 11px "Golos Text";color:#B5C0CC'
+      };
+    });
+    const track = (on) => 'width:44px;height:26px;border-radius:14px;padding:3px;cursor:pointer;transition:background .2s;background:' + (on ? 'linear-gradient(135deg,#66A6FF,#5094F0)' : '#CBD5E1') + ';box-sizing:border-box';
+    const knob = (on) => 'width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s;transform:translateX(' + (on ? '18px' : '0') + ')';
+    return {
+      onBack: this.props.onBack || (() => {}),
+      isDraft: !!this.props.draft, notDraft: !this.props.draft,
+      breadcrumbName: this.props.draft ? 'Новый формат' : (S.name || 'Без названия'),
+      name: S.name, seats: S.seats, color: S.color, step: S.step, price: S.price, paid: S.paid,
+      durLabel: this.durLabel(S.duration),
+      nameLeft: 60 - S.name.length,
+      priceSummary: S.paid ? (S.price + ' ₽') : 'Бесплатно',
+      open: S.open, isGroup: S.type === 'group', locOpen: S.locOpen,
+      rot: Object.fromEntries(Object.keys(S.open).map(k => [k, S.open[k] ? 'rotate(180deg)' : 'rotate(0deg)'])),
+      toggle: { basic: this.tog('basic'), timing: this.tog('timing'), advanced: this.tog('advanced'), price: this.tog('price') },
+      setType: { one: () => this.setState({ type: 'one' }), group: () => this.setState({ type: 'group' }), many: () => this.setState({ type: 'many' }) },
+      typeStyle: { one: typeStyleFor('one'), group: typeStyleFor('group'), many: typeStyleFor('many') },
+      seatsUp: () => this.setState(s => ({ seats: Math.min(100, s.seats + 1) })),
+      seatsDown: () => this.setState(s => ({ seats: Math.max(2, s.seats - 1) })),
+      colorList, durList, week,
+      setName: (e) => this.setState({ name: e.target.value.slice(0, 60) }),
+      setPrice: (e) => this.setState({ price: e.target.value }),
+      toggleLoc: () => this.setState(s => ({ locOpen: !s.locOpen })),
+      togglePaid: () => this.setState(s => ({ paid: !s.paid })),
+      toggleManual: () => this.setState(s => ({ manual: !s.manual })),
+      paidTrack: track(S.paid), paidKnob: knob(S.paid),
+      manualTrack: track(S.manual), manualKnob: knob(S.manual)
+    };
+  }
+}
+</script>
+</body>
+</html>
