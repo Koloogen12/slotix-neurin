@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+/* Design tokens — from design_handoff_slotix/README.md ("aurora glass" design language) */
+:root {
+  --color-primary: #5094f0;
+  --color-primary-gradient: linear-gradient(135deg, #66a6ff, #5094f0);
+  --color-link: #2f6fd0;
+  --color-link-hover: #1f5fbf;
+  --color-ink: #1a1c1e;
+  --color-text-secondary: #3e4347;
+  --color-text-secondary-2: #5c6672;
+  --color-text-secondary-3: #5c6e7d;
+  --color-muted: #8e97a4;
+  --color-faint: #a9b4bf;
+  --color-faint-2: #b5c0cc;
+  --color-faint-3: #c3ccd6;
+  --color-page-bg: #eaf2fb;
+  --color-success: #2fa85a;
+  --color-success-2: #3fcb6e;
+  --color-success-bg: rgba(63, 203, 110, 0.15);
+  --color-warning: #c77e1a;
+  --color-warning-bg: rgba(245, 185, 61, 0.16);
+  --color-danger: #d14343;
+  --color-danger-bg: rgba(232, 86, 86, 0.13);
+  --color-info: #2f6fd0;
+  --color-info-bg: rgba(80, 148, 240, 0.12);
+
+  --background: var(--color-page-bg);
+  --foreground: var(--color-ink);
+}
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-link: var(--color-link);
+  --color-ink: var(--color-ink);
+  --color-muted: var(--color-muted);
+  --color-faint: var(--color-faint);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: var(--color-info);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-golos), system-ui, sans-serif;
+}
+
+body {
+  background: var(--background) url("/slotix/aurora-bg.png") center top / cover no-repeat fixed;
+  color: var(--foreground);
+  font-family: var(--font-golos), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glass card — the one recurring surface treatment across the app (not emails, which are
+   plain — see notifications templates on the backend). */
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(30px) saturate(1.4);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(20, 40, 70, 0.1);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 12px;
+  background: var(--color-primary-gradient);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 8px 22px rgba(80, 148, 240, 0.32);
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+.btn-primary:hover {
+  box-shadow: 0 10px 26px rgba(80, 148, 240, 0.4);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 12px;
+  background: #f4f8fd;
+  border: 1px solid #e3ecf6;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.input-field {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d9e6;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 15px;
+  color: var(--color-ink);
+  outline: none;
+}
+.input-field:focus {
+  border-color: var(--color-primary);
+}
