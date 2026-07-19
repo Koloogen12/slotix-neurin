@@ -124,7 +124,7 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
       // the same thing to the visitor, so both re-open the picker instead of showing a
       // raw error.
       const isSlotGoneError =
-        error instanceof ApiError && (error.status === 409 || (error.status === 400 && /no longer available/i.test(error.message)));
+        error instanceof ApiError && (error.status === 409 || (error.status === 400 && /больше недоступно/i.test(error.message)));
       if (isSlotGoneError) {
         setConflictNotice(true);
         setSelectedSlot(null);

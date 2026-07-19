@@ -13,14 +13,18 @@ const TIMEZONES =
     ? Intl.supportedValuesOf("timeZone")
     : ["Europe/Moscow", "Europe/Kaliningrad", "Asia/Yekaterinburg", "Asia/Novosibirsk", "Asia/Vladivostok"];
 
-interface DayRow {
-  enabled: boolean;
+interface TimeRange {
   startTime: string;
   endTime: string;
 }
 
+interface DayRow {
+  enabled: boolean;
+  ranges: TimeRange[];
+}
+
 function defaultRow(enabled: boolean): DayRow {
-  return { enabled, startTime: "10:00", endTime: "19:00" };
+  return { enabled, ranges: [{ startTime: "10:00", endTime: "19:00" }] };
 }
 
 export default function AvailabilityPage() {
@@ -43,9 +47,18 @@ export default function AvailabilityPage() {
           setTimezone(rules[0].timezone);
           setDays((prev) => {
             const next = { ...prev };
-            for (let i = 0; i < 7; i++) next[i] = defaultRow(false);
+            for (let i = 0; i < 7; i++) next[i] = { enabled: false, ranges: [] };
             for (const rule of rules) {
-              next[rule.weekday] = { enabled: true, startTime: rule.startTime, endTime: rule.endTime };
+              const day = next[rule.weekday];
+              day.enabled = true;
+              day.ranges.push({ startTime: rule.startTime, endTime: rule.endTime });
+            }
+            // A day with no saved ranges yet (shouldn't happen for enabled days coming
+            // from the API, but keeps the UI from rendering an empty, unaddable row).
+            for (let i = 0; i < 7; i++) {
+              if (next[i].enabled && next[i].ranges.length === 0) {
+                next[i].ranges = [{ startTime: "10:00", endTime: "19:00" }];
+              }
             }
             return next;
           });
@@ -60,21 +73,51 @@ export default function AvailabilityPage() {
     setTimeout(() => setToast((t) => (t?.message === message ? null : t)), 2600);
   };
 
-  const updateDay = (weekday: number, patch: Partial<DayRow>) => {
-    setDays((prev) => ({ ...prev, [weekday]: { ...prev[weekday], ...patch } }));
+  const toggleDay = (weekday: number, enabled: boolean) => {
+    setDays((prev) => ({
+      ...prev,
+      [weekday]: {
+        enabled,
+        ranges: prev[weekday].ranges.length > 0 ? prev[weekday].ranges : [{ startTime: "10:00", endTime: "19:00" }],
+      },
+    }));
+  };
+
+  const updateRange = (weekday: number, index: number, patch: Partial<TimeRange>) => {
+    setDays((prev) => {
+      const ranges = prev[weekday].ranges.map((r, i) => (i === index ? { ...r, ...patch } : r));
+      return { ...prev, [weekday]: { ...prev[weekday], ranges } };
+    });
+  };
+
+  const addRange = (weekday: number) => {
+    setDays((prev) => {
+      const last = prev[weekday].ranges[prev[weekday].ranges.length - 1];
+      const ranges = [...prev[weekday].ranges, { startTime: last?.endTime ?? "10:00", endTime: "19:00" }];
+      return { ...prev, [weekday]: { ...prev[weekday], ranges } };
+    });
+  };
+
+  const removeRange = (weekday: number, index: number) => {
+    setDays((prev) => {
+      const ranges = prev[weekday].ranges.filter((_, i) => i !== index);
+      return { ...prev, [weekday]: { ...prev[weekday], ranges } };
+    });
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const rules = Object.entries(days)
-        .filter(([, row]) => row.enabled)
-        .map(([weekday, row]) => ({
-          weekday: Number(weekday),
-          startTime: row.startTime,
-          endTime: row.endTime,
-          timezone,
-        }));
+      const rules = Object.entries(days).flatMap(([weekday, day]) =>
+        day.enabled
+          ? day.ranges.map((r) => ({
+              weekday: Number(weekday),
+              startTime: r.startTime,
+              endTime: r.endTime,
+              timezone,
+            }))
+          : [],
+      );
       await api.put("/api/availability", { rules });
       showToast("Расписание сохранено");
     } catch (e) {
@@ -92,7 +135,8 @@ export default function AvailabilityPage() {
     <div>
       <h1 className="m-0 mb-1 text-[28px] font-bold tracking-tight text-(--color-ink)">Расписание</h1>
       <p className="mb-6 text-sm text-(--color-muted)">
-        Общее расписание для всех форматов встреч — когда клиенты могут вас забронировать.
+        Общее расписание для всех форматов встреч — когда клиенты могут вас забронировать. Для каждого дня можно
+        задать свой набор интервалов, например «9:00–12:00» и «14:00–18:00» с перерывом на обед.
       </p>
 
       {loadError && <div className="glass-card mb-5 p-4 text-sm text-(--color-danger)">{loadError}</div>}
@@ -110,40 +154,63 @@ export default function AvailabilityPage() {
 
       <div className="glass-card rounded-[20px] p-5">
         {DISPLAY_ORDER.map((weekday, idx) => {
-          const row = days[weekday];
+          const day = days[weekday];
           return (
             <div
               key={weekday}
-              className="flex flex-wrap items-center gap-4 py-3.5"
+              className="flex flex-wrap items-start gap-4 py-3.5"
               style={idx > 0 ? { borderTop: "1px solid rgba(20,30,45,.07)" } : undefined}
             >
-              <label className="flex w-[150px] flex-none cursor-pointer items-center gap-2.5 text-sm font-semibold text-(--color-ink)">
+              <label className="flex w-[150px] flex-none cursor-pointer items-center gap-2.5 pt-2 text-sm font-semibold text-(--color-ink)">
                 <input
                   type="checkbox"
-                  checked={row.enabled}
-                  onChange={(e) => updateDay(weekday, { enabled: e.target.checked })}
+                  checked={day.enabled}
+                  onChange={(e) => toggleDay(weekday, e.target.checked)}
                   className="h-4.5 w-4.5 cursor-pointer accent-(--color-primary)"
                 />
                 {WEEKDAY_LABELS[weekday]}
               </label>
-              {row.enabled ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="time"
-                    value={row.startTime}
-                    onChange={(e) => updateDay(weekday, { startTime: e.target.value })}
-                    className="input-field w-[120px]"
-                  />
-                  <span className="text-(--color-muted)">—</span>
-                  <input
-                    type="time"
-                    value={row.endTime}
-                    onChange={(e) => updateDay(weekday, { endTime: e.target.value })}
-                    className="input-field w-[120px]"
-                  />
+              {day.enabled ? (
+                <div className="flex flex-1 flex-col gap-2">
+                  {day.ranges.map((range, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <input
+                        type="time"
+                        value={range.startTime}
+                        onChange={(e) => updateRange(weekday, index, { startTime: e.target.value })}
+                        className="input-field w-[120px]"
+                      />
+                      <span className="text-(--color-muted)">—</span>
+                      <input
+                        type="time"
+                        value={range.endTime}
+                        onChange={(e) => updateRange(weekday, index, { endTime: e.target.value })}
+                        className="input-field w-[120px]"
+                      />
+                      {day.ranges.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeRange(weekday, index)}
+                          aria-label="Удалить интервал"
+                          className="flex h-8 w-8 flex-none items-center justify-center rounded-lg text-(--color-muted) hover:bg-black/5"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addRange(weekday)}
+                    className="w-fit cursor-pointer text-left text-[13px] font-semibold text-(--color-link)"
+                  >
+                    + Добавить интервал
+                  </button>
                 </div>
               ) : (
-                <span className="text-sm text-(--color-faint)">Недоступно</span>
+                <span className="pt-2 text-sm text-(--color-faint)">Недоступно</span>
               )}
             </div>
           );

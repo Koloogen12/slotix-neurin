@@ -488,16 +488,17 @@ export default function Home() {
                 Вы вспоминаете, о чём договорились, не пересматривая часовую запись.
               </span>
             </div>
-            <a
-              href="#pricing"
-              className="inline-flex items-center gap-[9px] rounded-2xl px-6 py-[14px] text-[15px] font-bold text-white"
+            <button
+              type="button"
+              onClick={() => openSignup("")}
+              className="inline-flex cursor-pointer items-center gap-[9px] rounded-2xl px-6 py-[14px] text-[15px] font-bold text-white"
               style={{ background: "linear-gradient(135deg,#8E6FE8,#7B5CE0)", boxShadow: "0 12px 28px rgba(123,92,224,.34)" }}
             >
-              Забронировать ранний доступ
+              Зарегистрироваться
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
-            </a>
+            </button>
           </div>
 
           <div className="flex min-w-[300px] flex-1 basis-[360px] justify-center">
