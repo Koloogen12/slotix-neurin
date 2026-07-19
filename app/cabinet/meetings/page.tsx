@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { api, ApiError, type Booking, type BookingStatus } from "@/lib/api";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { api, ApiError, type Booking, type BookingStatus, type TimeSlot } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
+import { CalendarPicker } from "@/app/[slug]/[formatId]/calendar-picker";
 
 type Tab = "upcoming" | "action" | "past" | "cancelled";
 
@@ -69,6 +71,7 @@ const PROVIDER_LABEL: Record<string, string> = {
 };
 
 export default function MeetingsPage() {
+  const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -81,23 +84,26 @@ export default function MeetingsPage() {
   const [menuForId, setMenuForId] = useState<string | null>(null);
   const [rejectFor, setRejectFor] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [cancelFor, setCancelFor] = useState<Booking | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [rescheduleFor, setRescheduleFor] = useState<Booking | null>(null);
+  const [rescheduleDate, setRescheduleDate] = useState<string | null>(null);
+  const [rescheduleSlots, setRescheduleSlots] = useState<TimeSlot[]>([]);
+  const [rescheduleSlotsLoading, setRescheduleSlotsLoading] = useState(false);
+  const [rescheduleSelectedSlot, setRescheduleSelectedSlot] = useState<TimeSlot | null>(null);
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    api
+  const loadBookings = useCallback(() => {
+    return api
       .get<Booking[]>("/api/bookings")
-      .then((data) => {
-        if (!cancelled) setBookings(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setLoadError(err instanceof ApiError ? err.message : "Не удалось загрузить встречи");
-      });
-    return () => {
-      cancelled = true;
-    };
+      .then((data) => setBookings(data))
+      .catch((err) => setLoadError(err instanceof ApiError ? err.message : "Не удалось загрузить встречи"));
   }, []);
+
+  useEffect(() => {
+    loadBookings();
+  }, [loadBookings]);
 
   function showToast(message: string) {
     setToast(message);
@@ -145,6 +151,75 @@ export default function MeetingsPage() {
     } finally {
       setBusy(id, false);
       setMenuForId(null);
+    }
+  }
+
+  async function handleCancel(booking: Booking, reason: string) {
+    setBusy(booking.id, true);
+    try {
+      const updated = await api.post<Booking>(`/api/bookings/${booking.id}/cancel`, reason ? { reason } : undefined);
+      setBookings(
+        (prev) =>
+          prev?.map((b) => (b.id === booking.id ? { ...b, status: updated.status, cancelReason: updated.cancelReason } : b)) ??
+          prev,
+      );
+      showToast("Встреча отменена — клиент уведомлён");
+      setCancelFor(null);
+      setCancelReason("");
+      if (selectedId === booking.id) setSelectedId(null);
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : "Не удалось отменить встречу");
+    } finally {
+      setBusy(booking.id, false);
+      setMenuForId(null);
+    }
+  }
+
+  function openReschedule(booking: Booking) {
+    setMenuForId(null);
+    setRescheduleFor(booking);
+    setRescheduleDate(null);
+    setRescheduleSlots([]);
+    setRescheduleSelectedSlot(null);
+  }
+
+  const fetchRescheduleSlots = useCallback(
+    async (booking: Booking, date: string) => {
+      if (!user) return;
+      setRescheduleSlotsLoading(true);
+      setRescheduleSelectedSlot(null);
+      try {
+        const slots = await api.get<TimeSlot[]>(
+          `/api/public/${encodeURIComponent(user.slug)}/${booking.formatId}/slots?date=${date}`,
+        );
+        setRescheduleSlots(slots);
+      } catch {
+        setRescheduleSlots([]);
+      } finally {
+        setRescheduleSlotsLoading(false);
+      }
+    },
+    [user],
+  );
+
+  function handleSelectRescheduleDate(date: string) {
+    setRescheduleDate(date);
+    if (rescheduleFor) fetchRescheduleSlots(rescheduleFor, date);
+  }
+
+  async function handleConfirmReschedule() {
+    if (!rescheduleFor || !rescheduleSelectedSlot) return;
+    setBusy(rescheduleFor.id, true);
+    try {
+      await api.post(`/api/bookings/${rescheduleFor.id}/reschedule`, { startAt: rescheduleSelectedSlot.start });
+      showToast("Встреча перенесена — клиент уведомлён");
+      setRescheduleFor(null);
+      if (selectedId === rescheduleFor.id) setSelectedId(null);
+      await loadBookings();
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : "Не удалось перенести встречу");
+    } finally {
+      setBusy(rescheduleFor.id, false);
     }
   }
 
@@ -461,6 +536,14 @@ export default function MeetingsPage() {
                                 Скопировать ссылку
                               </div>
                             )}
+                            {(pending || m.status === "confirmed") && (
+                              <div
+                                onClick={() => openReschedule(m)}
+                                className="flex cursor-pointer items-center gap-2.5 rounded-[9px] px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) hover:bg-[rgba(80,148,240,.08)]"
+                              >
+                                Перенести
+                              </div>
+                            )}
                             {pending && (
                               <div
                                 onClick={() => {
@@ -471,6 +554,18 @@ export default function MeetingsPage() {
                                 style={{ color: "var(--color-danger)" }}
                               >
                                 Отклонить
+                              </div>
+                            )}
+                            {m.status === "confirmed" && (
+                              <div
+                                onClick={() => {
+                                  setMenuForId(null);
+                                  setCancelFor(m);
+                                }}
+                                className="flex cursor-pointer items-center gap-2.5 rounded-[9px] px-3 py-2.5 text-sm font-medium"
+                                style={{ color: "var(--color-danger)" }}
+                              >
+                                Отменить
                               </div>
                             )}
                           </div>
@@ -655,6 +750,33 @@ export default function MeetingsPage() {
               </div>
             )}
 
+            {(selected.status === "pending" || selected.status === "confirmed") && (
+              <div className="mb-2.5 flex gap-2.5">
+                <button
+                  disabled={busyIds.has(selected.id)}
+                  onClick={() => openReschedule(selected)}
+                  className="dact"
+                  style={{ border: "1px solid #D1D9E6", background: "rgba(255,255,255,.6)", color: "var(--color-text-secondary)" }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4.5" width="18" height="16.5" rx="2.5" />
+                    <path d="M3 9h18M8 2.5v4M16 2.5v4" />
+                  </svg>
+                  Перенести
+                </button>
+                {selected.status === "confirmed" && (
+                  <button
+                    disabled={busyIds.has(selected.id)}
+                    onClick={() => setCancelFor(selected)}
+                    className="dact"
+                    style={{ border: "1px solid rgba(232,86,86,.35)", background: "var(--color-danger-bg)", color: "var(--color-danger)" }}
+                  >
+                    Отменить
+                  </button>
+                )}
+              </div>
+            )}
+
             <a
               href={`mailto:${selected.clientEmail}`}
               className="dact"
@@ -666,6 +788,117 @@ export default function MeetingsPage() {
               </svg>
               Написать
             </a>
+          </div>
+        </div>
+      )}
+
+      {rescheduleFor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
+          <div onClick={() => setRescheduleFor(null)} className="absolute inset-0" style={{ background: "rgba(26,40,60,.4)", backdropFilter: "blur(3px)" }} />
+          <div className="relative max-h-[86vh] w-[480px] max-w-full overflow-y-auto rounded-[22px] bg-white p-7 shadow-[0_30px_70px_rgba(20,40,70,.28)]">
+            <div className="mb-1 text-xl font-bold text-(--color-ink)">Перенести встречу</div>
+            <div className="mb-4.5 text-sm text-(--color-text-secondary-3)">
+              {rescheduleFor.clientName} · {rescheduleFor.format?.name ?? "Формат"}. Клиент получит письмо с новым временем.
+            </div>
+            <CalendarPicker
+              ownerTimezone={rescheduleFor.ownerTimezoneAtBooking}
+              selectedDate={rescheduleDate}
+              onSelectDate={handleSelectRescheduleDate}
+            />
+            {rescheduleDate && (
+              <div className="mt-4">
+                {rescheduleSlotsLoading ? (
+                  <div className="py-4 text-center text-sm text-(--color-muted)">Загружаем свободное время…</div>
+                ) : rescheduleSlots.length === 0 ? (
+                  <div className="py-4 text-center text-sm text-(--color-muted)">Нет свободного времени на эту дату</div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    {rescheduleSlots.map((slot) => {
+                      const active = rescheduleSelectedSlot?.start === slot.start;
+                      const time = new Intl.DateTimeFormat("ru-RU", {
+                        timeZone: rescheduleFor.ownerTimezoneAtBooking,
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      }).format(new Date(slot.start));
+                      return (
+                        <button
+                          key={slot.start}
+                          type="button"
+                          onClick={() => setRescheduleSelectedSlot(slot)}
+                          className="rounded-xl px-3 py-2.5 text-sm font-semibold"
+                          style={
+                            active
+                              ? { background: "var(--color-primary-gradient)", color: "#fff" }
+                              : { border: "1px solid #D1D9E6", background: "rgba(255,255,255,.6)", color: "var(--color-text-secondary)" }
+                          }
+                        >
+                          {time}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="mt-5.5 flex gap-2.5">
+              <button onClick={() => setRescheduleFor(null)} className="btn-secondary flex-1">
+                Отмена
+              </button>
+              <button
+                disabled={!rescheduleSelectedSlot || busyIds.has(rescheduleFor.id)}
+                onClick={handleConfirmReschedule}
+                className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Перенести встречу
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cancelFor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
+          <div onClick={() => setCancelFor(null)} className="absolute inset-0" style={{ background: "rgba(26,40,60,.4)", backdropFilter: "blur(3px)" }} />
+          <div className="relative w-[440px] max-w-full rounded-[22px] bg-white p-7 shadow-[0_30px_70px_rgba(20,40,70,.28)]">
+            <div
+              className="mb-4.5 flex h-13 w-13 items-center justify-center rounded-2xl"
+              style={{ background: "rgba(242,106,106,.12)", color: "#E15656" }}
+            >
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z" />
+              </svg>
+            </div>
+            <div className="mb-2 text-xl font-bold text-(--color-ink)">Отменить встречу?</div>
+            <div className="mb-4.5 text-sm text-(--color-text-secondary-3)">
+              Клиент получит письмо об отмене. Это действие нельзя отменить.
+            </div>
+            <div className="mb-2 text-[13px] font-semibold text-(--color-ink)">Причина (увидит клиент, необязательно)</div>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Например: заболел, перенесём в другой раз"
+              className="input-field mb-5 min-h-[80px] resize-y"
+            />
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => {
+                  setCancelFor(null);
+                  setCancelReason("");
+                }}
+                className="btn-secondary flex-1"
+              >
+                Не отменять
+              </button>
+              <button
+                disabled={busyIds.has(cancelFor.id)}
+                onClick={() => handleCancel(cancelFor, cancelReason.trim())}
+                className="flex-1 rounded-xl border-none px-4 py-3.5 text-sm font-semibold text-white"
+                style={{ background: "#E15656", boxShadow: "0 8px 20px rgba(225,86,86,.3)" }}
+              >
+                Отменить встречу
+              </button>
+            </div>
           </div>
         </div>
       )}

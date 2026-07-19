@@ -277,11 +277,15 @@ export default function FormatsListPage() {
             return (
               <div
                 key={f.id}
-                className="glass-card flex cursor-pointer flex-col overflow-hidden rounded-[20px]"
+                className="glass-card flex cursor-pointer flex-col rounded-[20px]"
                 style={{ opacity: draft ? 0.96 : 1 }}
                 onClick={() => router.push(`/cabinet/formats/${f.id}`)}
               >
-                <div style={{ height: 6, background: f.color }} />
+                {/* overflow-hidden used to live on the card itself so this strip's top corners
+                    got clipped into shape — but that also clipped the "..." dropdown menu
+                    below whenever it needed more height than the card had left. Rounding the
+                    strip's own corners gets the same look without clipping anything else. */}
+                <div className="rounded-t-[20px]" style={{ height: 6, background: f.color }} />
                 <div className="flex flex-1 flex-col p-5">
                   <div className="flex justify-between gap-2">
                     <div className="text-base font-semibold leading-snug" style={{ color: "var(--color-ink)" }}>
