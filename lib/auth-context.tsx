@@ -6,7 +6,7 @@ import { api, type Me } from "./api";
 interface AuthContextValue {
   user: Me | null;
   isLoading: boolean;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<Me | null>;
   logout: () => Promise<void>;
 }
 
@@ -20,11 +20,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const me = await api.get<Me>("/api/me");
       setUser(me);
+      return me;
     } catch (e) {
       // 401 just means logged out — any other status is still "no session" from the UI's
       // point of view, so treat all failures the same rather than surfacing an error state
       // on every page load.
       setUser(null);
+      return null;
     } finally {
       setIsLoading(false);
     }
