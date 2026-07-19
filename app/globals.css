@@ -102,6 +102,32 @@ body {
   cursor: pointer;
 }
 
+/* Detail-panel action button (Meetings' side panel: Подтвердить/Отклонить/Перенести/
+   Отменить/Написать). Colors/borders come from each usage's inline style; this only
+   supplies layout. Was referenced everywhere but never actually defined, so these
+   buttons had no flex layout at all — Tailwind's preflight sets `svg { display: block }`,
+   which without `align-items: center` stacks an icon above its label instead of beside it. */
+.dact {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.dact:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dact svg {
+  flex: none;
+}
+
 .input-field {
   width: 100%;
   box-sizing: border-box;

@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import type { Plan } from "@/lib/api";
+import { api, ApiError, type Plan } from "@/lib/api";
 
 interface PlanDef {
   key: Plan;
@@ -49,8 +50,18 @@ const PLAN_PRICE: Record<Plan, string> = {
 };
 
 export default function BillingPage() {
-  const { user } = useAuth();
+  return (
+    <Suspense fallback={null}>
+      <BillingPageContent />
+    </Suspense>
+  );
+}
+
+function BillingPageContent() {
+  const { user, refresh } = useAuth();
+  const searchParams = useSearchParams();
   const [toast, setToast] = useState<string | null>(null);
+  const [checkingOut, setCheckingOut] = useState<Plan | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showToast = useCallback((msg: string) => {
@@ -58,6 +69,36 @@ export default function BillingPage() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2600);
   }, []);
+
+  // T-Bank's SuccessURL/FailURL redirect back here with ?payment=... — the webhook that
+  // actually flips the plan runs async and can land slightly after this redirect, so a
+  // second delayed refresh gives it a moment to land before the user checks their plan.
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      showToast("Оплата прошла — обновляем тариф…");
+      refresh();
+      const timer = setTimeout(() => refresh(), 3000);
+      return () => clearTimeout(timer);
+    }
+    if (payment === "failed") {
+      showToast("Оплата не прошла. Попробуйте ещё раз.");
+    }
+  }, [searchParams, refresh, showToast]);
+
+  const handleUpgrade = useCallback(
+    async (plan: Exclude<Plan, "free">) => {
+      setCheckingOut(plan);
+      try {
+        const { paymentUrl } = await api.post<{ paymentUrl: string }>("/api/billing/checkout", { plan });
+        window.location.href = paymentUrl;
+      } catch (e) {
+        showToast(e instanceof ApiError ? e.message : "Не удалось начать оплату. Попробуйте ещё раз.");
+        setCheckingOut(null);
+      }
+    },
+    [showToast],
+  );
 
   const currentPlan = user?.plan ?? "free";
 
@@ -84,7 +125,13 @@ export default function BillingPage() {
 
       <div className="mb-8 grid gap-[18px]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         {PLANS.map((plan) => (
-          <PlanCard key={plan.key} plan={plan} isCurrent={plan.key === currentPlan} onUpgrade={() => showToast("Скоро — оплата тарифов пока в разработке")} />
+          <PlanCard
+            key={plan.key}
+            plan={plan}
+            isCurrent={plan.key === currentPlan}
+            loading={checkingOut === plan.key}
+            onUpgrade={() => plan.key !== "free" && handleUpgrade(plan.key)}
+          />
         ))}
       </div>
 
@@ -92,9 +139,7 @@ export default function BillingPage() {
         <div className="px-[10px] pb-3 pt-4 text-[16px] font-bold text-[var(--color-ink)]">История платежей</div>
         <div className="flex flex-col items-center gap-2 border-t px-[18px] py-8 text-center" style={{ borderColor: "rgba(20,30,45,.05)" }}>
           <div className="text-[14px] font-medium text-[var(--color-ink)]">Платежей пока нет</div>
-          <div className="text-[13px] text-[var(--color-muted)]">
-            История появится здесь после первой оплаты — сейчас приём платежей ещё не подключён.
-          </div>
+          <div className="text-[13px] text-[var(--color-muted)]">История появится здесь после первой оплаты.</div>
         </div>
       </div>
 
@@ -110,7 +155,17 @@ export default function BillingPage() {
   );
 }
 
-function PlanCard({ plan, isCurrent, onUpgrade }: { plan: PlanDef; isCurrent: boolean; onUpgrade: () => void }) {
+function PlanCard({
+  plan,
+  isCurrent,
+  loading,
+  onUpgrade,
+}: {
+  plan: PlanDef;
+  isCurrent: boolean;
+  loading: boolean;
+  onUpgrade: () => void;
+}) {
   return (
     <div
       className="glass-card relative p-[26px]"
@@ -166,10 +221,14 @@ function PlanCard({ plan, isCurrent, onUpgrade }: { plan: PlanDef; isCurrent: bo
         <button
           type="button"
           onClick={onUpgrade}
-          className={plan.key === "pro" ? "mt-[18px] w-full cursor-pointer rounded-xl py-3 text-[14px] font-semibold text-white" : "btn-primary mt-[18px] w-full py-3 text-[14px]"}
+          disabled={loading}
+          className={
+            (plan.key === "pro" ? "mt-[18px] w-full cursor-pointer rounded-xl py-3 text-[14px] font-semibold text-white" : "btn-primary mt-[18px] w-full py-3 text-[14px]") +
+            " disabled:cursor-not-allowed disabled:opacity-60"
+          }
           style={plan.key === "pro" ? { background: "#1A2733" } : undefined}
         >
-          {plan.key === "pro" ? "Перейти на Про" : "Перейти на Стандарт"}
+          {loading ? "Переходим к оплате…" : plan.key === "pro" ? "Перейти на Про" : "Перейти на Стандарт"}
         </button>
       )}
     </div>
