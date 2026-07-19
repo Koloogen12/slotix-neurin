@@ -5,19 +5,30 @@ export const alt = "Slotix — ИИ-конспект встреч: автома�
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Satori (what ImageResponse renders through) only parses ttf/otf, not woff2 — and which
+// format Google Fonts serves is UA-sniffed on their end, not something a fixed "old
+// browser" User-Agent string can reliably guarantee over time. Rather than depend on that,
+// validate the actual bytes and just skip the font (falling back to system-ui) if Google
+// handed back something Satori can't read, instead of letting ImageResponse throw.
+function isTtfOrOtf(buf: ArrayBuffer): boolean {
+  if (buf.byteLength < 4) return false;
+  const sig = new Uint8Array(buf, 0, 4);
+  const tag = String.fromCharCode(...sig);
+  return tag === "OTTO" || tag === "true" || (sig[0] === 0 && sig[1] === 1 && sig[2] === 0 && sig[3] === 0);
+}
+
 async function loadGolosText(weight: number): Promise<ArrayBuffer | null> {
   try {
     const css = await fetch(`https://fonts.googleapis.com/css2?family=Golos+Text:wght@${weight}&display=swap`, {
       headers: {
-        // Google serves woff2 to modern browsers and ttf to older/unrecognized ones —
-        // Satori (which ImageResponse renders through) can only parse ttf/otf, not woff2.
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
       },
     }).then((res) => res.text());
     const match = css.match(/url\(([^)]+)\)/);
     if (!match) return null;
-    return await fetch(match[1]).then((res) => res.arrayBuffer());
+    const buf = await fetch(match[1]).then((res) => res.arrayBuffer());
+    return isTtfOrOtf(buf) ? buf : null;
   } catch {
     return null;
   }
