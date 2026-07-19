@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { api, ApiError, type PublicProfile } from "@/lib/api";
@@ -16,6 +17,29 @@ async function fetchProfile(slug: string): Promise<PublicProfile> {
     if (error instanceof ApiError && error.status === 404) notFound();
     throw error;
   }
+}
+
+// This link is the one that actually circulates — owners paste it into messengers, email
+// signatures, bios. Without its own title/description, every shared link previewed as the
+// generic site homepage instead of "Book a meeting with {name}".
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  let profile: PublicProfile;
+  try {
+    profile = await api.get<PublicProfile>(`/api/public/${encodeURIComponent(slug)}`);
+  } catch {
+    return { title: "Профиль не найден" };
+  }
+  const name = profile.name ?? profile.slug;
+  const title = `Записаться на встречу с ${name}`;
+  const description = `Выберите удобное время и забронируйте встречу с ${name} онлайн — без переписки. Работает на Slotix.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${slug}` },
+    openGraph: { title, description, url: `/${slug}`, siteName: "Slotix", locale: "ru_RU", type: "profile" },
+    twitter: { card: "summary", title, description },
+  };
 }
 
 export default async function PublicProfilePage({ params }: PageProps) {
