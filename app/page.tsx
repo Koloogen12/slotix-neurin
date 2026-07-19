@@ -694,10 +694,10 @@ export default function Home() {
               <a href="#" style={{ color: "var(--color-link)" }}>
                 Справочный центр
               </a>
-              <a href="#" style={{ color: "var(--color-link)" }}>
+              <a href="/privacy" style={{ color: "var(--color-link)" }}>
                 Политика конфиденциальности
               </a>
-              <a href="#" style={{ color: "var(--color-link)" }}>
+              <a href="/oferta" style={{ color: "var(--color-link)" }}>
                 Условия использования
               </a>
             </div>
