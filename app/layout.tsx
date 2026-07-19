@@ -10,6 +10,7 @@ const golosText = Golos_Text({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://slotix.neurin.tech"),
   title: "Slotix — планирование встреч без переписок",
   description: "Slotix помогает планировать встречи без долгих переписок",
   icons: { icon: "/slotix/slotix-icon.png" },
