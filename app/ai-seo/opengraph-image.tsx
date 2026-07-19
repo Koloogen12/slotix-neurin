@@ -5,30 +5,31 @@ export const alt = "Slotix — ИИ-конспект встреч: автома�
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Satori (what ImageResponse renders through) only parses ttf/otf, not woff2 — and which
-// format Google Fonts serves is UA-sniffed on their end, not something a fixed "old
-// browser" User-Agent string can reliably guarantee over time. Rather than depend on that,
-// validate the actual bytes and just skip the font (falling back to system-ui) if Google
-// handed back something Satori can't read, instead of letting ImageResponse throw.
-function isTtfOrOtf(buf: ArrayBuffer): boolean {
+// Satori (what ImageResponse renders through) only parses ttf/otf/woff — not woff2, which
+// is what Google serves to any modern User-Agent. An old-enough UA (pre-2013 Chrome, no
+// woff2 support) gets woff back instead. Still validate the actual magic bytes rather than
+// trust that forever, since ImageResponse has no fallback of its own if a font fails to
+// parse — it throws (no fonts at all isn't allowed either, so a bad font can't just be
+// dropped; the caller falls back to a bundled local font instead, see below).
+function isSupportedFont(buf: ArrayBuffer): boolean {
   if (buf.byteLength < 4) return false;
-  const sig = new Uint8Array(buf, 0, 4);
-  const tag = String.fromCharCode(...sig);
-  return tag === "OTTO" || tag === "true" || (sig[0] === 0 && sig[1] === 1 && sig[2] === 0 && sig[3] === 0);
+  const tag = String.fromCharCode(...new Uint8Array(buf, 0, 4));
+  return tag === "OTTO" || tag === "true" || tag === "wOFF" || tag === "\x00\x01\x00\x00";
 }
 
 async function loadGolosText(weight: number): Promise<ArrayBuffer | null> {
   try {
     const css = await fetch(`https://fonts.googleapis.com/css2?family=Golos+Text:wght@${weight}&display=swap`, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+        // Deliberately ancient — anything from the woff2-support era (~2013+) gets woff2
+        // back, which Satori can't read.
+        "User-Agent": "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11",
       },
     }).then((res) => res.text());
     const match = css.match(/url\(([^)]+)\)/);
     if (!match) return null;
     const buf = await fetch(match[1]).then((res) => res.arrayBuffer());
-    return isTtfOrOtf(buf) ? buf : null;
+    return isSupportedFont(buf) ? buf : null;
   } catch {
     return null;
   }
@@ -40,7 +41,18 @@ export default async function Image() {
     ...(extrabold ? [{ name: "Golos Text", data: extrabold, weight: 800 as const, style: "normal" as const }] : []),
     ...(bold ? [{ name: "Golos Text", data: bold, weight: 700 as const, style: "normal" as const }] : []),
   ];
-  const fontFamily = fonts.length > 0 ? "Golos Text" : "system-ui, sans-serif";
+
+  // Satori requires at least one font to lay text out at all — it has no system-font
+  // fallback of its own. If the Google Fonts fetch above didn't yield anything usable
+  // (network hiccup, Google changes their UA-sniffing again), fall back to this bundled
+  // copy so the image still renders instead of 502ing.
+  if (fonts.length === 0) {
+    const bundled = await fetch(new URL("./fonts/golos-text-extrabold.woff", import.meta.url)).then((res) =>
+      res.arrayBuffer(),
+    );
+    fonts.push({ name: "Golos Text", data: bundled, weight: 800 as const, style: "normal" as const });
+  }
+  const fontFamily = "Golos Text";
 
   const bubble = (label: string, color: string, text: string) => (
     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
