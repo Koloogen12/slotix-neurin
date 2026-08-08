@@ -6,6 +6,7 @@ export const PROVIDER_LABELS: Record<VideoProvider, string> = {
   google_meet: "Google Meet",
   zoom: "Zoom",
   yandex_telemost: "Яндекс Телемост",
+  phone: "Телефонный звонок",
 };
 
 const WEEKDAY_FULL = ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"];

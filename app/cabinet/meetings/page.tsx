@@ -702,7 +702,7 @@ export default function MeetingsPage() {
                     </svg>
                   </span>
                   <div>
-                    {PROVIDER_LABEL[selected.format.provider] ?? selected.format.provider}
+                    {PROVIDER_LABEL[selected.provider ?? selected.format.providers[0]] ?? ""}
                     {selected.channelLink && (
                       <>
                         {" "}
@@ -801,7 +801,7 @@ export default function MeetingsPage() {
               {rescheduleFor.clientName} · {rescheduleFor.format?.name ?? "Формат"}. Клиент получит письмо с новым временем.
             </div>
             <CalendarPicker
-              ownerTimezone={rescheduleFor.ownerTimezoneAtBooking}
+              timezone={rescheduleFor.ownerTimezoneAtBooking}
               selectedDate={rescheduleDate}
               onSelectDate={handleSelectRescheduleDate}
             />

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, apiUrl, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { takePostAuthRedirect } from "@/lib/post-auth-redirect";
 
 const RESERVED_HINT: Record<string, string> = {
   reserved: "Этот адрес зарезервирован — выберите другой",
@@ -169,7 +170,7 @@ export default function OnboardingPage() {
         ...(avatarUrl ? { avatarUrl } : {}),
       });
       await refresh();
-      router.push("/cabinet/formats");
+      router.push(takePostAuthRedirect() ?? "/cabinet/formats");
     } catch (e) {
       setSubmitError(
         e instanceof ApiError ? e.message : "Не удалось сохранить данные. Попробуйте ещё раз."

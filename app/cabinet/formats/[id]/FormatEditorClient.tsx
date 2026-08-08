@@ -1,76 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   api,
   ApiError,
-  type AvailabilityException,
-  type AvailabilityRule,
+  type IntegrationsOverview,
   type Format,
   type FormatType,
   type VideoProvider,
 } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { ScheduleEditor } from "./ScheduleEditor";
 import {
   DURATION_PRESETS,
   FORMAT_COLORS,
   PROVIDER_LABELS,
+  PROVIDER_NEEDS_CONNECTION,
   PROVIDER_ORDER,
   TYPE_LABELS,
   formatDuration,
   kopecksToRublesInput,
   rublesToKopecks,
-  weekdayLabel,
 } from "../shared";
 
 interface Props {
   id: string;
-}
-
-interface WeekDayPreview {
-  label: string;
-  dateLabel: string;
-  slot: string;
-  available: boolean;
-}
-
-function buildWeekPreview(
-  availability: { rules: AvailabilityRule[]; exceptions: AvailabilityException[] } | null,
-): WeekDayPreview[] {
-  if (!availability) return [];
-  const days: WeekDayPreview[] = [];
-  const now = new Date();
-  const startUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(startUTC + i * 86400000);
-    const iso = d.toISOString().slice(0, 10);
-    const weekday = d.getUTCDay();
-    const exception = availability.exceptions.find((ex) => ex.date.slice(0, 10) === iso);
-    let slot = "Недоступно";
-    let available = false;
-    if (exception) {
-      if (exception.isAvailable && exception.startTime && exception.endTime) {
-        slot = `${exception.startTime}–${exception.endTime}`;
-        available = true;
-      }
-    } else {
-      const dayRules = availability.rules.filter((r) => r.weekday === weekday);
-      if (dayRules.length > 0) {
-        slot = dayRules.map((r) => `${r.startTime}–${r.endTime}`).join(", ");
-        available = true;
-      }
-    }
-    days.push({
-      label: weekdayLabel(weekday),
-      dateLabel: d.toLocaleDateString("ru-RU", { day: "numeric", month: "short", timeZone: "UTC" }),
-      slot,
-      available,
-    });
-  }
-  return days;
 }
 
 function initialsOf(name: string | null | undefined): string {
@@ -95,13 +52,21 @@ export function FormatEditorClient({ id }: Props) {
   const [seats, setSeats] = useState(2);
   const [color, setColor] = useState(FORMAT_COLORS[0]);
   const [durationMin, setDurationMin] = useState(30);
-  const [provider, setProvider] = useState<VideoProvider>("google_meet");
+  // A format offers a set of platforms; the client picks one at booking time. Platforms the
+  // owner hasn't connected stay unselectable and link to the integrations screen instead —
+  // enabling them would offer clients a meeting we can't produce a link for.
+  const [providers, setProviders] = useState<VideoProvider[]>(["google_meet"]);
+  const [connected, setConnected] = useState<Record<string, boolean>>({});
   const [paid, setPaid] = useState(false);
   const [priceRubles, setPriceRubles] = useState("");
+  const [packageOn, setPackageOn] = useState(false);
+  const [packageSize, setPackageSize] = useState("5");
+  const [packagePriceRubles, setPackagePriceRubles] = useState("");
   const [manualConfirm, setManualConfirm] = useState(false);
+  const [notetakerEnabled, setNotetakerEnabled] = useState(false);
+  const isPro = user?.plan === "pro";
 
   const [openSections, setOpenSections] = useState({ basic: true, timing: true, advanced: false, price: false });
-  const [availability, setAvailability] = useState<{ rules: AvailabilityRule[]; exceptions: AvailabilityException[] } | null>(null);
 
   useEffect(() => {
     if (isNew) return;
@@ -122,10 +87,14 @@ export function FormatEditorClient({ id }: Props) {
         setSeats(found.seats ?? 2);
         setColor(found.color);
         setDurationMin(found.durationMin);
-        setProvider(found.provider);
+        setProviders(found.providers.length > 0 ? found.providers : ["google_meet"]);
         setPaid(found.priceKopecks > 0);
+        setPackageOn(!!found.packageSize);
+        if (found.packageSize) setPackageSize(String(found.packageSize));
+        if (found.packagePriceKopecks) setPackagePriceRubles(kopecksToRublesInput(found.packagePriceKopecks));
         setPriceRubles(kopecksToRublesInput(found.priceKopecks));
         setManualConfirm(found.manualConfirm);
+        setNotetakerEnabled(found.notetakerEnabled);
         setOpenSections((s) => ({ ...s, price: found.priceKopecks > 0, advanced: found.manualConfirm }));
       } catch (e) {
         if (!cancelled) setErrorMsg(e instanceof ApiError ? e.message : "Не удалось загрузить формат");
@@ -141,19 +110,23 @@ export function FormatEditorClient({ id }: Props) {
   useEffect(() => {
     let cancelled = false;
     api
-      .get<{ rules: AvailabilityRule[]; exceptions: AvailabilityException[] }>("/api/availability")
+      .get<IntegrationsOverview>("/api/integrations")
       .then((data) => {
-        if (!cancelled) setAvailability(data);
+        if (cancelled) return;
+        setConnected({
+          google_meet: data.google_meet.status === "on",
+          zoom: data.zoom.status === "on",
+          yandex_telemost: data.yandex_telemost.status === "on",
+        });
       })
       .catch(() => {
-        // best-effort preview only — the editor still works without it
+        // Status is an enhancement: if it can't be read, tiles stay unselectable rather than
+        // silently letting the owner offer a platform we may not be able to deliver.
       });
     return () => {
       cancelled = true;
     };
   }, []);
-
-  const week = useMemo(() => buildWeekPreview(availability), [availability]);
 
   function validate(): string | null {
     if (!name.trim()) return "Введите название формата";
@@ -162,6 +135,12 @@ export function FormatEditorClient({ id }: Props) {
       return "Длительность должна быть от 15 до 180 минут";
     }
     if (type === "group" && (!seats || seats < 1)) return "Укажите количество мест для групповой встречи";
+    if (providers.length === 0) return "Выберите хотя бы одну площадку для встречи";
+    if (paid && rublesToKopecks(priceRubles) <= 0) return "Укажите стоимость платной встречи";
+    if (paid && packageOn) {
+      if (Number(packageSize) < 2) return "В пакете должно быть минимум 2 встречи";
+      if (rublesToKopecks(packagePriceRubles) <= 0) return "Укажите цену пакета";
+    }
     return null;
   }
 
@@ -172,9 +151,12 @@ export function FormatEditorClient({ id }: Props) {
       durationMin,
       seats: type === "group" ? seats : undefined,
       color,
-      provider,
+      providers,
       priceKopecks: paid ? rublesToKopecks(priceRubles) : 0,
+      packageSize: paid && packageOn ? Number(packageSize) : undefined,
+      packagePriceKopecks: paid && packageOn ? rublesToKopecks(packagePriceRubles) : undefined,
       manualConfirm,
+      notetakerEnabled: isPro ? notetakerEnabled : false,
     };
   }
 
@@ -388,12 +370,46 @@ export function FormatEditorClient({ id }: Props) {
           </div>
           <div className="flex flex-wrap gap-2">
             {PROVIDER_ORDER.map((p) => {
-              const on = provider === p;
+              const on = providers.includes(p);
+              const needsConnection = PROVIDER_NEEDS_CONNECTION[p];
+              const isConnected = !needsConnection || connected[p] === true;
+
+              // Not connected: the tile becomes a link to the integrations screen rather than
+              // a dead disabled control, so the owner knows what to do about it.
+              if (!isConnected) {
+                return (
+                  <Link
+                    key={p}
+                    href="/cabinet/integrations"
+                    className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold"
+                    style={{ background: "rgba(255,255,255,.5)", border: "1px dashed #C9D4DE", color: "var(--color-muted)" }}
+                  >
+                    {PROVIDER_LABELS[p]}
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+                      style={{ background: "rgba(80,148,240,.12)", color: "var(--color-link)" }}
+                    >
+                      Подключить
+                    </span>
+                  </Link>
+                );
+              }
+
               return (
                 <button
                   key={p}
                   type="button"
-                  onClick={() => setProvider(p)}
+                  onClick={() =>
+                    setProviders((prev) =>
+                      prev.includes(p)
+                        ? // Never let the last one be switched off — a format with no platform
+                          // could not be booked at all.
+                          prev.length > 1
+                          ? prev.filter((x) => x !== p)
+                          : prev
+                        : [...prev, p],
+                    )
+                  }
                   className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold"
                   style={
                     on
@@ -443,49 +459,8 @@ export function FormatEditorClient({ id }: Props) {
             />
           </div>
 
-          <div className="fe-lbl">Расписание (предпросмотр)</div>
-          <div className="fe-hint" style={{ marginTop: 0, marginBottom: 10 }}>
-            Расписание общее для аккаунта и не редактируется здесь —{" "}
-            <Link href="/cabinet/availability" style={{ color: "var(--color-link)", fontWeight: 600 }}>
-              изменить в разделе «Расписание»
-            </Link>
-            .
-          </div>
-          {week.length === 0 ? (
-            <div className="fe-hint">Расписание пока не загружено или не настроено.</div>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(7, minmax(84px, 1fr))", minWidth: 560 }}>
-                {week.map((w, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl p-2.5 text-center"
-                    style={{
-                      border: `1px solid ${w.available ? "rgba(80,148,240,.2)" : "#E3E9EF"}`,
-                      background: w.available ? "rgba(80,148,240,.05)" : "rgba(255,255,255,.4)",
-                    }}
-                  >
-                    <div className="text-xs font-semibold" style={{ color: "var(--color-ink)" }}>
-                      {w.label}
-                    </div>
-                    <div className="mb-2 text-[11px]" style={{ color: "var(--color-muted)" }}>
-                      {w.dateLabel}
-                    </div>
-                    <div
-                      className="rounded-md px-1 py-1 text-[11px] font-semibold"
-                      style={
-                        w.available
-                          ? { color: "var(--color-link)", background: "rgba(80,148,240,.1)" }
-                          : { color: "var(--color-faint-2)" }
-                      }
-                    >
-                      {w.slot}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="fe-lbl">Расписание</div>
+          <ScheduleEditor formatId={id} timezone={user?.timezone ?? "Europe/Moscow"} />
         </Section>
 
         <Section title="Продвинутые настройки" open={openSections.advanced} onToggle={() => toggleSection("advanced")}>
@@ -495,6 +470,28 @@ export function FormatEditorClient({ id }: Props) {
             title="Подтверждать записи вручную"
             subtitle="Клиент получит подтверждение только после вашего одобрения"
           />
+          {isPro ? (
+            <div className="mt-4">
+              <ToggleRow
+                on={notetakerEnabled}
+                onToggle={() => setNotetakerEnabled((v) => !v)}
+                title="AI-конспект встречи"
+                subtitle="Бот подключится к Zoom или Google Meet, запишет встречу и пришлёт конспект с задачами"
+              />
+            </div>
+          ) : (
+            <div className="mt-4 flex items-center justify-between gap-4 rounded-xl border border-dashed border-[#C9D4DE] bg-white/50 px-4 py-3">
+              <div>
+                <div className="text-[14px] font-semibold text-[var(--color-ink)]">AI-конспект встречи</div>
+                <div className="mt-0.5 text-[13px] text-[var(--color-muted)]">
+                  Автоматический конспект с задачами по спикерам — на тарифе Pro.
+                </div>
+              </div>
+              <Link href="/cabinet/billing" className="btn-secondary flex-none whitespace-nowrap !px-4 !py-2 text-[13px]">
+                Перейти на Pro
+              </Link>
+            </div>
+          )}
         </Section>
 
         <Section
@@ -528,6 +525,43 @@ export function FormatEditorClient({ id }: Props) {
                 >
                   ₽
                 </span>
+              </div>
+
+              <div className="mt-5 border-t border-[rgba(20,30,45,.08)] pt-4">
+                <ToggleRow
+                  on={packageOn}
+                  onToggle={() => setPackageOn((v) => !v)}
+                  title="Продавать пакетом"
+                  subtitle="Клиент оплачивает несколько встреч сразу — остаток списывается автоматически"
+                />
+                {packageOn && (
+                  <div className="mt-4 flex flex-wrap gap-4">
+                    <div style={{ maxWidth: 140 }}>
+                      <div className="fe-lbl">Встреч в пакете</div>
+                      <input
+                        className="fe-inp"
+                        value={packageSize}
+                        onChange={(e) => setPackageSize(e.target.value.replace(/[^\d]/g, ""))}
+                        placeholder="5"
+                        inputMode="numeric"
+                      />
+                    </div>
+                    <div style={{ maxWidth: 180 }}>
+                      <div className="fe-lbl">Цена пакета</div>
+                      <div style={{ position: "relative" }}>
+                        <input
+                          className="fe-inp"
+                          style={{ paddingRight: 34 }}
+                          value={packagePriceRubles}
+                          onChange={(e) => setPackagePriceRubles(e.target.value.replace(/[^\d.,]/g, ""))}
+                          placeholder="0"
+                          inputMode="numeric"
+                        />
+                        <span style={{ position: "absolute", right: 14, top: 12, color: "var(--color-muted)", fontSize: 15, fontWeight: 500 }}>₽</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -569,7 +603,7 @@ export function FormatEditorClient({ id }: Props) {
                 <ClockIcon /> {formatDuration(durationMin)}
               </div>
               <div className="flex items-center gap-2.5 text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                <VideoIcon /> {PROVIDER_LABELS[provider]}
+                <VideoIcon /> {providers.map((p) => PROVIDER_LABELS[p]).join(" · ")}
               </div>
               {paid && (
                 <div className="flex items-center gap-2.5 text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
@@ -676,8 +710,8 @@ function ToggleRow({
         type="button"
         onClick={onToggle}
         aria-pressed={on}
-        className="box-border rounded-full p-0.5"
-        style={{ width: 44, height: 26, background: on ? "var(--color-primary-gradient)" : "#CBD5E1", transition: "background .2s" }}
+        className="box-border flex-none rounded-full p-0.5"
+        style={{ width: 44, minWidth: 44, height: 26, background: on ? "var(--color-primary-gradient)" : "#CBD5E1", transition: "background .2s" }}
       >
         <div
           className="rounded-full bg-white"

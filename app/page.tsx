@@ -1,7 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AuthModal } from "@/components/auth-modal";
+import { useAuth } from "@/lib/auth-context";
+import { OrganizationJsonLd, SoftwareApplicationJsonLd } from "@/components/structured-data";
+import {
+  AlternativesSection,
+  BeforeAfterSection,
+  IntegrationsPanel,
+  SegmentsSection,
+} from "@/components/landing-sections";
 
 type ModalState = { open: boolean; mode: "login" | "signup"; email: string };
 
@@ -50,6 +59,7 @@ const BULLETS = [
   { title: "Уведомления и напоминания", text: "Вам и клиенту приходит подтверждение, а встреча сразу добавляется в календари." },
   { title: "Оплата сразу при бронировании", text: "Подключите приём платежей и получайте оплату онлайн в момент записи." },
 ];
+
 
 const CAL_WEEKDAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const CAL_AVAILABLE = [10, 11, 17, 18, 22, 23, 24, 29, 30, 31];
@@ -140,9 +150,38 @@ const WHY_CARDS = [
 ];
 
 export default function Home() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
   const [modal, setModal] = useState<ModalState>({ open: false, mode: "login", email: "" });
   const [heroEmail, setHeroEmail] = useState("");
   const [ctaEmail, setCtaEmail] = useState("");
+
+  // The session lives for 30 days, so someone who already signed up almost never wants the
+  // marketing page again — send them straight to their cabinet (or to finish onboarding).
+  useEffect(() => {
+    if (isLoading || !user) return;
+    router.replace(user.slug.startsWith("tmp-") ? "/onboarding" : "/cabinet/formats");
+  }, [isLoading, user, router]);
+
+  // `?signup=<email>` opens the signup modal with the address already filled — the booking
+  // success screen sends clients here after they have just used the product. Read from
+  // `location` rather than `useSearchParams` so the landing stays statically rendered.
+  useEffect(() => {
+    const email = new URLSearchParams(window.location.search).get("signup");
+    if (email === null) return;
+    setModal({ open: true, mode: "signup", email });
+    window.history.replaceState(null, "", window.location.pathname);
+  }, []);
+
+  if (!isLoading && user) {
+    return (
+      <div className="flex min-h-screen flex-1 items-center justify-center">
+        <div className="glass-card px-6 py-4 text-sm" style={{ color: "var(--color-muted)" }}>
+          Открываем кабинет…
+        </div>
+      </div>
+    );
+  }
 
   const openLogin = () => setModal({ open: true, mode: "login", email: "" });
   const openSignup = (email: string) => setModal({ open: true, mode: "signup", email });
@@ -150,6 +189,8 @@ export default function Home() {
 
   return (
     <div className="flex-1 overflow-x-hidden">
+      <OrganizationJsonLd />
+      <SoftwareApplicationJsonLd />
       {/* NAV */}
       <div
         className="sticky top-0 z-50 border-b"
@@ -162,7 +203,7 @@ export default function Home() {
       >
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-5 px-[clamp(20px,5vw,40px)] py-4">
           <a href="#top" className="flex items-center">
-            <img src="/slotix/slotix-logo.png" alt="Slotix" className="block h-[30px] w-auto" />
+            <img src="/slotix/slotix-logo.webp" alt="Slotix — сервис онлайн-записи на встречи" width={120} height={30} className="block h-[30px] w-auto" />
           </a>
           <div className="flex items-center gap-[clamp(14px,2.4vw,34px)]">
             <a href="#features" className="hidden md:inline text-[15px] font-semibold text-[var(--color-text-secondary)]">
@@ -171,7 +212,10 @@ export default function Home() {
             <a href="#integrations" className="hidden md:inline text-[15px] font-semibold text-[var(--color-text-secondary)]">
               Интеграции
             </a>
-            <a href="#pricing" className="hidden md:inline text-[15px] font-semibold text-[var(--color-text-secondary)]">
+            <a href="#audiences" className="hidden md:inline text-[15px] font-semibold text-[var(--color-text-secondary)]">
+              Кому подходит
+            </a>
+            <a href="/pricing" className="hidden md:inline text-[15px] font-semibold text-[var(--color-text-secondary)]">
               Тарифы
             </a>
             <button type="button" onClick={openLogin} className="text-[15px] font-semibold text-[var(--color-ink)] cursor-pointer">
@@ -339,8 +383,8 @@ export default function Home() {
               >
                 {f.icon}
               </div>
-              <div className="mb-[10px] text-[19px] font-bold text-[var(--color-ink)]">{f.title}</div>
-              <div className="text-[15px] leading-[1.55] text-[var(--color-text-secondary-2)]">{f.text}</div>
+              <h3 className="m-0 mb-[10px] text-[19px] font-bold text-[var(--color-ink)]">{f.title}</h3>
+              <p className="m-0 text-[15px] leading-[1.55] text-[var(--color-text-secondary-2)]">{f.text}</p>
             </div>
           ))}
         </div>
@@ -367,7 +411,7 @@ export default function Home() {
                   </svg>
                 </span>
                 <div>
-                  <div className="mb-1 text-[16px] font-bold text-[var(--color-ink)]">{b.title}</div>
+                  <h3 className="m-0 mb-1 text-[16px] font-bold text-[var(--color-ink)]">{b.title}</h3>
                   <div className="text-[15px] leading-[1.5] text-[var(--color-text-secondary-2)]">{b.text}</div>
                 </div>
               </div>
@@ -570,7 +614,7 @@ export default function Home() {
               >
                 {c.badge}
               </span>
-              <div className="mb-[10px] text-[19px] font-bold text-[var(--color-ink)]">{c.title}</div>
+              <h3 className="m-0 mb-[10px] text-[19px] font-bold text-[var(--color-ink)]">{c.title}</h3>
               <div className="flex-1 text-[14.5px] leading-[1.55] text-[var(--color-text-secondary-2)]">{c.text}</div>
               <div
                 className="mt-[18px] flex items-center gap-2 border-t pt-[15px] text-[13px] font-semibold"
@@ -587,6 +631,11 @@ export default function Home() {
       </div>
 
       {/* INTEGRATIONS */}
+      {/* СЕГМЕНТЫ · ДО И ПОСЛЕ · АЛЬТЕРНАТИВЫ — общие блоки, см. components/landing-sections.tsx */}
+      <SegmentsSection />
+      <BeforeAfterSection />
+      <AlternativesSection />
+
       <div id="integrations" className="mx-auto max-w-[1200px] px-[clamp(20px,5vw,40px)] py-[clamp(40px,6vw,80px)]">
         <h2
           className="m-0 mb-[clamp(32px,4vw,48px)] max-w-[640px] font-extrabold text-[var(--color-ink)]"
@@ -615,6 +664,8 @@ export default function Home() {
         </div>
       </div>
 
+      <IntegrationsPanel compact />
+
       {/* FINAL CTA */}
       <div id="pricing" className="mx-auto max-w-[1200px] px-[clamp(20px,5vw,40px)] pb-[clamp(48px,7vw,96px)] pt-[clamp(20px,3vw,40px)]">
         <div
@@ -634,7 +685,7 @@ export default function Home() {
             Для регистрации нужен только email
           </h2>
           <p className="m-0 mb-8 text-[var(--color-text-secondary)]" style={{ font: "400 clamp(15px,1.3vw,18px)/1.5 var(--font-golos)" }}>
-            7 дней тарифа Premium бесплатно. Дальше — выбираете подходящий тариф.
+            Бесплатный тариф без ограничения по времени. Захотите больше форматов и провайдеров — перейдёте на платный тариф в один клик.
           </p>
           <form
             className="mx-auto mb-4 flex max-w-[520px] flex-wrap gap-[10px]"
@@ -668,11 +719,33 @@ export default function Home() {
       <div className="border-t" style={{ borderColor: "rgba(255,255,255,.5)", background: "rgba(234,242,251,.4)" }}>
         <div className="mx-auto flex max-w-[1200px] flex-wrap gap-[clamp(32px,5vw,64px)] px-[clamp(20px,5vw,40px)] py-[clamp(40px,5vw,60px)]">
           <div className="min-w-[240px] flex-1 basis-[260px]">
-            <img src="/slotix/slotix-logo.png" alt="Slotix" className="mb-4 block h-[26px] w-auto" />
+            <img src="/slotix/slotix-logo.webp" alt="Slotix" width={104} height={26} className="mb-4 block h-[26px] w-auto" />
             <div className="mb-4 max-w-[280px] text-[14px] leading-[1.55] text-[var(--color-muted)]">
               Онлайн-сервис записи на встречи, консультации и занятия.
             </div>
-            <div className="text-[13px] text-[var(--color-faint)]">© 2026 Slotix</div>
+            <div className="mb-3 text-[13px] text-[var(--color-faint)]">© 2026 Slotix</div>
+            <div className="max-w-[280px] text-[13px] leading-[1.6] text-[var(--color-faint)]">
+              <div className="font-semibold text-[var(--color-muted)]">ИП Кочнев Данил Сергеевич</div>
+              <div>ИНН 420549679716</div>
+              <div>ОГРНИП 326420500091032</div>
+            </div>
+          </div>
+          <div className="min-w-[150px] flex-none">
+            <div className="mb-[14px] text-[14px] font-bold text-[var(--color-ink)]">Кому подходит</div>
+            <div className="flex flex-col gap-[11px] text-[14px]">
+              <a href="/dlya/konsultantov" style={{ color: "var(--color-link)" }}>
+                Консультантам
+              </a>
+              <a href="/dlya/psihologov" style={{ color: "var(--color-link)" }}>
+                Психологам и коучам
+              </a>
+              <a href="/dlya/komand" style={{ color: "var(--color-link)" }}>
+                Командам и студиям
+              </a>
+              <a href="/dlya/hr" style={{ color: "var(--color-link)" }}>
+                HR и рекрутингу
+              </a>
+            </div>
           </div>
           <div className="min-w-[150px] flex-none">
             <div className="mb-[14px] text-[14px] font-bold text-[var(--color-ink)]">Продукт</div>
@@ -683,6 +756,9 @@ export default function Home() {
               <a href="#integrations" style={{ color: "var(--color-link)" }}>
                 Интеграции
               </a>
+              <a href="/pricing" style={{ color: "var(--color-link)" }}>
+                Тарифы
+              </a>
               <button type="button" onClick={openLogin} className="cursor-pointer text-left" style={{ color: "var(--color-link)" }}>
                 Войти
               </button>
@@ -691,7 +767,7 @@ export default function Home() {
           <div className="min-w-[150px] flex-none">
             <div className="mb-[14px] text-[14px] font-bold text-[var(--color-ink)]">Поддержка</div>
             <div className="flex flex-col gap-[11px] text-[14px]">
-              <a href="#" style={{ color: "var(--color-link)" }}>
+              <a href="/support" style={{ color: "var(--color-link)" }}>
                 Справочный центр
               </a>
               <a href="/privacy" style={{ color: "var(--color-link)" }}>
@@ -699,6 +775,9 @@ export default function Home() {
               </a>
               <a href="/oferta" style={{ color: "var(--color-link)" }}>
                 Условия использования
+              </a>
+              <a href="/cookies" style={{ color: "var(--color-link)" }}>
+                Политика cookie
               </a>
             </div>
           </div>

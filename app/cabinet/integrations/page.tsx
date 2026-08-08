@@ -12,35 +12,28 @@ type ConnectionStatus = "on" | "off" | "error";
 interface ProviderDef {
   key: ProviderKey;
   name: string;
-  glyph: string;
-  badgeBg: string;
-  badgeColor: string;
+  logoSrc: string;
   desc: string;
+  pendingVerification?: string;
 }
 
 const PROVIDERS: ProviderDef[] = [
   {
     key: "google_meet",
     name: "Google Meet",
-    glyph: "M",
-    badgeBg: "#EAF1FE",
-    badgeColor: "#2F6FD0",
+    logoSrc: "/logos/google-meet.png",
     desc: "Ссылки на встречу создаются автоматически через ваш Google Calendar.",
   },
   {
     key: "zoom",
     name: "Zoom",
-    glyph: "Z",
-    badgeBg: "#E8F1FF",
-    badgeColor: "#2D8CFF",
+    logoSrc: "/logos/zoom.png",
     desc: "Создавайте Zoom-конференции для форматов с этой локацией.",
   },
   {
     key: "yandex_telemost",
     name: "Яндекс Телемост",
-    glyph: "Я",
-    badgeBg: "#FFEFEF",
-    badgeColor: "#F04444",
+    logoSrc: "/logos/yandex-telemost.png",
     desc: "Российский сервис видеовстреч без установки приложений.",
   },
 ];
@@ -182,6 +175,8 @@ function IntegrationsPageContent() {
             })}
       </div>
 
+      <PaymentAcceptance />
+
       {toast && (
         <div
           className="fixed bottom-[26px] left-1/2 z-[60] flex -translate-x-1/2 items-center gap-[11px] rounded-2xl px-5 py-[14px] text-[14px] font-semibold text-white"
@@ -241,18 +236,34 @@ function IntegrationCard({
       style={isError ? { borderColor: "rgba(242,106,106,.3)" } : undefined}
     >
       <div className="mb-[14px] flex items-center gap-[14px]">
-        <div
-          className="flex h-[46px] w-[46px] items-center justify-center rounded-[13px] text-[17px] font-extrabold"
-          style={{ background: def.badgeBg, color: def.badgeColor }}
-        >
-          {def.glyph}
+        <div className="flex h-[46px] w-[46px] flex-none items-center justify-center rounded-[13px] bg-white p-2" style={{ border: "1px solid rgba(20,30,45,.06)" }}>
+          <img src={def.logoSrc} alt="" className="h-full w-full object-contain" />
         </div>
         <div className="text-[16px] font-bold text-[var(--color-ink)]">{def.name}</div>
+        {def.pendingVerification && status !== "on" && (
+          <span
+            className="ml-auto rounded-full px-2.5 py-1 text-[11px] font-medium"
+            style={{ background: "rgba(199,154,46,.15)", color: "#8A6A1F" }}
+          >
+            {def.pendingVerification}
+          </span>
+        )}
       </div>
       <div className="mb-[18px] flex-1 text-[13.5px] leading-[1.5] text-[var(--color-muted)]">{def.desc}</div>
 
       {def.key === "google_meet" ? (
         <GoogleMeetFooter status={status} />
+      ) : def.pendingVerification && status !== "on" ? (
+        <div className="border-t pt-4" style={{ borderColor: "rgba(20,30,45,.06)" }}>
+          <button
+            type="button"
+            disabled
+            className="w-full cursor-not-allowed rounded-[11px] border py-[11px] text-[14px] font-semibold opacity-50"
+            style={{ borderColor: "#D1D9E6", background: "rgba(255,255,255,.6)", color: "var(--color-link)" }}
+          >
+            Подключить
+          </button>
+        </div>
       ) : status === "on" ? (
         <div className="flex items-center gap-[9px] border-t pt-4" style={{ borderColor: "rgba(20,30,45,.06)" }}>
           <span className="flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: "#2E8A73" }}>
@@ -326,6 +337,148 @@ function GoogleMeetFooter({ status }: { status: ConnectionStatus }) {
       >
         Подключить через Календари
       </Link>
+    </div>
+  );
+}
+
+
+type PaymentProviderKind = "yookassa" | "cloudpayments";
+
+interface PaymentStatus {
+  connected: boolean;
+  provider: PaymentProviderKind | null;
+  publicId: string | null;
+}
+
+const PAYMENT_PROVIDERS: {
+  key: PaymentProviderKind;
+  name: string;
+  publicLabel: string;
+  secretLabel: string;
+  hint: string;
+  helpUrl: string;
+  helpText: string;
+}[] = [
+  {
+    key: "yookassa",
+    name: "ЮKassa",
+    publicLabel: "shopId",
+    secretLabel: "Секретный ключ",
+    hint: "Личный кабинет ЮKassa → Интеграция → Ключи API. Для проверки можно завести тестовый магазин — договор не нужен.",
+    helpUrl: "https://yookassa.ru/developers/using-api/testing",
+    helpText: "Где взять ключи и тестовый магазин",
+  },
+  {
+    key: "cloudpayments",
+    name: "CloudPayments",
+    publicLabel: "Public ID",
+    secretLabel: "API Secret",
+    hint: "Личный кабинет CloudPayments → Настройки → API. Public ID нужен для оплат, API Secret — для подтверждения.",
+    helpUrl: "https://developers.cloudpayments.ru/",
+    helpText: "Где взять ключи и тестовые карты",
+  },
+];
+
+function PaymentAcceptance() {
+  const [status, setStatus] = useState<PaymentStatus | null>(null);
+  const [provider, setProvider] = useState<PaymentProviderKind>("yookassa");
+  const [publicId, setPublicId] = useState("");
+  const [secret, setSecret] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    api.get<PaymentStatus>("/api/payment-connections").then(setStatus).catch(() => setStatus(null));
+  }, []);
+  useEffect(load, [load]);
+
+  const def = PAYMENT_PROVIDERS.find((p) => p.key === provider)!;
+
+  async function connect() {
+    setBusy(true);
+    setError(null);
+    try {
+      const next = await api.post<PaymentStatus>("/api/payment-connections", { provider, publicId: publicId.trim(), secret: secret.trim() });
+      setStatus(next);
+      setPublicId("");
+      setSecret("");
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "Не удалось подключить");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function disconnect() {
+    await api.delete("/api/payment-connections");
+    load();
+  }
+
+  return (
+    <div className="mt-9">
+      <h2 className="mb-1 text-lg font-bold tracking-tight text-[var(--color-ink)]">Приём оплат от клиентов</h2>
+      <p className="mb-5 text-sm text-[var(--color-muted)]">
+        Подключите свою платёжную систему — деньги за платные встречи и пакеты приходят напрямую вам.
+      </p>
+
+      <div className="glass-card max-w-[560px] rounded-[20px] p-6">
+        {status?.connected ? (
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="h-2 w-2 rounded-full" style={{ background: "var(--color-success)" }} />
+                <span className="text-[15px] font-semibold text-[var(--color-ink)]">
+                  {PAYMENT_PROVIDERS.find((p) => p.key === status.provider)?.name ?? status.provider} подключён
+                </span>
+              </div>
+              {status.publicId && <div className="mt-1 text-[13px] text-[var(--color-muted)]">ID: {status.publicId}</div>}
+            </div>
+            <button type="button" onClick={disconnect} className="btn-secondary flex-none !px-4 !py-2 text-[13px]">
+              Отключить
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-4 flex gap-2">
+              {PAYMENT_PROVIDERS.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  onClick={() => setProvider(p.key)}
+                  className="flex-1 cursor-pointer rounded-xl px-3.5 py-2.5 text-[14px] font-semibold"
+                  style={
+                    provider === p.key
+                      ? { background: "rgba(80,148,240,.1)", border: "1px solid rgba(80,148,240,.25)", color: "var(--color-link)" }
+                      : { background: "rgba(255,255,255,.5)", border: "1px solid #E3E9EF", color: "var(--color-text-secondary)" }
+                  }
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="mb-1.5 block text-[13px] font-semibold text-[var(--color-ink)]">{def.publicLabel}</label>
+                <input className="input-field" value={publicId} onChange={(e) => setPublicId(e.target.value)} placeholder={def.publicLabel} />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[13px] font-semibold text-[var(--color-ink)]">{def.secretLabel}</label>
+                <input className="input-field" type="password" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="••••••••" />
+              </div>
+              <div className="text-[12.5px] leading-relaxed text-[var(--color-muted)]">
+                {def.hint}{" "}
+                <a href={def.helpUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--color-link)]">
+                  {def.helpText} ↗
+                </a>
+              </div>
+              {error && <div className="text-sm font-medium text-[var(--color-danger)]">{error}</div>}
+              <button type="button" className="btn-primary" disabled={busy || !publicId.trim() || !secret.trim()} onClick={connect}>
+                {busy ? "Проверяем ключи…" : "Подключить"}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

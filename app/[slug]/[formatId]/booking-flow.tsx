@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { api, ApiError, type Booking, type PublicProfile, type TimeSlot } from "@/lib/api";
+import { api, ApiError, type Booking, type PublicProfile, type TimeSlot, type VideoProvider } from "@/lib/api";
+import { getAttribution } from "@/lib/attribution";
 import { Avatar } from "../avatar";
 import {
   AlertIcon,
@@ -27,6 +28,7 @@ import {
   ownerTodayParts,
 } from "../format-utils";
 import { CalendarPicker } from "./calendar-picker";
+import { TimezonePicker } from "./timezone-picker";
 
 type Step = "pick" | "form" | "payment" | "done";
 
@@ -36,13 +38,38 @@ interface BookingFlowProps {
   format: PublicFormat;
 }
 
+/** Every IANA zone the runtime knows, so a visitor anywhere can pick their own. The static
+ * tail is a fallback for runtimes without Intl.supportedValuesOf, and the visitor's detected
+ * zone is force-included so the select always has its own value to show. */
+const TIMEZONE_OPTIONS: string[] = (() => {
+  const intl = Intl as unknown as { supportedValuesOf?: (key: string) => string[] };
+  const zones = intl.supportedValuesOf?.("timeZone") ?? [
+    "Europe/Kaliningrad",
+    "Europe/Moscow",
+    "Europe/Samara",
+    "Asia/Yekaterinburg",
+    "Asia/Omsk",
+    "Asia/Krasnoyarsk",
+    "Asia/Irkutsk",
+    "Asia/Yakutsk",
+    "Asia/Vladivostok",
+    "Asia/Magadan",
+    "Asia/Kamchatka",
+    "UTC",
+  ];
+  const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return detected && !zones.includes(detected) ? [detected, ...zones] : zones;
+})();
+
 const DIVIDER_CLASSES =
   "h-px w-full flex-none bg-[linear-gradient(90deg,transparent,rgba(20,30,45,.08)_16%,rgba(20,30,45,.08)_84%,transparent)] " +
   "min-[1080px]:h-auto min-[1080px]:w-px min-[1080px]:self-stretch min-[1080px]:bg-[linear-gradient(180deg,transparent,rgba(20,30,45,.08)_16%,rgba(20,30,45,.08)_84%,transparent)]";
 
 export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
   const [step, setStep] = useState<Step>("pick");
-  const [selectedDate, setSelectedDate] = useState<string>(() => ownerTodayParts(profile.timezone).dateStr);
+  const [selectedDate, setSelectedDate] = useState<string>(
+    () => ownerTodayParts(Intl.DateTimeFormat().resolvedOptions().timeZone || profile.timezone).dateStr,
+  );
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(true);
   const [slotsError, setSlotsError] = useState<string | null>(null);
@@ -52,20 +79,32 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [clientComment, setClientComment] = useState("");
+  // The owner may offer several platforms; the API has already filtered the list down to the
+  // ones they can actually deliver, so anything here is bookable. One entry = no choice to make.
+  const [provider, setProvider] = useState<VideoProvider | null>(() => format.providers[0] ?? null);
+  const [clientPhone, setClientPhone] = useState("");
+  const offersPackage = !!(format.packageSize && format.packagePriceKopecks);
+  const [purchase, setPurchase] = useState<"single" | "package">("single");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
 
-  const clientTimezone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
+  // Slot times are rendered in this zone (see formatTimeInTimezone calls below). It defaults
+  // to the visitor's own zone and is theirs to change — the caption here used to print the
+  // *owner's* zone while the times were already converted to the visitor's, so a client in
+  // Vladivostok read Vladivostok times labelled "Moscow (GMT+3)".
+  const [clientTimezone, setClientTimezone] = useState<string>(
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Moscow",
+  );
   const isPaid = format.priceKopecks > 0;
 
   const fetchSlots = useCallback(
-    async (date: string) => {
+    async (date: string, tz: string) => {
       setSlotsLoading(true);
       setSlotsError(null);
       try {
         const data = await api.get<TimeSlot[]>(
-          `/api/public/${encodeURIComponent(slug)}/${format.id}/slots?date=${date}`,
+          `/api/public/${encodeURIComponent(slug)}/${format.id}/slots?date=${date}&timezone=${encodeURIComponent(tz)}`,
         );
         setSlots(data);
       } catch {
@@ -81,15 +120,17 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
     // Only the initial mount load goes through an effect — subsequent date changes call
     // fetchSlots directly from the click handler below, so this doesn't need `selectedDate`
     // in its dependency list.
-    fetchSlots(selectedDate);
+    fetchSlots(selectedDate, clientTimezone);
+    // Re-runs when the visitor switches zone: the same calendar date covers a different span
+    // of real time, so the slot list has to be re-fetched, not just re-labelled.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [clientTimezone]);
 
   function handleSelectDate(date: string) {
     setConflictNotice(false);
     setSelectedSlot(null);
     setSelectedDate(date);
-    fetchSlots(date);
+    fetchSlots(date, clientTimezone);
   }
 
   function handleGoToForm() {
@@ -114,8 +155,18 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
         clientComment: clientComment.trim() ? clientComment.trim() : undefined,
         startAt: selectedSlot.start,
         clientTimezone,
+        provider,
+        clientPhone: provider === "phone" ? clientPhone.trim() : undefined,
+        purchase: offersPackage ? purchase : undefined,
+        utm: getAttribution(),
       });
       setBooking(created);
+      // Paid booking → redirect to the provider's hosted checkout. After paying, the provider
+      // returns the client to the booking page, which reflects the confirmed status.
+      if (created.paymentUrl) {
+        window.location.href = created.paymentUrl;
+        return;
+      }
       setStep(created.status !== "confirmed" && isPaid ? "payment" : "done");
     } catch (error) {
       // The backend closes the GET-slots/POST-book race two ways: a 409 from the narrow
@@ -129,7 +180,7 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
         setConflictNotice(true);
         setSelectedSlot(null);
         setStep("pick");
-        fetchSlots(selectedDate);
+        fetchSlots(selectedDate, clientTimezone);
         return;
       }
       setSubmitError(
@@ -154,18 +205,10 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
 
   return (
     <div className="relative w-full max-w-[1240px]">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/slotix/hero-glass.png"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[-10%] top-[-168px] hidden w-[120%] max-w-none select-none min-[1080px]:block"
-        style={{
-          WebkitMaskImage: "radial-gradient(115% 132% at 50% 28%, #000 54%, transparent 100%)",
-          maskImage: "radial-gradient(115% 132% at 50% 28%, #000 54%, transparent 100%)",
-        }}
-      />
-
+      {/* The decorative hero-glass overlay that used to sit here was removed: the card is
+          translucent, so it showed through the calendar and slot list as a second layer of
+          swirls on top of the page's own aurora background. The booking screen keeps a flat
+          background and one card. */}
       <div className="glass-card relative flex flex-col overflow-hidden !rounded-[32px] min-[1080px]:flex-row">
         <InfoColumn profile={profile} format={format} />
         <div className={DIVIDER_CLASSES} />
@@ -174,15 +217,12 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
           <>
             <div className="flex flex-1 flex-col p-6 min-[1080px]:p-10">
               <CalendarPicker
-                ownerTimezone={profile.timezone}
+                timezone={clientTimezone}
                 selectedDate={selectedDate}
                 onSelectDate={handleSelectDate}
               />
-              <div className="mt-auto flex items-center gap-3 rounded-xl border border-white/60 bg-white/85 px-4 py-3.5 pt-7 shadow-[0_2px_8px_rgba(20,40,70,0.05)] min-[1080px]:mt-auto">
-                <GlobeIcon className="flex-none text-[var(--color-muted)]" />
-                <span className="text-[15px] font-medium text-[var(--color-ink)]">
-                  {formatTimezoneLabel(profile.timezone)}
-                </span>
+              <div className="mt-8 min-[1080px]:mt-10">
+                <TimezonePicker value={clientTimezone} onChange={setClientTimezone} />
               </div>
             </div>
 
@@ -305,10 +345,83 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
                 />
               </div>
 
+              {format.providers.length > 1 && (
+                <div>
+                  <label className="mb-2 block text-[13px] font-semibold text-[var(--color-ink)]" htmlFor="provider">
+                    Где встречаемся
+                  </label>
+                  <select
+                    id="provider"
+                    className="input-field cursor-pointer"
+                    value={provider ?? ""}
+                    onChange={(e) => setProvider(e.target.value as VideoProvider)}
+                  >
+                    {format.providers.map((p) => (
+                      <option key={p} value={p}>
+                        {PROVIDER_LABELS[p]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {provider === "phone" && (
+                <div>
+                  <label className="mb-2 block text-[13px] font-semibold text-[var(--color-ink)]" htmlFor="clientPhone">
+                    Номер для звонка
+                  </label>
+                  <input
+                    id="clientPhone"
+                    type="tel"
+                    className="input-field"
+                    placeholder="+7 900 000-00-00"
+                    required
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {offersPackage && (
+                <div className="flex flex-col gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setPurchase("single")}
+                    className="flex items-center justify-between rounded-xl px-4 py-3 text-left"
+                    style={purchase === "single"
+                      ? { background: "rgba(80,148,240,.1)", border: "1px solid rgba(80,148,240,.35)" }
+                      : { background: "rgba(255,255,255,.6)", border: "1px solid #E3E9EF" }}
+                  >
+                    <span className="text-[14px] font-semibold text-[var(--color-ink)]">Одна встреча</span>
+                    <span className="text-[14px] font-semibold text-[var(--color-ink)]">{formatPrice(format.priceKopecks)}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPurchase("package")}
+                    className="flex items-center justify-between rounded-xl px-4 py-3 text-left"
+                    style={purchase === "package"
+                      ? { background: "rgba(80,148,240,.1)", border: "1px solid rgba(80,148,240,.35)" }
+                      : { background: "rgba(255,255,255,.6)", border: "1px solid #E3E9EF" }}
+                  >
+                    <span>
+                      <span className="block text-[14px] font-semibold text-[var(--color-ink)]">Пакет {format.packageSize} встреч</span>
+                      <span className="block text-[12.5px] text-[var(--color-muted)]">Записывайтесь на удобные слоты, остаток спишется сам</span>
+                    </span>
+                    <span className="text-[14px] font-semibold text-[var(--color-ink)]">{formatPrice(format.packagePriceKopecks!)}</span>
+                  </button>
+                </div>
+              )}
+
               {submitError && <div className="text-sm font-medium text-[var(--color-danger)]">{submitError}</div>}
 
               <button type="submit" disabled={submitting} className="btn-primary w-full">
-                {submitting ? "Отправляем…" : isPaid ? `Перейти к оплате • ${formatPrice(format.priceKopecks)}` : "Записаться"}
+                {submitting
+                  ? "Отправляем…"
+                  : offersPackage && purchase === "package"
+                    ? `Купить пакет • ${formatPrice(format.packagePriceKopecks!)}`
+                    : isPaid
+                      ? `Перейти к оплате • ${formatPrice(format.priceKopecks)}`
+                      : "Записаться"}
               </button>
               <div className="text-center text-[13px] text-[var(--color-muted)]">Подтверждение придёт на почту</div>
             </form>
@@ -340,7 +453,7 @@ function InfoColumn({
         </div>
         <div className="flex items-center gap-3.5 text-[15px] font-medium text-[var(--color-text-secondary)]">
           <VideoIcon className="text-[var(--color-muted)]" />
-          {PROVIDER_LABELS[format.provider]}
+          {format.providers.map((p) => PROVIDER_LABELS[p]).join(" · ") || "Площадка не указана"}
         </div>
         <div className="flex items-center gap-3.5 text-[15px] font-medium text-[var(--color-text-secondary)]">
           <RubleIcon className="text-[var(--color-muted)]" />
@@ -438,6 +551,46 @@ function DoneCard({
           Управление записью
         </Link>
       </div>
+
+      <SignupCta defaultEmail={booking.clientEmail} />
+    </div>
+  );
+}
+
+/** The booking page's only ask of the client: they have just seen the product work end to end,
+ * which is the one moment they are most likely to want it themselves. The email is prefilled
+ * from the booking so the offer is one click, and it is carried to the landing's signup modal
+ * rather than posted here — account creation belongs to one flow, not two. */
+function SignupCta({ defaultEmail }: { defaultEmail: string }) {
+  const [email, setEmail] = useState(defaultEmail);
+
+  return (
+    <div
+      className="mt-8 rounded-2xl p-6 text-left"
+      style={{ background: "rgba(80,148,240,.06)", border: "1px solid rgba(80,148,240,.16)" }}
+    >
+      <div className="mb-4 text-[19px] font-bold leading-snug text-[var(--color-ink)]">
+        Зарегистрируйтесь в Slotix, чтобы получить такой же сервис для бронирования встреч. Это бесплатно.
+      </div>
+      <form
+        className="flex flex-col gap-2.5 sm:flex-row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          window.location.href = `/?signup=${encodeURIComponent(email.trim())}`;
+        }}
+      >
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Ваша почта"
+          aria-label="Электронная почта"
+          className="input-field flex-1"
+        />
+        <button type="submit" className="btn-primary whitespace-nowrap">
+          Попробовать бесплатно
+        </button>
+      </form>
     </div>
   );
 }

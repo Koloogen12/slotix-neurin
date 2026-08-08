@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { AccountScheduleCard } from "./AccountScheduleCard";
 
 const TIMEZONES: { value: string; label: string }[] = [
   { value: "Europe/Kaliningrad", label: "Калининград (GMT+2)" },
@@ -24,6 +25,7 @@ export default function SettingsPage() {
 
   const [name, setName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarError, setAvatarError] = useState<string | null>(null);
   const [timezone, setTimezone] = useState("Europe/Moscow");
   const [acceptingBookings, setAcceptingBookings] = useState(true);
   const [saveState, setSaveState] = useState<SaveState>("idle");
@@ -70,9 +72,25 @@ export default function SettingsPage() {
     save({ name: trimmed });
   }
 
-  function handleAvatarBlur() {
-    if (avatarUrl === (user?.avatarUrl ?? "")) return;
-    save({ avatarUrl: avatarUrl.trim() || undefined });
+  function handleAvatarChange(file: File | null) {
+    setAvatarError(null);
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setAvatarError("Выберите файл изображения");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError("Файл слишком большой (макс. 2 МБ)");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") return;
+      setAvatarUrl(reader.result);
+      save({ avatarUrl: reader.result });
+    };
+    reader.onerror = () => setAvatarError("Не удалось загрузить фото");
+    reader.readAsDataURL(file);
   }
 
   function handleTimezoneChange(value: string) {
@@ -107,9 +125,17 @@ export default function SettingsPage() {
           </div>
           <div>
             <div className="mb-1 text-[15px] font-semibold text-[var(--color-ink)]">Фото профиля</div>
-            <div className="text-[13px] text-[var(--color-muted)]">
-              Вставьте ссылку на изображение (PNG или JPG) — загрузка файлов пока недоступна.
-            </div>
+            <div className="mb-2 text-[13px] text-[var(--color-muted)]">PNG или JPG, до 2 МБ.</div>
+            <label className="btn-secondary inline-flex cursor-pointer">
+              Загрузить фото
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleAvatarChange(e.target.files?.[0] ?? null)}
+              />
+            </label>
+            {avatarError && <div className="mt-2 text-xs text-[var(--color-danger)]">{avatarError}</div>}
           </div>
         </div>
 
@@ -121,17 +147,6 @@ export default function SettingsPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               onBlur={handleNameBlur}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-[13px] font-semibold text-[var(--color-ink)]">Ссылка на фото</label>
-            <input
-              className="input-field"
-              placeholder="https://…"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              onBlur={handleAvatarBlur}
             />
           </div>
 
@@ -182,8 +197,8 @@ export default function SettingsPage() {
               style={{ background: acceptingBookings ? "var(--color-primary)" : "#D1D9E6" }}
             >
               <span
-                className="absolute top-[3px] h-[22px] w-[22px] rounded-full bg-white shadow transition-transform"
-                style={{ transform: acceptingBookings ? "translateX(22px)" : "translateX(3px)" }}
+                className="absolute left-0 top-[3px] h-[22px] w-[22px] rounded-full bg-white shadow transition-transform"
+                style={{ transform: acceptingBookings ? "translateX(21px)" : "translateX(3px)" }}
               />
             </button>
           </div>
@@ -202,6 +217,10 @@ export default function SettingsPage() {
           {saveState === "error" && (saveError ?? "Не удалось сохранить")}
           {saveState === "idle" && "Изменения сохраняются автоматически"}
         </div>
+      </div>
+
+      <div className="glass-card mb-[18px] p-[26px]">
+        <AccountScheduleCard />
       </div>
 
       <div className="glass-card p-[26px]" style={{ borderColor: "rgba(242,106,106,.28)" }}>

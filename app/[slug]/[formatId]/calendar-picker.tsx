@@ -5,7 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
 import { MONTH_NOMINATIVE, WEEKDAY_SHORT, ownerTodayParts } from "../format-utils";
 
 interface CalendarPickerProps {
-  ownerTimezone: string;
+  timezone: string;
   selectedDate: string | null;
   onSelectDate: (date: string) => void;
 }
@@ -14,8 +14,8 @@ function pad(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-export function CalendarPicker({ ownerTimezone, selectedDate, onSelectDate }: CalendarPickerProps) {
-  const today = ownerTodayParts(ownerTimezone);
+export function CalendarPicker({ timezone, selectedDate, onSelectDate }: CalendarPickerProps) {
+  const today = ownerTodayParts(timezone);
   const [view, setView] = useState({ year: today.year, month: today.month });
 
   const firstWeekday = (new Date(Date.UTC(view.year, view.month, 1)).getUTCDay() + 6) % 7; // Monday-first

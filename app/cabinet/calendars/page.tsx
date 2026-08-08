@@ -7,7 +7,66 @@ import { useAuth } from "@/lib/auth-context";
 
 const PROVIDER_LABEL: Record<CalendarConnection["provider"], string> = {
   google: "Google Calendar",
+  yandex: "Яндекс Календарь",
 };
+
+function YandexConnectCard({ onConnected }: { onConnected: (msg: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [appPassword, setAppPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const connect = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.post("/api/calendars/yandex/connect", { email: email.trim(), appPassword: appPassword.trim() });
+      setOpen(false);
+      setEmail("");
+      setAppPassword("");
+      onConnected("Яндекс Календарь подключён");
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "Не удалось подключить");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="glass-card p-6">
+      <div className="flex items-center gap-3.5">
+        <div className="flex h-11 w-11 flex-none items-center justify-center rounded-xl text-lg font-bold" style={{ background: "#FFF2E0", color: "#E8560A" }}>Я</div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[15px] font-bold text-(--color-ink)">Яндекс Календарь</div>
+          <div className="text-[13px] text-(--color-muted)">Занятость учитывается в свободных слотах, встречи попадают в календарь</div>
+        </div>
+        {!open && (
+          <button onClick={() => setOpen(true)} className="btn-secondary !px-4 !py-2.5 !text-[13px]">
+            Подключить
+          </button>
+        )}
+      </div>
+
+      {open && (
+        <div className="mt-4 flex flex-col gap-2.5">
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Яндекс-почта (you@yandex.ru)" className="rounded-xl border border-white/70 bg-white/70 px-4 py-2.5 text-sm outline-none focus:border-(--color-primary)" />
+          <input value={appPassword} onChange={(e) => setAppPassword(e.target.value)} type="password" placeholder="Пароль приложения" className="rounded-xl border border-white/70 bg-white/70 px-4 py-2.5 text-sm outline-none focus:border-(--color-primary)" />
+          <div className="text-xs text-(--color-muted)">
+            Не пароль от аккаунта — отдельный «пароль приложения» из настроек Яндекс ID (раздел «Пароли приложений» → «Календарь CalDAV»).
+          </div>
+          {error && <div className="text-sm font-semibold" style={{ color: "var(--color-danger)" }}>{error}</div>}
+          <div className="flex gap-2">
+            <button onClick={connect} disabled={busy || !email.trim() || !appPassword.trim()} className="btn-primary py-2.5 text-sm disabled:opacity-50">
+              {busy ? "Подключаем…" : "Подключить"}
+            </button>
+            <button onClick={() => setOpen(false)} className="btn-secondary py-2.5 text-sm">Отмена</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function GoogleGlyph() {
   return (
@@ -126,7 +185,7 @@ function CalendarsContent() {
           </div>
           <div className="mb-1.5 text-lg font-bold text-(--color-ink)">Календарь ещё не подключён</div>
           <div className="mb-5 max-w-[360px] text-sm text-(--color-muted)">
-            Подключите Google Calendar, чтобы новые встречи автоматически появлялись в календаре и слоты скрывались при занятости
+            Подключите Google Calendar или Яндекс Календарь — встречи будут автоматически появляться в календаре, а занятое время скрываться из свободных слотов
           </div>
           <button onClick={connectGoogle} className="btn-primary">
             Подключить Google Calendar
@@ -209,6 +268,15 @@ function CalendarsContent() {
             ))}
           </div>
         </>
+      )}
+
+      {connections !== null && (
+        <YandexConnectCard
+          onConnected={(m) => {
+            loadConnections();
+            showToast(m);
+          }}
+        />
       )}
 
       {toast && (

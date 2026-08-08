@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type Format } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { useConfirm } from "@/components/confirm-dialog";
 import { formatMeta, formatPriceLabel, PROVIDER_LABELS } from "./shared";
 
 type SortKey = "new" | "name" | "price" | "dur";
@@ -39,6 +40,7 @@ export default function FormatsListPage() {
   const [view, setView] = useState<ViewMode>("grid");
   const [sort, setSort] = useState<SortKey>("new");
   const [menuFor, setMenuFor] = useState<string | null>(null);
+  const confirm = useConfirm();
   const [toast, setToast] = useState<{ message: string; kind: "success" | "error" } | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [copiedProfile, setCopiedProfile] = useState(false);
@@ -108,8 +110,12 @@ export default function FormatsListPage() {
   const handleUnpublish = (f: Format) =>
     withAction(f.id, () => api.post(`/api/formats/${f.id}/unpublish`), "Формат снят с публикации");
 
-  const handleDelete = (f: Format) => {
-    if (!window.confirm(`Удалить формат «${f.name}»? Это действие необратимо.`)) return;
+  const handleDelete = async (f: Format) => {
+    const ok = await confirm({
+      title: `Удалить формат «${f.name}»?`,
+      description: "Это действие необратимо. Ссылка на формат перестанет работать.",
+    });
+    if (!ok) return;
     withAction(f.id, () => api.delete(`/api/formats/${f.id}`), "Формат удалён");
   };
 
@@ -340,7 +346,7 @@ export default function FormatsListPage() {
                       className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12.5px] font-semibold"
                       style={{ background: "rgba(255,255,255,.6)", border: "1px solid rgba(255,255,255,.7)", color: "var(--color-muted)" }}
                     >
-                      {PROVIDER_LABELS[f.provider]}
+                      {f.providers.map((p) => PROVIDER_LABELS[p]).join(" · ")}
                     </span>
                   </div>
                   <div
@@ -385,7 +391,7 @@ export default function FormatsListPage() {
                   className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12.5px] font-semibold"
                   style={{ background: "rgba(255,255,255,.6)", border: "1px solid rgba(255,255,255,.7)", color: "var(--color-muted)" }}
                 >
-                  {PROVIDER_LABELS[f.provider]}
+                  {f.providers.map((p) => PROVIDER_LABELS[p]).join(" · ")}
                 </span>
                 <div className="relative flex-none" data-menu-root onClick={(e) => e.stopPropagation()}>
                   <button

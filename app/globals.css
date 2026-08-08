@@ -45,10 +45,26 @@
 }
 
 body {
-  background: var(--background) url("/slotix/aurora-bg.png") center top / cover no-repeat fixed;
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-golos), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Фон — отдельным фиксированным слоем, а не background-attachment: fixed на body.
+   Прошлая версия крепилась к body со скроллом: картинка кончалась там, где кончался
+   первый экран, и ниже шла заливка — на длинных страницах это давало горизонтальный шов.
+   А background-attachment: fixed здесь применять нельзя: вместе с backdrop-filter у
+   липких шапок он даёт двойную экспозицию на их границе, и в iOS Safari он попросту
+   не работает. Отдельный fixed-слой решает обе задачи: он остаётся на месте при скролле
+   и корректно попадает под размытие стеклянных поверхностей. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--background) url("/slotix/aurora-bg.webp") center center / cover no-repeat;
+  pointer-events: none;
 }
 
 /* Glass card — the one recurring surface treatment across the app (not emails, which are
@@ -141,4 +157,250 @@ body {
 }
 .input-field:focus {
   border-color: var(--color-primary);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Примитивы для лендинга. Только новые классы — ничего из существующего
+   не переопределяют, поэтому на боевые страницы не влияют.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Стекло с внутренней кромкой света. Именно эта светлая линия по верхнему краю
+   и тонкая тёмная по нижнему дают ощущение толщины материала — без них карточка
+   читается как плоский прямоугольник. */
+.glass-elevated {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.58));
+  backdrop-filter: blur(34px) saturate(1.5);
+  -webkit-backdrop-filter: blur(34px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 26px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(20, 40, 70, 0.05),
+    0 2px 6px rgba(20, 40, 70, 0.04),
+    0 18px 40px -12px rgba(20, 40, 70, 0.16),
+    0 48px 90px -30px rgba(20, 40, 70, 0.18);
+}
+
+/* Вложенная плашка внутри стекла: чуть глубже фона, с той же кромкой. */
+.glass-inset {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.5));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(20, 40, 70, 0.04);
+}
+
+/* Цветное свечение под макетом — источник света, из-за которого стекло
+   выглядит подсвеченным, а не наклеенным на фон. */
+.aura {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(64px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: -1;
+}
+.aura-blue {
+  background: radial-gradient(circle, rgba(102, 166, 255, 0.75), transparent 68%);
+}
+.aura-green {
+  background: radial-gradient(circle, rgba(79, 214, 160, 0.6), transparent 68%);
+}
+.aura-violet {
+  background: radial-gradient(circle, rgba(147, 120, 236, 0.5), transparent 68%);
+}
+
+/* Волосяной разделитель, гаснущий к краям, — вместо жёсткой линии border-top. */
+.hairline {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, rgba(20, 40, 70, 0.13), transparent);
+}
+
+/* Едва заметное зерно поверх больших стеклянных плоскостей: убирает
+   «пластиковость» градиента и полосы бандинга на широких экранах. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.32;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+}
+
+/* Спутники макета — мелкие плашки, «висящие» рядом с основной карточкой.
+   Плавают в разной фазе, поэтому композиция не выглядит замершей. */
+@keyframes slotix-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -9px, 0);
+  }
+}
+.float-slow,
+.float-mid,
+.float-fast {
+  animation-name: slotix-float;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.float-slow {
+  animation-duration: 9s;
+}
+.float-mid {
+  animation-duration: 7s;
+  animation-delay: -2.5s;
+}
+.float-fast {
+  animation-duration: 5.5s;
+  animation-delay: -1s;
+}
+
+/* Пульс у индикатора «идёт запись». */
+@keyframes slotix-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+.pulse-dot {
+  animation: slotix-pulse 1.9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Заполнение шкалы загрузки — «наливается» один раз при появлении. */
+@keyframes slotix-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.bar-fill {
+  transform-origin: left center;
+  animation: slotix-fill 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Градиентная кромка, проявляющаяся при наведении на карточку. */
+.rim-hover {
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease;
+}
+.rim-hover::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, rgba(102, 166, 255, 0.9), rgba(79, 214, 160, 0.55), transparent 65%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  pointer-events: none;
+}
+.rim-hover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 26px 52px -16px rgba(20, 40, 70, 0.22);
+}
+.rim-hover:hover::before {
+  opacity: 1;
+}
+
+/* Цифры в колонках не должны «прыгать» по ширине. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-slow,
+  .float-mid,
+  .float-fast,
+  .pulse-dot,
+  .bar-fill {
+    animation: none;
+  }
+  .bar-fill {
+    transform: none;
+  }
+  .rim-hover {
+    transition: none;
+  }
+  .rim-hover:hover {
+    transform: none;
+  }
+}
+
+/* ── Доступность: видимый фокус и читаемые мелкие подписи ───────────────────
+   У кнопок был outline:none, а фокус показывался только тенью — при навигации
+   с клавиатуры человек не понимал, где находится. :focus-visible срабатывает
+   только на клавиатуре и не мешает мыши. */
+:where(a, button, summary, [role="button"], input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* Визуально скрытая подпись для полей: скринридер читает, глазами не видно. */
+.sr-only-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Микровзаимодействия ────────────────────────────────────────────────────
+   Отклик на нажатие: кнопка должна «проминаться». Без этого на телефоне
+   непонятно, засчитался тап или нет. */
+:where(.btn-primary, .btn-secondary):active {
+  transform: translateY(1px) scale(0.988);
+}
+.btn-primary,
+.btn-secondary {
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
+}
+
+/* Появление секции при прокрутке. animation-timeline поддерживают не все браузеры —
+   там, где нет, блок просто виден сразу, без деградации содержимого. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: slotix-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 22%;
+    }
+    @keyframes slotix-reveal {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 22px, 0);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
 }

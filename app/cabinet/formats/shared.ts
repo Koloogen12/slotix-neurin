@@ -19,9 +19,24 @@ export const PROVIDER_LABELS: Record<VideoProvider, string> = {
   google_meet: "Google Meet",
   zoom: "Zoom",
   yandex_telemost: "Яндекс Телемост",
+  phone: "Телефонный звонок",
 };
 
-export const PROVIDER_ORDER: VideoProvider[] = ["google_meet", "zoom", "yandex_telemost"];
+// Phone is last and always available: it needs no integration.
+export const PROVIDER_ORDER: VideoProvider[] = ["google_meet", "zoom", "yandex_telemost", "phone"];
+
+/** Platforms that require the owner to connect an account before they can be offered. */
+export const PROVIDER_NEEDS_CONNECTION: Record<VideoProvider, boolean> = {
+  google_meet: true,
+  zoom: true,
+  yandex_telemost: true,
+  phone: false,
+};
+
+// Providers shown but not selectable yet, with the reason shown as a small tag on their tile.
+export const PROVIDER_PENDING: Partial<Record<VideoProvider, string>> = {
+  zoom: "Ожидаем верификацию",
+};
 
 export const TYPE_LABELS: Record<FormatType, { title: string; subtitle: string }> = {
   one: { title: "Один на один", subtitle: "Консультация 1:1" },

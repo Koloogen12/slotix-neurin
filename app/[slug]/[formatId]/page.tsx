@@ -3,6 +3,7 @@ import Link from "next/link";
 import { api, ApiError, type PublicProfile } from "@/lib/api";
 import { Avatar } from "../avatar";
 import { BookingFlow } from "./booking-flow";
+import { BrandingBadge } from "../branding-badge";
 
 interface PageProps {
   params: Promise<{ slug: string; formatId: string }>;
@@ -15,6 +16,14 @@ async function fetchProfile(slug: string): Promise<PublicProfile> {
     if (error instanceof ApiError && error.status === 404) notFound();
     throw error;
   }
+}
+
+/** The booking screen is a single card on a flat surface. `body` paints the site-wide aurora
+ * image, which shows straight through the translucent .glass-card and reads as a second layer
+ * of artwork sitting on top of the calendar and slot list — so this screen covers it with the
+ * plain page colour. Fixed + negative z-index keeps it behind all content while scrolling. */
+function FlatBackdrop() {
+  return <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 bg-[var(--color-page-bg)]" />;
 }
 
 export default async function BookingFormatPage({ params }: PageProps) {
@@ -49,7 +58,9 @@ export default async function BookingFormatPage({ params }: PageProps) {
 
   return (
     <div className="flex flex-1 items-start justify-center px-4 py-10 sm:py-16 min-[1080px]:py-24">
+      <FlatBackdrop />
       <BookingFlow slug={slug} profile={profile} format={format} />
+      <BrandingBadge show={profile.showBranding} />
     </div>
   );
 }

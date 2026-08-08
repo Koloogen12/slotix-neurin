@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   CalendarIcon,
   CancelledIcon,
@@ -17,13 +19,71 @@ import type { BookingWithOwner } from "./types";
 type Mode = "details" | "cancel" | "reschedule";
 
 export function BookingManageView({ booking, token }: { booking: BookingWithOwner; token: string }) {
-  if (booking.status === "cancelled") return <CancelledView booking={booking} />;
-  if (booking.status === "moved") return <MovedView booking={booking} />;
-  return <ActiveBookingView booking={booking} token={token} />;
+  // A booking returning from a hosted checkout is still `pending` until the payment is
+  // confirmed. Sync it once on load so the client sees "оплачено" immediately, without
+  // waiting for the provider's async webhook.
+  const [status, setStatus] = useState<BookingWithOwner["status"]>(booking.status);
+  const [justPaid, setJustPaid] = useState(false);
+  const [syncing, setSyncing] = useState(booking.status === "pending");
+
+  useEffect(() => {
+    if (booking.status !== "pending") return;
+    let cancelled = false;
+    api
+      .post<{ status: string }>(`/api/public/booking/${token}/sync-payment`)
+      .then((r) => {
+        if (cancelled) return;
+        if (r.status === "confirmed" || r.status === "paid_awaiting_owner_confirmation") {
+          setStatus("confirmed");
+          setJustPaid(true);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => !cancelled && setSyncing(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [booking.status, token]);
+
+  const effective = { ...booking, status };
+  if (effective.status === "cancelled") return <CancelledView booking={effective} />;
+  if (effective.status === "moved") return <MovedView booking={effective} />;
+  if (justPaid) return <PaidView booking={effective} />;
+  return <ActiveBookingView booking={effective} token={token} syncing={syncing} />;
 }
 
-function ActiveBookingView({ booking, token }: { booking: BookingWithOwner; token: string }) {
-  const [mode, setMode] = useState<Mode>("details");
+function PaidView({ booking }: { booking: BookingWithOwner }) {
+  return (
+    <div className="mx-auto w-full max-w-[480px]">
+      <div className="glass-card p-9 text-center">
+        <div className="mx-auto mb-5 flex h-[66px] w-[66px] items-center justify-center rounded-full" style={{ background: "rgba(63,203,110,.15)", color: "var(--color-success)" }}>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+        </div>
+        <div className="mb-2 text-[22px] font-bold text-[var(--color-ink)]">Оплата прошла!</div>
+        <div className="mb-6 text-sm text-[var(--color-muted)]">
+          Встреча с {booking.user.name ?? "специалистом"} подтверждена. Детали и ссылку мы отправили на вашу почту.
+        </div>
+      </div>
+      <div className="mt-6 text-center text-xs text-[var(--color-faint)]">Работает на SLOTIX</div>
+    </div>
+  );
+}
+
+function ActiveBookingView({ booking, token, syncing }: { booking: BookingWithOwner; token: string; syncing?: boolean }) {
+  // Reminder/confirmation emails link straight to a step ("Перенести", "Отменить"); without
+  // this they'd all land on the details card and the two links would be indistinguishable.
+  const requestedAction = useSearchParams().get("action");
+  const [mode, setMode] = useState<Mode>(
+    requestedAction === "cancel" || requestedAction === "reschedule" ? requestedAction : "details",
+  );
+
+  if (syncing && booking.status === "pending") {
+    return (
+      <div className="mx-auto w-full max-w-[480px]">
+        <div className="glass-card p-9 text-center text-sm text-[var(--color-muted)]">Проверяем оплату…</div>
+      </div>
+    );
+  }
 
   if (mode === "cancel") {
     return <CancelPanel booking={booking} token={token} onBack={() => setMode("details")} />;
@@ -106,12 +166,19 @@ function DetailsCard({
             </div>
             <div className="flex items-center gap-3 text-sm font-medium text-[var(--color-text-secondary)]">
               <VideoIcon className="flex-none text-[var(--color-muted)]" />
-              {booking.channelLink ? (
+              {booking.provider === "phone" ? (
+                <span>
+                  {providerLabel("phone")}
+                  {booking.clientPhone ? ` · ${booking.clientPhone}` : ""}
+                </span>
+              ) : booking.channelLink ? (
                 <a href={booking.channelLink} target="_blank" rel="noopener noreferrer">
-                  {providerLabel(format.provider)} · ссылка на встречу
+                  {providerLabel(booking.provider ?? format.providers[0])} · ссылка на встречу
                 </a>
               ) : (
-                <span>{providerLabel(format.provider)} — ссылка появится после подтверждения</span>
+                <span>
+                  {providerLabel(booking.provider ?? format.providers[0])} — ссылка появится после подтверждения
+                </span>
               )}
             </div>
           </div>
@@ -131,7 +198,6 @@ function DetailsCard({
           </button>
         </div>
       </div>
-      <div className="mt-6 text-center text-xs text-[var(--color-faint)]">Работает на SLOTIX</div>
     </div>
   );
 }
@@ -160,7 +226,6 @@ function CancelledView({ booking }: { booking: BookingWithOwner }) {
           Записаться заново
         </Link>
       </div>
-      <div className="mt-6 text-center text-xs text-[var(--color-faint)]">Работает на SLOTIX</div>
     </div>
   );
 }
@@ -183,7 +248,6 @@ function MovedView({ booking }: { booking: BookingWithOwner }) {
           На страницу {booking.user.name ?? "специалиста"}
         </Link>
       </div>
-      <div className="mt-6 text-center text-xs text-[var(--color-faint)]">Работает на SLOTIX</div>
     </div>
   );
 }

@@ -3,8 +3,10 @@ import { LegalDocument } from "@/lib/legal/legal-document";
 import { SUPPORT_BLOCKS, SUPPORT_EFFECTIVE_DATE, SUPPORT_TITLE } from "@/lib/legal/support-content";
 
 export const metadata: Metadata = {
-  title: SUPPORT_TITLE,
-  description: "Как связаться с поддержкой Slotix — email и ответы на частые вопросы.",
+  title: "Поддержка и контакты",
+  description:
+    "Как связаться с поддержкой Slotix, сроки ответа и разбор частых вопросов: подключение календаря, приём оплат, площадки для созвонов и AI-конспекты.",
+  keywords: ["поддержка slotix", "связаться со slotix", "помощь по онлайн-записи", "техподдержка сервиса записи"],
   alternates: { canonical: "/support" },
   robots: { index: true, follow: true },
 };

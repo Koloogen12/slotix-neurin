@@ -27,7 +27,9 @@ function defaultRow(enabled: boolean): DayRow {
   return { enabled, ranges: [{ startTime: "10:00", endTime: "19:00" }] };
 }
 
-export default function AvailabilityPage() {
+/** The account's default week, inherited by every format that has no schedule of its own.
+ * Per-format schedules are edited on the format page; this is only the fallback. */
+export function AccountScheduleCard() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [timezone, setTimezone] = useState("Europe/Moscow");
@@ -133,10 +135,11 @@ export default function AvailabilityPage() {
 
   return (
     <div>
-      <h1 className="m-0 mb-1 text-[28px] font-bold tracking-tight text-(--color-ink)">Расписание</h1>
+      <h2 className="m-0 mb-1 text-[18px] font-bold tracking-tight text-(--color-ink)">Общее расписание</h2>
       <p className="mb-6 text-sm text-(--color-muted)">
-        Общее расписание для всех форматов встреч — когда клиенты могут вас забронировать. Для каждого дня можно
-        задать свой набор интервалов, например «9:00–12:00» и «14:00–18:00» с перерывом на обед.
+        Его наследует каждый формат встреч, у которого нет собственного расписания. Своё расписание задаётся на
+        странице формата. Для каждого дня можно указать несколько интервалов, например «9:00–12:00» и «14:00–18:00»
+        с перерывом на обед.
       </p>
 
       {loadError && <div className="glass-card mb-5 p-4 text-sm text-(--color-danger)">{loadError}</div>}

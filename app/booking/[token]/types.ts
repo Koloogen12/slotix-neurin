@@ -16,4 +16,6 @@ export interface PublicBookingOwner {
 export interface BookingWithOwner extends Booking {
   format: Format;
   user: PublicBookingOwner;
+  /** True when the owner is on the free plan — drives the "Работает на Slotix" badge. */
+  showBranding: boolean;
 }

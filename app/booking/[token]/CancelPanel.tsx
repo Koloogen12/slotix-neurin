@@ -48,7 +48,7 @@ export function CancelPanel({
             {dateLabel} · {timeLabel}
           </div>
           <div className="mt-1 text-[13px] text-[var(--color-muted)]">
-            с {booking.user.name ?? "специалистом"} · {providerLabel(booking.format.provider)}
+            с {booking.user.name ?? "специалистом"} · {providerLabel(booking.provider ?? booking.format.providers[0])}
           </div>
         </div>
 

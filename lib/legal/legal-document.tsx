@@ -1,11 +1,77 @@
 import Link from "next/link";
 
-export type LegalBlock = { type: "h2"; text: string } | { type: "p"; text: string } | { type: "ul"; items: string[] };
+export type LegalBlock =
+  | { type: "h2"; text: string }
+  | { type: "p"; text: string }
+  | { type: "ul"; items: string[] }
+  /** Врезка — для оговорок, которые должны быть заметны при беглом чтении (например,
+   * статус переноса обработки на российские решения). */
+  | { type: "note"; text: string }
+  | { type: "table"; head: string[]; rows: string[][] };
+
+/** Якорь для оглавления: заголовки нумерованные, поэтому берём номер раздела. */
+function anchorFor(text: string): string {
+  const num = text.match(/^(\d+)\./);
+  return num ? `section-${num[1]}` : text.toLowerCase().replace(/[^a-zа-я0-9]+/gi, "-").slice(0, 40);
+}
 
 function Block({ block }: { block: LegalBlock }) {
   if (block.type === "h2") {
     return (
-      <h2 className="mt-9 mb-3 text-xl font-bold tracking-[-.01em] text-[var(--color-ink)]">{block.text}</h2>
+      <h2
+        id={anchorFor(block.text)}
+        className="mt-10 mb-3.5 scroll-mt-6 border-t pt-7 text-xl font-bold tracking-[-.01em] text-[var(--color-ink)]"
+        style={{ borderColor: "rgba(140,150,165,.16)" }}
+      >
+        {block.text}
+      </h2>
+    );
+  }
+  if (block.type === "note") {
+    return (
+      <div
+        className="mb-4 rounded-xl px-4 py-3 text-[14px] leading-[1.6]"
+        style={{ background: "rgba(80,148,240,.09)", color: "var(--color-text-secondary-2)", borderLeft: "3px solid var(--color-primary)" }}
+      >
+        {block.text}
+      </div>
+    );
+  }
+  if (block.type === "table") {
+    return (
+      <div className="mb-5 overflow-x-auto">
+        <table className="w-full min-w-[640px] border-collapse text-[14px]">
+          <thead>
+            <tr>
+              {block.head.map((h) => (
+                <th
+                  key={h}
+                  className="border-b px-3 py-2.5 text-left align-bottom font-semibold text-[var(--color-ink)]"
+                  style={{ borderColor: "rgba(140,150,165,.35)" }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {block.rows.map((row) => (
+              <tr key={row.join("|")}>
+                {row.map((cell, ci) => (
+                  <td
+                    // biome-ignore lint/suspicious/noArrayIndexKey: fixed-width legal table, columns never reorder
+                    key={ci}
+                    className="border-b px-3 py-2.5 align-top leading-[1.55] text-[var(--color-text-secondary-2)]"
+                    style={{ borderColor: "rgba(140,150,165,.16)" }}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   }
   if (block.type === "ul") {
@@ -55,6 +121,22 @@ export function LegalDocument({
           <div className="mb-7 text-[14px] font-medium text-[var(--color-muted)]">Редакция от {effectiveDate}</div>
 
           {intro && <p className="mb-3.5 text-[15px] leading-[1.65] text-[var(--color-text-secondary-2)]">{intro}</p>}
+
+          {/* Оглавление: документы длинные, без него найти нужный раздел тяжело. */}
+          <nav className="mt-7 rounded-2xl px-5 py-4" style={{ background: "rgba(255,255,255,.55)" }} aria-label="Содержание">
+            <div className="mb-2.5 text-[13px] font-bold uppercase tracking-wide text-[var(--color-muted)]">Содержание</div>
+            <ol className="m-0 flex list-none flex-col gap-1.5 p-0">
+              {blocks
+                .filter((b): b is Extract<LegalBlock, { type: "h2" }> => b.type === "h2")
+                .map((b) => (
+                  <li key={b.text}>
+                    <a href={`#${anchorFor(b.text)}`} className="text-[14px] text-[var(--color-link)] no-underline hover:underline">
+                      {b.text}
+                    </a>
+                  </li>
+                ))}
+            </ol>
+          </nav>
 
           {blocks.map((block, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: static legal-document content, blocks never reorder

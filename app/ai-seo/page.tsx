@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-const TITLE = "ИИ-конспект встреч онлайн — автопротокол звонка | Slotix";
+// Бренд дописывает шаблон в layout — иначе выходит «… | Slotix | Slotix».
+const TITLE = "ИИ-конспект встреч онлайн — автопротокол звонка";
 const DESCRIPTION =
   "Slotix присылает готовый конспект встречи с задачами и договорённостями сразу после звонка — вам и клиенту, на почту и в Telegram. Без записей и ручных заметок.";
 const URL = "/ai-seo";
@@ -94,7 +95,7 @@ export default function AiSeoPage() {
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-5 px-[clamp(20px,5vw,40px)] py-4">
           <a href="/" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/slotix/slotix-logo.png" alt="Slotix" className="block h-[30px] w-auto" />
+            <img src="/slotix/slotix-logo.webp" alt="Slotix" className="block h-[30px] w-auto" />
           </a>
           <div className="flex items-center gap-[clamp(14px,2.4vw,34px)]">
             <a href="/#features" className="hidden md:inline text-[15px] font-semibold text-[var(--color-text-secondary)]">

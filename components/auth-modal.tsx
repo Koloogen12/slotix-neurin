@@ -14,13 +14,16 @@ interface AuthModalProps {
   onClose: () => void;
   initialMode: AuthModalMode;
   initialEmail?: string;
+  /** Where to land after a successful auth. Defaults to the cabinet; the invite page passes
+   * its own URL so an invited person isn't bounced away from what they were doing. */
+  redirectTo?: string;
 }
 
 function redirectPathFor(user: Me): string {
   return user.slug.startsWith("tmp-") ? "/onboarding" : "/cabinet/formats";
 }
 
-export function AuthModal({ isOpen, onClose, initialMode, initialEmail }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, initialMode, initialEmail, redirectTo }: AuthModalProps) {
   const router = useRouter();
   const { refresh } = useAuth();
 
@@ -46,7 +49,10 @@ export function AuthModal({ isOpen, onClose, initialMode, initialEmail }: AuthMo
   async function completeAuth(user: Me) {
     await refresh();
     onClose();
-    router.push(redirectPathFor(user));
+    // Onboarding still wins for a brand-new account — it has to pick a slug before anything
+    // else works — but otherwise honour the caller's destination.
+    const needsOnboarding = user.slug.startsWith("tmp-");
+    router.push(redirectTo && !needsOnboarding ? redirectTo : redirectPathFor(user));
   }
 
   async function handleLogin(e: FormEvent) {

@@ -48,6 +48,7 @@ const PROVIDER_LABELS: Record<VideoProvider, string> = {
   google_meet: "Google Meet",
   zoom: "Zoom",
   yandex_telemost: "Яндекс Телемост",
+  phone: "Телефонный звонок",
 };
 
 export function providerLabel(provider: VideoProvider): string {

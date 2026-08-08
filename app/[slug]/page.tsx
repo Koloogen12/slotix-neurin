@@ -5,6 +5,7 @@ import { api, ApiError, type PublicProfile } from "@/lib/api";
 import { Avatar } from "./avatar";
 import { ChevronRightIcon } from "./icons";
 import { formatMeta } from "./format-utils";
+import { BrandingBadge } from "./branding-badge";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -49,6 +50,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
   return (
     <div className="flex flex-1 items-start justify-center px-4 py-16 sm:py-24">
+      <BrandingBadge show={profile.showBranding} />
       <div className="w-full max-w-[540px]">
         <div className="mb-8 flex flex-col items-center text-center">
           <Avatar name={profile.name} avatarUrl={profile.avatarUrl} size={88} />

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { BookingManageView } from "./BookingManageView";
+import { BrandingBadge } from "../../[slug]/branding-badge";
 import type { BookingWithOwner } from "./types";
 
 export default async function BookingManagePage({
@@ -20,5 +21,10 @@ export default async function BookingManagePage({
     throw error;
   }
 
-  return <BookingManageView booking={booking} token={token} />;
+  return (
+    <div className="flex flex-1 items-center justify-center px-4 py-10 sm:py-16">
+      <BookingManageView booking={booking} token={token} />
+      <BrandingBadge show={booking.showBranding} />
+    </div>
+  );
 }
