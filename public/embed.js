@@ -64,6 +64,15 @@
       if (options[field]) url.searchParams.set(field, options[field]);
     }
 
+    // Ответы на свои вопросы формата: {stage: "..."} -> ?q_stage=...
+    if (options.answers) {
+      for (var key in options.answers) {
+        if (Object.prototype.hasOwnProperty.call(options.answers, key) && options.answers[key]) {
+          url.searchParams.set("q_" + key, options.answers[key]);
+        }
+      }
+    }
+
     return url.toString();
   }
 
@@ -276,8 +285,25 @@
 
   // --- auto-binding --------------------------------------------------------
 
+  /** data-slotix-q-<key> -> answers[<key>]. Дефисы в имени атрибута сохраняются как есть:
+   * ключ вопроса и так ограничен латиницей, цифрами, дефисом и подчёркиванием. */
+  function answersFromElement(element) {
+    var answers = null;
+    var attributes = element.attributes;
+    for (var i = 0; i < attributes.length; i++) {
+      var name = attributes[i].name;
+      if (name.indexOf("data-slotix-q-") !== 0) continue;
+      var key = name.slice("data-slotix-q-".length);
+      if (!key) continue;
+      if (!answers) answers = {};
+      answers[key] = attributes[i].value;
+    }
+    return answers;
+  }
+
   function optionsFromElement(element) {
     return {
+      answers: answersFromElement(element),
       cta: element.getAttribute("data-slotix-cta") || undefined,
       name: element.getAttribute("data-slotix-name") || undefined,
       email: element.getAttribute("data-slotix-email") || undefined,

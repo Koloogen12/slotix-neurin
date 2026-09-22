@@ -345,10 +345,32 @@ export interface PublicProfile {
   acceptingBookings: boolean;
   /** Whether to show the "Работает на Slotix" badge — true for owners on the free plan. */
   showBranding: boolean;
-  formats: Pick<
+  formats: (Pick<
     Format,
     "id" | "name" | "type" | "durationMin" | "seats" | "color" | "providers" | "priceKopecks" | "packageSize" | "packagePriceKopecks" | "manualConfirm"
-  >[];
+  > & { questions: FormatQuestion[] })[];
+}
+
+export type FormatQuestionType = "short_text" | "long_text" | "single_choice";
+
+/** Вопрос, который владелец задаёт при записи на формат. `key` — устойчивый слаг: по нему
+ * встраивающая страница предзаполняет ответ через `?q_<key>=`, не зная id из базы. */
+export interface FormatQuestion {
+  id: string;
+  key: string;
+  label: string;
+  type: FormatQuestionType;
+  required: boolean;
+  /** Непусто только у single_choice. */
+  options: string[];
+  /** Непусто только у long_text. */
+  minLength: number | null;
+}
+
+/** Ответ клиента, уходящий вместе с записью. */
+export interface BookingAnswerInput {
+  key: string;
+  value: string;
 }
 
 export interface TimeSlot {

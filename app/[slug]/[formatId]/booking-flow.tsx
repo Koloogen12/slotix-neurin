@@ -29,6 +29,7 @@ import {
   ownerTodayParts,
 } from "../format-utils";
 import { CalendarPicker } from "./calendar-picker";
+import { FormatQuestions } from "./format-questions";
 import { TimezonePicker } from "./timezone-picker";
 
 type Step = "pick" | "form" | "payment" | "done";
@@ -80,6 +81,8 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [clientComment, setClientComment] = useState("");
+  // Ответы на свои вопросы владельца, по ключу вопроса.
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   // The owner may offer several platforms; the API has already filtered the list down to the
   // ones they can actually deliver, so anything here is bookable. One entry = no choice to make.
   const [provider, setProvider] = useState<VideoProvider | null>(() => format.providers[0] ?? null);
@@ -117,6 +120,19 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
     if (name) setClientName((current) => current || name);
     if (email) setClientEmail((current) => current || email);
     if (comment) setClientComment((current) => current || comment);
+
+    // Ответы предзаполняются как `?q_<key>=значение`. Карточка сегмента на лендинге тем самым
+    // заранее отвечает за посетителя на вопрос, ответ на который она и так знает.
+    const prefilled: Record<string, string> = {};
+    params.forEach((value, name) => {
+      if (!name.startsWith("q_")) return;
+      const key = name.slice(2);
+      const trimmed = value.trim().slice(0, 5000);
+      if (key && trimmed) prefilled[key] = trimmed;
+    });
+    if (Object.keys(prefilled).length > 0) {
+      setAnswers((current) => ({ ...prefilled, ...current }));
+    }
   }, []);
 
   const fetchSlots = useCallback(
@@ -180,6 +196,9 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
         clientPhone: provider === "phone" ? clientPhone.trim() : undefined,
         purchase: offersPackage ? purchase : undefined,
         utm: getAttribution(),
+        answers: format.questions.length
+          ? format.questions.map((q) => ({ key: q.key, value: answers[q.key] ?? "" }))
+          : undefined,
       });
       setBooking(created);
       // Fired at creation, not at the "done" screen: a paid format redirects to the payment
@@ -370,6 +389,12 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
                   onChange={(e) => setClientComment(e.target.value)}
                 />
               </div>
+
+              <FormatQuestions
+                questions={format.questions}
+                values={answers}
+                onChange={(key, value) => setAnswers((current) => ({ ...current, [key]: value }))}
+              />
 
               {format.providers.length > 1 && (
                 <div>
