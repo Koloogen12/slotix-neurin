@@ -3,3 +3,6 @@ node_modules/
 .env*.local
 .env
 *.log
+
+# Артефакт инкрементальной сборки TS — попадал в каждый коммит и шумел в диффах.
+tsconfig.tsbuildinfo

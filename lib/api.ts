@@ -67,6 +67,37 @@ export type Plan = "free" | "standard" | "pro";
 /** Всё, что можно купить: подписки и разовая докупка минут AI-конспектов. */
 export type BillableItem = "standard" | "pro" | "team" | "ai_pack";
 
+/** ₽ проводит Робокасса, $ и € — lava.top; выбор валюты и есть выбор провайдера. */
+export type BillingCurrency = "RUB" | "USD" | "EUR";
+export type BillingInterval = "monthly" | "yearly" | "one_time";
+
+/** Цены приходят с сервера — в UI их дублировать нельзя, иначе разъедутся со счётом. */
+export interface BillingCatalogItem {
+  item: BillableItem;
+  title: string;
+  intervals: { interval: BillingInterval; prices: Record<BillingCurrency, number> }[];
+}
+
+export interface BillingCatalog {
+  currencies: BillingCurrency[];
+  items: BillingCatalogItem[];
+}
+
+export interface BillingSubscription {
+  item: BillableItem | null;
+  interval: BillingInterval;
+  currency: BillingCurrency;
+  status: "active" | "past_due" | "canceled";
+  currentPeriodEnd: string;
+  autoRenew: boolean;
+  provider: string | null;
+}
+
+export interface BillingState {
+  plan: Plan;
+  subscription: BillingSubscription | null;
+}
+
 export interface AiBalance {
   scope: "personal" | "team";
   plan: Plan | "team";
