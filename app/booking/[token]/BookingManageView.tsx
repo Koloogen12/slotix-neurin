@@ -93,7 +93,14 @@ function ActiveBookingView({ booking, token, syncing }: { booking: BookingWithOw
     return <ReschedulePanel booking={booking} token={token} onBack={() => setMode("details")} />;
   }
 
-  return <DetailsCard booking={booking} onCancel={() => setMode("cancel")} onReschedule={() => setMode("reschedule")} />;
+  return (
+    <DetailsCard
+      booking={booking}
+      token={token}
+      onCancel={() => setMode("cancel")}
+      onReschedule={() => setMode("reschedule")}
+    />
+  );
 }
 
 function PendingNote({ booking }: { booking: BookingWithOwner }) {
@@ -116,10 +123,12 @@ function PendingNote({ booking }: { booking: BookingWithOwner }) {
 
 function DetailsCard({
   booking,
+  token,
   onCancel,
   onReschedule,
 }: {
   booking: BookingWithOwner;
+  token: string;
   onCancel: () => void;
   onReschedule: () => void;
 }) {
@@ -183,6 +192,8 @@ function DetailsCard({
             </div>
           </div>
         </div>
+
+        <TelegramReminders token={token} />
 
         <div className="mt-6 flex gap-3">
           <button type="button" className="btn-secondary flex-1" onClick={onReschedule}>
@@ -248,6 +259,50 @@ function MovedView({ booking }: { booking: BookingWithOwner }) {
           На страницу {booking.user.name ?? "специалиста"}
         </Link>
       </div>
+    </div>
+  );
+}
+
+/** Напоминания о встрече в Telegram. Ссылку получаем по клику, а не заранее: бот всё равно не
+ * может написать первым, так что канал появляется только если клиент сам откроет бота, — и
+ * одноразовый код не стоит заводить каждому, кто просто открыл страницу записи. */
+function TelegramReminders({ token }: { token: string }) {
+  const [state, setState] = useState<"idle" | "loading" | "opened" | "error">("idle");
+
+  async function connect() {
+    setState("loading");
+    try {
+      const { url } = await api.get<{ url: string }>(`/api/public/booking/${token}/telegram-link`);
+      // Открываем сразу, не показывая ссылку: лишний шаг «скопируйте и вставьте» тут ничего
+      // не добавляет, а на телефоне ссылка t.me сама переключает в приложение.
+      window.open(url, "_blank", "noopener");
+      setState("opened");
+    } catch {
+      setState("error");
+    }
+  }
+
+  if (state === "opened") {
+    return (
+      <div className="mt-5 text-center text-[13px] text-[var(--color-muted)]">
+        Откройте бота и нажмите «Запустить» — напоминания придут в Telegram.
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-5 text-center">
+      <button
+        type="button"
+        className="cursor-pointer text-[13px] font-semibold text-[var(--color-link,#2F6FD0)] underline underline-offset-2"
+        disabled={state === "loading"}
+        onClick={connect}
+      >
+        {state === "loading" ? "Готовим ссылку…" : "Получать напоминания в Telegram"}
+      </button>
+      {state === "error" && (
+        <div className="mt-1 text-[12px] text-[var(--color-danger)]">Не удалось подключить — попробуйте позже</div>
+      )}
     </div>
   );
 }

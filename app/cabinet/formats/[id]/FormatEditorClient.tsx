@@ -14,6 +14,7 @@ import {
 } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { ScheduleEditor } from "./ScheduleEditor";
+import { QuestionsEditor } from "./QuestionsEditor";
 import {
   DURATION_PRESETS,
   FORMAT_COLORS,
@@ -461,6 +462,9 @@ export function FormatEditorClient({ id }: Props) {
 
           <div className="fe-lbl">Расписание</div>
           <ScheduleEditor formatId={id} timezone={user?.timezone ?? "Europe/Moscow"} />
+
+          <div className="fe-lbl">Вопросы при записи</div>
+          <QuestionsEditor formatId={id} />
         </Section>
 
         <Section title="Продвинутые настройки" open={openSections.advanced} onToggle={() => toggleSection("advanced")}>

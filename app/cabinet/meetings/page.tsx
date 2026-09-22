@@ -154,6 +154,21 @@ export default function MeetingsPage() {
     }
   }
 
+  /** Клиент не пришёл. Само письмо с приглашением перезаписаться шлёт крон — здесь только
+   * отметка, поэтому кнопка отвечает мгновенно и не зависит от почтового провайдера. */
+  async function handleNoShow(booking: Booking, noShow: boolean) {
+    setBusy(booking.id, true);
+    try {
+      const updated = await api.post<Booking>(`/api/bookings/${booking.id}/no-show`, { noShow });
+      setBookings((prev) => prev?.map((b) => (b.id === booking.id ? { ...b, noShowAt: updated.noShowAt } : b)) ?? prev);
+      showToast(noShow ? "Отмечено — клиент получит приглашение выбрать другое время" : "Отметка снята");
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : "Не удалось отметить неявку");
+    } finally {
+      setBusy(booking.id, false);
+    }
+  }
+
   async function handleCancel(booking: Booking, reason: string) {
     setBusy(booking.id, true);
     try {
@@ -674,6 +689,16 @@ export default function MeetingsPage() {
                   «{selected.clientComment}»
                 </div>
               )}
+              {selected.answers && selected.answers.length > 0 && (
+                <div className="mt-3 flex flex-col gap-2.5 rounded-[11px] p-3.5" style={{ background: "rgba(255,255,255,.6)" }}>
+                  {selected.answers.map((answer) => (
+                    <div key={answer.label}>
+                      <div className="text-[12px] text-(--color-muted)">{answer.label}</div>
+                      <div className="text-[13.5px] whitespace-pre-line text-(--color-text-secondary)">{answer.value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="mb-5.5 flex flex-col gap-3.5 px-1">
@@ -772,6 +797,21 @@ export default function MeetingsPage() {
                     style={{ border: "1px solid rgba(232,86,86,.35)", background: "var(--color-danger-bg)", color: "var(--color-danger)" }}
                   >
                     Отменить
+                  </button>
+                )}
+                {selected.status === "confirmed" && new Date(selected.startAt).getTime() < Date.now() && (
+                  <button
+                    disabled={busyIds.has(selected.id) || !!selected.followUpSentAt}
+                    onClick={() => handleNoShow(selected, !selected.noShowAt)}
+                    className="dact"
+                    style={{ border: "1px solid #D1D9E6", background: "rgba(255,255,255,.6)", color: "var(--color-text-secondary)" }}
+                    title={
+                      selected.followUpSentAt
+                        ? "Письмо клиенту уже отправлено — отметку снять нельзя"
+                        : "Клиенту придёт приглашение выбрать другое время"
+                    }
+                  >
+                    {selected.noShowAt ? "Отменить отметку о неявке" : "Клиент не пришёл"}
                   </button>
                 )}
               </div>

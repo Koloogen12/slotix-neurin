@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api, ApiError, type IntegrationsOverview } from "@/lib/api";
+import { WebhooksSection } from "./WebhooksSection";
 
 type ConnectableProvider = "zoom" | "yandex_telemost";
 type ProviderKey = "google_meet" | ConnectableProvider;
@@ -176,6 +177,8 @@ function IntegrationsPageContent() {
       </div>
 
       <PaymentAcceptance />
+
+      <WebhooksSection />
 
       {toast && (
         <div

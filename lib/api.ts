@@ -205,6 +205,12 @@ export interface Booking {
   paymentUrl?: string;
   createdAt: string;
   format?: Format;
+  /** Ответы на вопросы формата, в том порядке, в каком их задавали. */
+  answers?: { label: string; value: string }[];
+  /** Владелец отметил, что клиент не пришёл. */
+  noShowAt?: string | null;
+  /** Письмо-добивка после неявки уже ушло — отметку снять уже нельзя. */
+  followUpSentAt?: string | null;
 }
 
 export interface BookingSourceRow {
@@ -406,3 +412,29 @@ export interface MeetingNote {
   booking: { clientName: string; startAt: string } | null;
 }
 
+// --- Исходящие вебхуки ---
+
+export type WebhookEventName =
+  | "booking_created"
+  | "booking_confirmed"
+  | "booking_cancelled"
+  | "booking_rescheduled";
+
+/** `secret` приходит только в ответе на создание: показать его повторно нельзя. */
+export interface Webhook {
+  id: string;
+  url: string;
+  events: WebhookEventName[];
+  enabled: boolean;
+  createdAt: string;
+}
+
+export interface WebhookDelivery {
+  id: string;
+  event: WebhookEventName;
+  status: "pending" | "delivered" | "failed";
+  attempts: number;
+  lastError: string | null;
+  deliveredAt: string | null;
+  createdAt: string;
+}
