@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { EMBED_PATH_PREFIX } from "@/lib/embed";
 import Link from "next/link";
 
 const STORAGE_KEY = "slotix-cookie-consent";
@@ -74,15 +76,20 @@ export function trackPageView(url: string): void {
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  // Inside an embedded widget there is nothing to consent to and nobody to ask: the banner
+  // would cover the booking form on someone else's page, and firing our counter there would
+  // track their visitors under our ID, outside their own consent flow. Both are off.
+  const isEmbedded = usePathname()?.startsWith(EMBED_PATH_PREFIX) ?? false;
 
   useEffect(() => {
+    if (isEmbedded) return;
     const stored = readConsent();
     if (!stored) {
       setVisible(true);
       return;
     }
     if (stored.decision === "accepted") loadMetrica(YM_COUNTER_ID);
-  }, []);
+  }, [isEmbedded]);
 
   const decide = (decision: Decision) => {
     try {
@@ -94,7 +101,7 @@ export function CookieConsent() {
     if (decision === "accepted") loadMetrica(YM_COUNTER_ID);
   };
 
-  if (!visible) return null;
+  if (isEmbedded || !visible) return null;
 
   return (
     <div

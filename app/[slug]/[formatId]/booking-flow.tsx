@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react
 import Link from "next/link";
 import { api, ApiError, type Booking, type PublicProfile, type TimeSlot, type VideoProvider } from "@/lib/api";
 import { getAttribution } from "@/lib/attribution";
+import { postToHost } from "@/lib/embed";
 import { Avatar } from "../avatar";
 import {
   AlertIcon,
@@ -98,6 +99,26 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
   );
   const isPaid = format.priceKopecks > 0;
 
+  // Prefill from the opening link (`?name=&email=&comment=`). An embedding site knows who
+  // clicked — a landing page can pass the segment the visitor picked straight into the
+  // comment, so nobody retypes it. Applied in an effect rather than in the useState
+  // initialisers because those also run during SSR, where `window` does not exist and a
+  // server-rendered "" would hydrate against a filled input.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const take = (key: string, max: number) => params.get(key)?.trim().slice(0, max) || undefined;
+
+    const name = take("name", 120);
+    const email = take("email", 200);
+    const comment = take("comment", 2000);
+
+    // Only ever fills an untouched field: a visitor who already typed must not have it
+    // overwritten if this effect re-runs.
+    if (name) setClientName((current) => current || name);
+    if (email) setClientEmail((current) => current || email);
+    if (comment) setClientComment((current) => current || comment);
+  }, []);
+
   const fetchSlots = useCallback(
     async (date: string, tz: string) => {
       setSlotsLoading(true);
@@ -161,6 +182,11 @@ export function BookingFlow({ slug, profile, format }: BookingFlowProps) {
         utm: getAttribution(),
       });
       setBooking(created);
+      // Fired at creation, not at the "done" screen: a paid format redirects to the payment
+      // provider on the next line and would otherwise never report anything to the host page.
+      // So this means "a booking row now exists", which is exactly the funnel step the
+      // embedding site counts — payment is a separate state it can read from the webhook.
+      postToHost({ type: "booked", formatId: format.id, startAt: selectedSlot.start });
       // Paid booking → redirect to the provider's hosted checkout. After paying, the provider
       // returns the client to the booking page, which reflects the confirmed status.
       if (created.paymentUrl) {

@@ -67,6 +67,17 @@ body::before {
   pointer-events: none;
 }
 
+/* Встроенный виджет живёт внутри чужой страницы: и заливка, и aurora-слой там читались бы
+   как посторонний прямоугольник поверх вёрстки хозяина. Гасим оба, чтобы фон просвечивал
+   сквозь iframe (у него выставлен allowtransparency + background: transparent в embed.js). */
+body:has(.slotix-embed-root) {
+  background: transparent;
+}
+
+body:has(.slotix-embed-root)::before {
+  display: none;
+}
+
 /* Glass card — the one recurring surface treatment across the app (not emails, which are
    plain — see notifications templates on the backend). */
 .glass-card {

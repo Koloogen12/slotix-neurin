@@ -50,6 +50,36 @@ const SECURITY_HEADERS = [
   },
 ];
 
+// Who may frame /embed/*. The booking widget is meant to be dropped onto customers' own
+// sites, so the default has to be open — a fixed allowlist would mean a deploy per customer.
+// The pages under this prefix are public and contain no authenticated action, so the usual
+// framing risk (clickjacking a logged-in session) does not apply. Set the variable to a
+// space-separated origin list to lock embedding down to known sites.
+const EMBED_FRAME_ANCESTORS = process.env.EMBED_FRAME_ANCESTORS?.trim() || "*";
+
+// Same baseline as the site, with framing opened up and the Metrica origins dropped: the
+// counter never runs inside the widget (see CookieConsent), and a consent banner has no
+// business appearing inside someone else's page.
+const EMBED_HEADERS = [
+  { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  {
+    key: "Content-Security-Policy",
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      `connect-src 'self'${API_ORIGIN ? ` ${API_ORIGIN}` : ""}`,
+      "form-action 'self'",
+      `frame-ancestors ${EMBED_FRAME_ANCESTORS}`,
+      "base-uri 'self'",
+    ].join("; "),
+  },
+];
+
 const nextConfig: NextConfig = {
   // The host this runs on has 1 GB of RAM shared with the notetaker worker, so `next start`
   // with the full node_modules tree is too heavy — standalone emits a self-contained server
@@ -61,7 +91,13 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname),
   },
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      // Negative lookahead, not just ordering: Next emits every matching rule, and a browser
+      // given two CSP headers enforces the strictest of each directive. Without excluding
+      // /embed here its permissive frame-ancestors would be intersected back down to 'self'.
+      { source: "/:path((?!embed/).*)", headers: SECURITY_HEADERS },
+      { source: "/embed/:path*", headers: EMBED_HEADERS },
+    ];
   },
 };
 

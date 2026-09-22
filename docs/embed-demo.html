@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Slotix embed — проверка</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body { font: 15px/1.6 system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; color: #14202d; }
+  h1 { font-size: 22px; } h2 { font-size: 16px; margin-top: 32px; }
+  button { font: inherit; padding: 10px 18px; border: 0; border-radius: 10px; background: #5094f0; color: #fff; cursor: pointer; }
+  button.secondary { background: #e6eefb; color: #14202d; }
+  #log { background: #0f1722; color: #cfe3ff; padding: 14px; border-radius: 10px; font: 12px/1.6 ui-monospace, monospace; min-height: 120px; white-space: pre-wrap; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+</style>
+
+<h1>Проверка встраивания Slotix</h1>
+<p>Замените <code>SLUG</code> и <code>FORMAT_ID</code> в кнопках ниже на реальные. Страницу надо
+открывать по http (<code>npx serve docs</code>), а не через <code>file://</code> — иначе браузер
+шлёт origin <code>null</code> и поведение iframe отличается от боевого.</p>
+
+<h2>Модальное окно</h2>
+<div class="row">
+  <button data-slotix="https://slotix.neurin.tech/SLUG/FORMAT_ID" data-slotix-cta="hero">
+    Разобрать гипотезу (cta=hero)
+  </button>
+  <button class="secondary"
+          data-slotix="https://slotix.neurin.tech/SLUG/FORMAT_ID"
+          data-slotix-cta="seg-founder"
+          data-slotix-comment="Фаундер · продукт есть, выручки нет">
+    С предзаполненным комментарием (cta=seg-founder)
+  </button>
+</div>
+
+<h2>Встроенный в страницу</h2>
+<div data-slotix-inline-url="https://slotix.neurin.tech/SLUG/FORMAT_ID"
+     data-slotix-cta="inline"></div>
+
+<h2>События</h2>
+<div id="log">жду событий…</div>
+
+<script>
+  var log = document.getElementById("log");
+  function write(name, detail) {
+    log.textContent = new Date().toLocaleTimeString() + "  " + name +
+      (detail && Object.keys(detail).length ? "  " + JSON.stringify(detail) : "") + "\n" + log.textContent;
+  }
+  ["open", "ready", "booked", "close", "fallback"].forEach(function (name) {
+    window.addEventListener("slotix:" + name, function (e) { write("slotix:" + name, e.detail); });
+  });
+</script>
+<script src="https://slotix.neurin.tech/embed.js" defer></script>

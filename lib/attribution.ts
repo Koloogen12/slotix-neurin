@@ -70,3 +70,39 @@ export function getAttribution(): Attribution | undefined {
     return undefined;
   }
 }
+
+// ---------------------------------------------------------------------------
+// CTA tag — which button on the embedding site opened the widget (`?cta=hero`).
+//
+// Kept out of `Attribution` on purpose: that object is posted to the backend as `utm`, whose
+// DTO has no cta field, so it would be silently dropped by the validation whitelist and look
+// stored when it is not. Until the Booking model gains a column, the tag lives client-side
+// and travels to the host page in the `booked` postMessage, where the site's own analytics
+// records it alongside the click that started the session.
+
+const CTA_STORAGE_KEY = "slotix_cta";
+const CTA_MAX_LENGTH = 64;
+
+/** Reads `?cta=` from the current URL and remembers it for this session. First value wins,
+ * matching UTM first-touch semantics. Safe to call on every page mount. */
+export function captureCta(): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (sessionStorage.getItem(CTA_STORAGE_KEY)) return;
+    const value = new URLSearchParams(window.location.search).get("cta")?.trim();
+    if (value) sessionStorage.setItem(CTA_STORAGE_KEY, value.slice(0, CTA_MAX_LENGTH));
+  } catch {
+    /* private-mode / storage disabled — attribution is best-effort */
+  }
+}
+
+/** The cta tag captured earlier this session, or undefined when the widget was opened from a
+ * link that carried none. */
+export function getCta(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  try {
+    return sessionStorage.getItem(CTA_STORAGE_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
