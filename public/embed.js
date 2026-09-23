@@ -271,6 +271,11 @@
       return;
     }
 
+    if (data.type === "close") {
+      if (fromModal) close();
+      return;
+    }
+
     if (data.type === "booked") {
       var frame = fromModal ? state.iframe : originIframe;
       emit("booked", {

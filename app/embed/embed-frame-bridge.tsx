@@ -9,7 +9,19 @@ import { postToHost, reportHeightToHost } from "@/lib/embed";
 export function EmbedFrameBridge() {
   useEffect(() => {
     postToHost({ type: "ready" });
-    return reportHeightToHost();
+    const stopHeight = reportHeightToHost();
+
+    // Esc внутри рамки до хозяина страницы не долетает: событие достаётся документу iframe.
+    // Без этого окно закрывалось бы только крестиком, стоит один раз кликнуть в форму.
+    const onKeydown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") postToHost({ type: "close" });
+    };
+    document.addEventListener("keydown", onKeydown);
+
+    return () => {
+      stopHeight();
+      document.removeEventListener("keydown", onKeydown);
+    };
   }, []);
 
   return null;

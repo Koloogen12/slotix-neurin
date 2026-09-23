@@ -11,7 +11,10 @@ export const EMBED_PATH_PREFIX = "/embed/";
 export type EmbedMessage =
   | { source: typeof EMBED_SOURCE; type: "ready" }
   | { source: typeof EMBED_SOURCE; type: "resize"; height: number }
-  | { source: typeof EMBED_SOURCE; type: "booked"; formatId: string; startAt: string };
+  | { source: typeof EMBED_SOURCE; type: "booked"; formatId: string; startAt: string }
+  // Esc, нажатый внутри рамки. Хозяин страницы такого keydown не видит — фокус в чужом
+  // документе, — поэтому о нажатии сообщаем сами, иначе окно закрывается только крестиком.
+  | { source: typeof EMBED_SOURCE; type: "close" };
 
 /** True when this document is framed. Reading window.parent across origins throws in some
  * browsers, and that throw is itself proof of a cross-origin parent — hence the catch. */
